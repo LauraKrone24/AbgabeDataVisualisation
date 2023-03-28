@@ -27,7 +27,7 @@ Python To-Do
 
 - Daten nach Stunden groupen 
 + Daten nach Start-Flughäfen groupen für Delay
-- Daten nach End-Flughäfen groupen für Delay
++ Daten nach End-Flughäfen groupen für Delay
 - Daten nach Airlines groupen
 
 
