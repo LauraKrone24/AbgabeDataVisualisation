@@ -1,4 +1,4 @@
-,Airport,Hour,ORIGIN_AIRPORT_POS,AvgDelay,LowDelay,HighDelay,Count
+,Airport,Hour,AIRPORT_POS,AvgDelay,LowDelay,HighDelay,Count
 2130,SLC,00,"{'lat': 40.78839, 'lon': -111.97776999999999}",-6.0,-6,-6,1
 1191,LAX,00,"{'lat': 33.94254, 'lon': -118.40807}",0.25,-8,14,4
 2029,SEA,00,"{'lat': 47.44898, 'lon': -122.30931000000001}",-1.0,-1,-1,2
