@@ -17,22 +17,69 @@
     <body>
         
         
-        <div id = "Options">      
-            Show
-            <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="load(1)">Highest Delay</a>
-                <a class="dropdown-item" onclick="load(2)">Avg. Delay</a>
-                <a class="dropdown-item" onclick="load(3)">Lowest Delay</a>
-            </div>
-         
+        <div id = "Options">     
+            <table>
+                <tr>
+                    <td>
+                        Show
+                        <div id="dropdownButtonHighAvgLow"></div>
+                    </td>
+                    <td>
+                        Show
+                        <div id="dataviz_builtWithD3"></div>
+                    </td>
+                </tr>
+            </table> 
+           
         </div>
+        
         <div id="map"></div>
         <label>Hier Quellenangabe einfügen</label>
+
+
+
         <script type="text/javascript">
+            var HigAvgLow=2;
+            var OrginDestination=1; 
+            
+            var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
+                .append('select')
+                
+            dropdownButtonHighAvgLow 
+                .selectAll('myOptions') 
+                .data([{text:"Highest Delay",value:1},{text:"Avg Delay",value:2},{text:"Lowest Delay",value:3}])
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonHighAvgLow.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                HigAvgLow= option;
+                load()
+                })
+                var optionsHighAvgLow = [{text:"Highest Delay",value:1},{text:"Avg Delay",value:1},{text:"Lowest Delay",value:1}]
+
+
+            var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
+                .append('select')
+                
+            dropdownButtonOrginDestination
+                .selectAll('myOptions') 
+                .data({text:"Highest Delay",value:1},{text:"Avg Delay",value:2},)
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonOrginDestination.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                OrginDestination = option;
+                load()
+                })
+
+
             var view = "map"
-            //Mapbox initialization
             mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
 
             var map = new mapboxgl.Map({
@@ -42,12 +89,12 @@
                 center: [-104.386330, 43.753746]
             });
 
-            //Project geojson coordinate to the map's current state
+            
             function project(d) {
                 return map.project(new mapboxgl.LngLat(+d[0], +d[1]));
             }
 
-            //Project any point to map's current state
+            
             function projectPoint(lon, lat) {
                 var point = map.project(new mapboxgl.LngLat(lon, lat));
                 return point
@@ -59,19 +106,20 @@
 
             
             let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
+            
             load()
-            function load(option=2)
+            function load()
             {
+               
                 console.log("hi")
                 svg.selectAll("*").remove()
                 d3.csv(orgAirportsDelay,(x)=> {
                 
-                if (!x.ORIGIN_AIRPORT_POS.includes('nan')) {
-                 x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
-                 //x.color = d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+                if (!x.AIRPORT_POS.includes('nan')) {
+                 x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
                  return x}}).then(data=>{
-                    var myColor = d3.scaleLinear().domain([30,-10])
-                    .range(["red","white", "green"])
+                    var myColor = d3.scaleLinear().domain([60,-10])
+                    .range(["red", "green"])
                     console.log(data)
                     var x = d3.scaleLinear()
                     .domain([0, 5])
@@ -91,16 +139,17 @@
 
                     g.append('circle')
                     .attr("cx", d => {
-                        return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x
+                        return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).x
                     })
                     .attr("cy", d => {
-                        return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y
+                        return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).y
                     })
                     .attr("r",d => { return d.Count })
                     .style('fill', d => {
-                        if(option==1) {return myColor(d.HighDelay) }
-                        if(option==2) {return myColor(d.AvgDelay) }
-                        if(option==3) {return myColor(d.LowDelay) }
+                        
+                        if(HigAvgLow==1) {return myColor(d.HighDelay) }
+                        if(HigAvgLow==2) {return myColor(d.AvgDelay) }
+                        if(HigAvgLow==3) {return myColor(d.LowDelay) }
                     })
                     .style("opacity",0)
                     .transition()
