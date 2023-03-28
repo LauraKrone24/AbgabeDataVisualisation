@@ -1,0 +1,39 @@
+- einfaches Boxplot zu Verspätungen (Filter: Abflug Vs Ankuft)
+    --> in Plotly: Abspeichern als Image oder HTML und Einbindung in HTML seite ? 
+
+- Histogramm von Flughafen Verspätungen (nach Kategorien) nach Zeit(stündlich) (Filter: Range und Abstandsbreite (z.b. Halbstundentakt))
+    --> geht das in d3 ? sonst nur allgemein Gesamt als HTML apspeichern filter öffnet entsprechend andern Link 
+
+- Barchart Verspätungsvergleich (Durchschnittliche vs Max) mit Stundenregler ? oder Animation (Button)
+    --> d3 ? Geht zur Not mit selbst erstellten Boxen 
+
+- Chord Diagramm Flugverbindungen (Fluhäfen oder Länder)
+    --> plotly! Einbindung über HTML ? Filter durch 2 verschiedene Links
+    --> 2. Datensat, dass Flughafenkürzel mit Land / Stadt in Verbindung bringt
+
+- Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
+    Punktgröße= Anzahl flüge gestartet
+    Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
+    Tooltip zu Flughafeninfos (Exakte Zahlen, Land und Stadtinfos)
+
+- Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
+    --> 3. Datenset zu Airline Kürzeln?
+    --> Visualisierung von Verspätungen? 
+    --> Animierung nach Zeit 
+
+
+
+Python To-Do
+
+- Daten nach Stunden groupen 
+- Daten nach Flughäfen groupen 
+- Daten nach Airlines groupen
+
+
+Herausfinden: 
+
+- Karte und Punkte zusammen bewegen
+- Datensets 2 und 3 Finden 
+- Boxplots in d3
+- Histogramm in d3
+- Animierte Barcharts in d3

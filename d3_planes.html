@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css" rel="stylesheet" />
+        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://d3js.org/queue.v1.min.js"></script>
+        <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <div id="map"></div>
+        <script type="text/javascript">
+            var view = "map"
+            //Mapbox initialization
+            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
+
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/dark-v9',
+                zoom: 3,
+                center: [-104.386330, 43.753746]
+            });
+
+            //Project geojson coordinate to the map's current state
+            function project(d) {
+                return map.project(new mapboxgl.LngLat(+d[0], +d[1]));
+            }
+
+            //Project any point to map's current state
+            function projectPoint(lon, lat) {
+                var point = map.project(new mapboxgl.LngLat(lon, lat));
+                return point
+
+            }
+
+            var canvas = map.getCanvasContainer();
+            var svg = d3.select(canvas).append("svg");
+
+            
+            let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/DataScienceAbgabe/main/OrigDelaySummary.csv"
+        
+            d3.json(orgAirportsDelay,(x)=> {
+                if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')) {
+                 x.DESTINATION_AIRPORT_POS = JSON.parse(x.DESTINATION_AIRPORT_POS.replace(/\'/g, "\""))
+                 x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
+                 x.color = d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+                 return x}}).then(data=>{
+                    console.log(data)
+                    var x = d3.scaleLinear()
+                    .domain([0, 5])
+                    .range([0, 1000]);
+
+                    var y = d3.scaleLinear()
+                        .domain([10, 0])
+                        .range([0, 500]);
+                    var line = d3.line()
+                    .x((d) => x(d.x))
+                    .y((d) => y(d.y))
+                    
+                    g = svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append('g')
+
+                    g.append('circle')
+                    .attr("cx", d => {
+                        return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x
+                    })
+                    .attr("cy", d => {
+                        return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y
+                    })
+                    .attr("r",)
+                    .style('fill', d => { return d.color })
+                    .style('opacity',0)
+                    
+                    
+
+                    
+
+                    
+                    
+                    
+                 })
+
+        </script>
+    </body>
+
+    </html>
