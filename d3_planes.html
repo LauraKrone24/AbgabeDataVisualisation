@@ -42,14 +42,16 @@
             var svg = d3.select(canvas).append("svg");
 
             
-            let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/DataScienceAbgabe/main/OrigDelaySummary.csv"
+            let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
         
-            d3.json(orgAirportsDelay,(x)=> {
-                if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')) {
-                 x.DESTINATION_AIRPORT_POS = JSON.parse(x.DESTINATION_AIRPORT_POS.replace(/\'/g, "\""))
+            d3.csv(orgAirportsDelay,(x)=> {
+                
+                if (!x.ORIGIN_AIRPORT_POS.includes('nan')) {
                  x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
-                 x.color = d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+                 //x.color = d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255)
                  return x}}).then(data=>{
+                    var myColor = d3.scaleLinear().domain([30,-10])
+                    .range(["red","white", "green"])
                     console.log(data)
                     var x = d3.scaleLinear()
                     .domain([0, 5])
@@ -74,9 +76,16 @@
                     .attr("cy", d => {
                         return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y
                     })
-                    .attr("r",)
-                    .style('fill', d => { return d.color })
-                    .style('opacity',0)
+                    .attr("r",d => { return d.Count })
+                    .style('fill', d => { return myColor(d.AvgDelay) })
+                    .style("opacity",0)
+                    .transition()
+                    .delay(function (d, i) { return d.Hour * 1000 })
+                    .style("opacity",1)
+                    .transition()
+                    .duration(1000)
+                    .remove()
+                    
                     
                     
 
