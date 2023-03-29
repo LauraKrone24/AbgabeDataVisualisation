@@ -11,7 +11,7 @@
     --> plotly! Einbindung über HTML ? Filter durch 2 verschiedene Links
     --> 2. Datensat, dass Flughafenkürzel mit Land / Stadt in Verbindung bringt
 
-- Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
+* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
     Punktgröße= Anzahl flüge gestartet
     Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
     Tooltip zu Flughafeninfos (Exakte Zahlen, Land und Stadtinfos)
@@ -33,7 +33,7 @@ Python To-Do
 
 Herausfinden: 
 
-- Karte und Punkte zusammen bewegen
+- Karte und Punkte zusammen bewegen -> https://franksh.com/posts/d3-mapboxgl/
 - Datensets 2 und 3 Finden 
 - Boxplots in d3
 - Histogramm in d3

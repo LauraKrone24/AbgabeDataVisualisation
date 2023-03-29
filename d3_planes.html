@@ -21,12 +21,23 @@
             <table>
                 <tr>
                     <td>
-                        Show
+                        Delay of Interest
                         <div id="dropdownButtonHighAvgLow"></div>
                     </td>
                     <td>
-                        Show
+                         Airport
                         <div id="dropdownButtonOrginDestination"></div>
+                    </td>
+                    <td>
+                        Speed
+                        <div id="dropdownButtonAnimationspeed"></div>
+                    </td>
+                    <td>
+                        Animationstart
+                        <div id="dropdownButtonAnimationStart"></div>
+                    </td>
+                    <td valign='bottom'>
+                        <div id="TimeText"></div>
                     </td>
                 </tr>
             </table> 
@@ -41,13 +52,15 @@
         <script type="text/javascript">
             var HigAvgLow=2;
             var OrginDestination=1; 
+            var AnimationSpeed = 1000;
+            var StartHour=0; 
             
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
                 
             dropdownButtonHighAvgLow 
                 .selectAll('myOptions') 
-                .data([{text:"Highest Delay",value:1},{text:"Avg Delay",value:2},{text:"Lowest Delay",value:3}])
+                .data([{text:"Avg Delay",value:2},{text:"Highest Delay",value:1},{text:"Lowest Delay",value:3}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -79,6 +92,42 @@
                 })
 
 
+
+            var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
+                .append('select')
+                
+            dropdownButtonAnimationspeed 
+                .selectAll('myOptions') 
+                .data([{text:"x 3600     ",value:1000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonAnimationspeed.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                AnimationSpeed= option;
+                
+                load()
+                })
+
+                var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
+                .append('select')
+                
+                dropdownButtonAnimationStart
+                .selectAll('myOptions') 
+                .data([{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23},{text:"No animation",value:-1}])
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+                dropdownButtonAnimationStart.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                StartHour = option;
+                load()
+                })
+
             var view = "map"
             mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
 
@@ -88,10 +137,13 @@
                 zoom: 3,
                 center: [-104.386330, 43.753746]
             });
-
+            map.on("viewreset", load);
+            
+            map.on("moveend", load);
+            
             
             function project(d) {
-                return map.project(new mapboxgl.LngLat(+d[0], +d[1]));
+                return map.project(new mapboxgl.LngLat(d[0], d[1]));
             }
 
             
@@ -104,27 +156,35 @@
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg");
 
-            
+            var TimeText = d3.select('#TimeText')
+                            .append("text")
+                            
             
             load()
             function load()
             {
+
                 let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
                 let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
                 var CSVLink; 
                 if(OrginDestination==1){CSVLink= orgAirportsDelay;}
                 else{CSVLink= destAirportsDelay}
-               
-                console.log(CSVLink)
+
+                
                 svg.selectAll("*").remove()
                 d3.csv(CSVLink,(x)=> {
                 
                 if (!x.AIRPORT_POS.includes('nan')) {
                  x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
                  return x}}).then(data=>{
+                    data = data.filter(x => { return  (x.Hour*1)>= StartHour})
+
+                        
+                    
+                    
                     var myColor = d3.scaleLinear().domain([60,-10])
                     .range(["red", "green"])
-                    console.log(data)
+                    console.log(data2)
                     var x = d3.scaleLinear()
                     .domain([0, 5])
                     .range([0, 1000]);
@@ -151,33 +211,40 @@
                     .attr("r",d => { return d.Count })
                     .style('fill', d => {
                         
-                        if(HigAvgLow==1) {return myColor(d.HighDelay) }
+                        if(HigAvgLow==1) {return myColor(d.HigDelay) }
                         if(HigAvgLow==2) {return myColor(d.AvgDelay) }
                         if(HigAvgLow==3) {return myColor(d.LowDelay) }
                     })
                     .style("opacity",0)
                     .transition()
-                    .delay(function (d, i) { return d.Hour * 1000 })
+                    .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
                     .style("opacity",1)
                     .transition()
-                    .duration(1000)
+                    .duration(AnimationSpeed)
                     .remove()
 
-                    let hoursOfTheDay = [00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+                    
 
-                    svg.selectAll('text')
-                    .data(hoursOfTheDay)
-                    .enter()
-                    .append('text')
-                    .attr("x", 1200)
-	                .attr("y", 1200)
-                    .style("fill","red")
-                    .transition()
-                    .delay(function (d, i) { return d * 1000 })
-                    .text((d)=>{  return d })
-                    .transition()
-                    .duration(1000)
-                    .remove()
+                    for(let i = 0; i<24;i++)
+                    {
+                        
+                        if(i<=9){
+                            TimeText.transition()
+                            .delay( (i-StartHour) * AnimationSpeed )
+                            .text("2015-01-01 0"+i+":00:00")
+                        }else{
+                            TimeText.transition()
+                            .delay( (i-StartHour) * AnimationSpeed )
+                            .text("2015-01-01 "+i+":00:00")
+                        }
+
+                        
+
+                    }
+                    
+
+
+                  
 
 
                     
