@@ -107,7 +107,6 @@
             dropdownButtonAnimationspeed.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 AnimationSpeed= option;
-                
                 load()
                 })
 
@@ -125,6 +124,11 @@
                 dropdownButtonAnimationStart.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 StartHour = option;
+                if(StartHour!= -1)
+                {
+                    animationspeed=d3.select("#dropdownButtonAnimationStart").property("value")
+                    console.log(AnimationSpeed)
+                }
                 load()
                 })
 
@@ -179,12 +183,14 @@
                  return x}}).then(data=>{
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
-                        
+                    if (StartHour ==-1){
+                        AnimationSpeed =  1000000000000; 
+                    }
                     
                     
                     var myColor = d3.scaleLinear().domain([60,-10])
                     .range(["red", "green"])
-                    console.log(data2)
+                    console.log(data)
                     var x = d3.scaleLinear()
                     .domain([0, 5])
                     .range([0, 1000]);
@@ -227,14 +233,18 @@
 
                     for(let i = 0; i<24;i++)
                     {
-                        
+                        if(StartHour==-1)
+                        {
+                            TimeText.text("2015-01-01")
+                            break; 
+                        }
                         if(i<=9){
                             TimeText.transition()
-                            .delay( (i-StartHour) * AnimationSpeed )
+                            .delay( function (d, i) { return (i-StartHour) * AnimationSpeed } )
                             .text("2015-01-01 0"+i+":00:00")
-                        }else{
+                         }else{
                             TimeText.transition()
-                            .delay( (i-StartHour) * AnimationSpeed )
+                            .delay( function (d, i) { return (i-StartHour) * AnimationSpeed } )
                             .text("2015-01-01 "+i+":00:00")
                         }
 
