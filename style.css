@@ -1,6 +1,7 @@
 body {
     margin: 0;
     padding: 0;
+    
 }
 
 #map {
@@ -11,11 +12,31 @@ body {
     z-index: 0;
     
 }
-
-
+h5{
+    color:beige; 
+}
+table{
+    background-color: #292929;
+    width: 100%;
+}
+select{
+    background-color:#292929;
+    color:beige; 
+}
+.dropdown{
+    background-color: #292929;
+}
 svg {
     position: absolute;
     width: 100%;
     height: 100%;
     
+}
+.tt {
+    background: #eee;
+    box-shadow: 0 0 5px #999999;
+    color: #333;
+    display: none;
+    padding: 10px;
+    position: absolute;
 }

@@ -14,26 +14,30 @@
 
     </head>
 
-    <body>
+    <body >
         
         
         <div id = "Options">     
-            <table>
+            <table >
                 <tr>
                     <td>
-                        Delay of Interest
+                        <h5>Visualisation</h5>
+                        <div id="dropdownButtonVisulisation"></div>
+                    </td>
+                    <td>
+                        <h5>Delay of Interest</h5>
                         <div id="dropdownButtonHighAvgLow"></div>
                     </td>
                     <td>
-                         Airport
+                         <h5>Airport</h5>
                         <div id="dropdownButtonOrginDestination"></div>
                     </td>
                     <td>
-                        Speed
+                        <h5>Speed</h5>
                         <div id="dropdownButtonAnimationspeed"></div>
                     </td>
                     <td>
-                        Animationstart
+                        <h5>Starthour</h5>
                         <div id="dropdownButtonAnimationStart"></div>
                     </td>
                     <td valign='bottom'>
@@ -61,6 +65,7 @@
             dropdownButtonHighAvgLow 
                 .selectAll('myOptions') 
                 .data([{text:"Avg Delay",value:2},{text:"Highest Delay",value:1},{text:"Lowest Delay",value:3}])
+                .attr("class","dropdown")
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -115,7 +120,7 @@
                 
                 dropdownButtonAnimationStart
                 .selectAll('myOptions') 
-                .data([{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23},{text:"No animation",value:-1}])
+                .data([{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23},{text:"Daily Avg.",value:-1}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -126,10 +131,28 @@
                 StartHour = option;
                 if(StartHour!= -1)
                 {
-                    animationspeed=d3.select("#dropdownButtonAnimationStart").property("value")
-                    console.log(AnimationSpeed)
+                    
+                    AnimationSpeed= dropdownButtonAnimationspeed.property("value");
+                    console.log("Animationspeed:"+AnimationSpeed)
                 }
                 load()
+                })
+
+            var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
+                .append('select')
+                
+                dropdownButtonVisulisation 
+                .selectAll('myOptions') 
+                .data([{text:"Delay at airports",href:"airports.html"},{text:"Delay from airlines",href:"airlines.html"},{text:"Lowest Delay",href:3}])
+                .attr("class","dropdown")
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonVisulisation.on("change", function(d) {
+                let option = d3.select(this).property("href")
+                open(option)
                 })
 
             var view = "map"
@@ -160,22 +183,34 @@
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg");
 
-            var TimeText = d3.select('#TimeText')
-                            .append("text")
-                            
             
+                            
+            var TimeText = d3.select('#TimeText')
+                        .append("text")
+                        .attr("color","beige")
+
+
+            var tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'tt')
+
+            tooltip
+              .append('div')
+              .attr('class', 'label')
+
             load()
             function load()
             {
 
+                TimeText.interrupt()
                 let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
                 let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
                 var CSVLink; 
-                if(OrginDestination==1){CSVLink= orgAirportsDelay;}
-                else{CSVLink= destAirportsDelay}
+                OrginDestination==1?CSVLink= orgAirportsDelay:CSVLink= destAirportsDelay
 
                 
                 svg.selectAll("*").remove()
+                
                 d3.csv(CSVLink,(x)=> {
                 
                 if (!x.AIRPORT_POS.includes('nan')) {
@@ -203,11 +238,12 @@
                     .y((d) => y(d.y))
                     
                     g = svg.selectAll("circle")
+                    
                     .data(data)
                     .enter()
                     .append('g')
-
-                    g.append('circle')
+                   
+                    circles = g.append('circle')
                     .attr("cx", d => {
                         return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).x
                     })
@@ -229,28 +265,49 @@
                     .duration(AnimationSpeed)
                     .remove()
 
+                    circles.on('mouseover', (d) => {
+                        console.log("click")
+                    tooltip
+                        .select('.label')
+                        .html("<lable>"+d+">/lable>")
+                    tooltip
+                        .style('top', (d3.event.pageY + 10) + 'px')
+                        .style('left', (d3.event.pageX + 10) + 'px')
+                        .style('display', 'block');
+                    })
+                    circles.style("z-index",10)
+
+                    .on('mouseout', () => {
+                        tooltip.style('display', 'none');
+                    })
+
                     
-
-                    for(let i = 0; i<24;i++)
+                    if(StartHour==-1)
                     {
-                        if(StartHour==-1)
-                        {
-                            TimeText.text("2015-01-01")
-                            break; 
-                        }
-                        if(i<=9){
-                            TimeText.transition()
-                            .delay( function (d, i) { return (i-StartHour) * AnimationSpeed } )
-                            .text("2015-01-01 0"+i+":00:00")
-                         }else{
-                            TimeText.transition()
-                            .delay( function (d, i) { return (i-StartHour) * AnimationSpeed } )
-                            .text("2015-01-01 "+i+":00:00")
-                        }
-
-                        
-
+                        TimeText.text("2015-01-01")
+                           
                     }
+                    else{
+                        for(let i = StartHour; i<24;i++)
+                         {
+                       
+                            if(i<=9){
+                                TimeText.transition()
+                                .delay((i-StartHour) * AnimationSpeed  )
+                                .text("2015-01-01 0"+i+":00:00")
+                                .duration(AnimationSpeed)
+                                
+                            }else{
+                                TimeText.transition()
+                                .delay((i-StartHour) * AnimationSpeed  )
+                                .duration(AnimationSpeed)
+                                .text("2015-01-01 "+i+":00:00")
+                                
+                            }
+                        }
+                    }
+
+                    
                     
 
 
