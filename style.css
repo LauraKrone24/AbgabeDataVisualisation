@@ -6,7 +6,6 @@ body {
 
 #map {
     position: absolute;
-    
     width:100%;
     height: 90%;
     z-index: 0;
@@ -18,7 +17,9 @@ h5{
 table{
     background-color: #292929;
     width: 100%;
+    height: 100%;
 }
+
 select{
     background-color:#292929;
     color:beige; 
@@ -39,4 +40,7 @@ svg {
     display: none;
     padding: 10px;
     position: absolute;
+}
+#TimeText{
+    color:beige; 
 }

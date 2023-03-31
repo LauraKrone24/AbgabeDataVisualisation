@@ -19,7 +19,7 @@
         
         <div id = "Options">     
             <table >
-                <tr>
+                <tr id="tableheader">
                     <td>
                         <h5>Visualisation</h5>
                         <div id="dropdownButtonVisulisation"></div>
@@ -42,6 +42,9 @@
                     </td>
                     <td valign='bottom'>
                         <div id="TimeText"></div>
+                    </td>
+                    <td>    
+                        <div id="Colorscale" width="580" height="40"></div>
                     </td>
                 </tr>
             </table> 
@@ -115,10 +118,10 @@
                 load()
                 })
 
-                var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
+            var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
                 
-                dropdownButtonAnimationStart
+            dropdownButtonAnimationStart
                 .selectAll('myOptions') 
                 .data([{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23},{text:"Daily Avg.",value:-1}])
                 .enter()
@@ -126,7 +129,7 @@
                 .text(function (d) { return d.text; }) 
                 .attr("value", function (d) { return d.value; }) 
 
-                dropdownButtonAnimationStart.on("change", function(d) {
+            dropdownButtonAnimationStart.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 StartHour = option;
                 if(StartHour!= -1)
@@ -143,7 +146,7 @@
                 
                 dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay at airports",href:"airports.html"},{text:"Delay from airlines",href:"airlines.html"},{text:"Lowest Delay",href:3}])
+                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Lowest Delay",value:3}])
                 .attr("class","dropdown")
                 .enter()
                 .append('option')
@@ -151,8 +154,9 @@
                 .attr("value", function (d) { return d.value; }) 
 
             dropdownButtonVisulisation.on("change", function(d) {
-                let option = d3.select(this).property("href")
-                open(option)
+                let option = d3.select(this).property("value")
+                console.log(option)
+                open(option,"_self")
                 })
 
             var view = "map"
@@ -164,21 +168,12 @@
                 zoom: 3,
                 center: [-104.386330, 43.753746]
             });
+
+
             map.on("viewreset", load);
-            
             map.on("moveend", load);
             
-            
-            function project(d) {
-                return map.project(new mapboxgl.LngLat(d[0], d[1]));
-            }
-
-            
-            function projectPoint(lon, lat) {
-                var point = map.project(new mapboxgl.LngLat(lon, lat));
-                return point
-
-            }
+           
 
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg");
@@ -223,22 +218,23 @@
                     }
                     
                     
-                    var myColor = d3.scaleLinear().domain([60,-10])
-                    .range(["red", "green"])
-                    console.log(data)
+                    var myColor = d3.scaleLinear().domain([-15,0,45])
+                    .range(["green","white", "red"])
+                    
+
                     var x = d3.scaleLinear()
-                    .domain([0, 5])
-                    .range([0, 1000]);
+                        .domain([0, 5])
+                        .range([0, 1000]);
 
                     var y = d3.scaleLinear()
                         .domain([10, 0])
-                        .range([0, 500]);
+                        .range([0, 500])
+
                     var line = d3.line()
-                    .x((d) => x(d.x))
-                    .y((d) => y(d.y))
+                        .x((d) => x(d.x))
+                        .y((d) => y(d.y))
                     
                     g = svg.selectAll("circle")
-                    
                     .data(data)
                     .enter()
                     .append('g')
@@ -253,7 +249,7 @@
                     .attr("r",d => { return d.Count })
                     .style('fill', d => {
                         
-                        if(HigAvgLow==1) {return myColor(d.HigDelay) }
+                        if(HigAvgLow==1) {return myColor(d.HighDelay) }
                         if(HigAvgLow==2) {return myColor(d.AvgDelay) }
                         if(HigAvgLow==3) {return myColor(d.LowDelay) }
                     })
@@ -265,21 +261,7 @@
                     .duration(AnimationSpeed)
                     .remove()
 
-                    circles.on('mouseover', (d) => {
-                        console.log("click")
-                    tooltip
-                        .select('.label')
-                        .html("<lable>"+d+">/lable>")
-                    tooltip
-                        .style('top', (d3.event.pageY + 10) + 'px')
-                        .style('left', (d3.event.pageX + 10) + 'px')
-                        .style('display', 'block');
-                    })
-                    circles.style("z-index",10)
-
-                    .on('mouseout', () => {
-                        tooltip.style('display', 'none');
-                    })
+                   
 
                     
                     if(StartHour==-1)
@@ -307,16 +289,43 @@
                         }
                     }
 
-                    
-                    
+                    var colorscaleArray = Array.from(Array(60).keys())
+                    var colorscale = d3.scaleSequential()
+                    .interpolator(d3.interpolator("green","white","red"))
+                    .domain([-15,0,45])
 
+                    var xScale = d3.scaleLinear()
+                    .domain([0,60])
+                    .range([0, 580]);
 
-                  
-
-
-                    
-                    
+                   
+                    d3.select("Colorscale" + id).AIRPORT_POS("rect")
+                    .data(colorscaleArray)
+                    .enter()
+                    .append("rect")
+                    .attr("x", (d) => Math.floor(xScale(d)))
+                    .attr("y", 100)
+                    .attr("z-index",90)
+                    .attr("height", 40)
+                    .attr("width", (d) => {
+                        if (d == 59) {
+                            return 6;
+                        }
+                        return Math.floor(xScale(d+1)) - Math.floor(xScale(d)) + 1;
+                    })
+                    .attr("fill", (d) => colorscale(d));
                  })
+
+            }
+
+            function project(d) {
+                return map.project(new mapboxgl.LngLat(d[0], d[1]));
+            }
+
+            
+            function projectPoint(lon, lat) {
+                var point = map.project(new mapboxgl.LngLat(lon, lat));
+                return point
 
             }
             
