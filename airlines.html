@@ -79,24 +79,30 @@
                 load()
                 })
                 
+            let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
 
+            d3.csv(AirlineLink).then(airlinedata=>{
+                var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
+                    .append('select')
+                    
+                dropdownButtonAirlines
+                    .selectAll('myOptions') 
+                    .data(airlinedata)
+                    .enter()
+                    .append('option')
+                    .text(function (d) { return d.text; }) 
+                    .attr("value", function (d) { return d.value; }) 
 
-            var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
-                .append('select')
-                
-            dropdownButtonOrginDestination
-                .selectAll('myOptions') 
-                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
+                dropdownButtonAirlines.on("change", function(d) {
+                    let option = d3.select(this).property("value")
+                    Airline = option;
+                    load()
+                    })
 
-            dropdownButtonOrginDestination.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                OrginDestination = option;
-                load()
-                })
+            });
+
+            
+
 
 
 
