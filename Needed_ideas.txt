@@ -17,12 +17,13 @@
     ? Tooltip zu Flughafeninfos (Exakte Zahlen, Land und Stadtinfos) --> https://observablehq.com/@stephanebachelier/mapbox-d3
     ? Colorlegend https://observablehq.com/@d3/color-legend
 
-* Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
-    * 3. Datenset zu Airline Kürzeln? --> im Filter 
++* Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
+    + 3. Datenset zu Airline Kürzeln? --> im Filter 
     + Visualisierung von Verspätungen? 
     ? Colorlegend https://observablehq.com/@d3/color-legend
-    * Animierung nach Zeit (verfeinern) 
+    + Animierung nach Zeit (verfeinern) 
     ? Kreise durch Flugzeuge ersetzen 
+    ? 2. Tablerow für zusätzliche Infos 
 
 
 
