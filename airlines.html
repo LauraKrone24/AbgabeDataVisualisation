@@ -48,8 +48,20 @@
                     </td>
                 </tr>
                 <tr id="Addinfo">
-                    <td>
-                            <h6></h6>
+                    <td> <br>
+                            <h6>Air Time Difference</h6>
+                            <table >
+                                <tr>
+                                   <td>Min</td> 
+                                   <td>Avg</td> 
+                                   <td>Max</td> 
+                                </tr>
+                                <tr>
+                                    <td><div id="ATDMin"></div></td> 
+                                    <td><div id="ATDAvg"></div></td> 
+                                    <td><div id="ATDMax"></div></td> 
+                                 </tr>
+                            </table>
                     </td>
                 </tr>
             </table> 
@@ -65,6 +77,17 @@
             var Airline="all"; 
             var AnimationSpeed = 1000;
             var StartHour=0; 
+
+            var ATDMin = d3.select('#ATDMin')
+                .append("text")
+                .attr("color","beige")
+
+            var ATDAvg = d3.select('#ATDAvg')
+                .append("text")
+                .attr("color","beige")
+            var ATDMax = d3.select('#ATDMax')
+                .append("text")
+                .attr("color","beige")
             
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
@@ -88,6 +111,7 @@
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 console.log(airlinedata)
+                loadAddinfo(airlinedata)
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
                     .append('select')
                     
@@ -102,12 +126,20 @@
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
                     Airline = option;
+                    loadAddinfo(airlinedata)
                     load()
                     })
+                
+                
 
             });
 
-            
+            function loadAddinfo(airlinedata){
+                ATDAvg.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].AvgAirTimeDiff)  
+                ATDMin.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MinAirTimeDiff)
+                ATDMax.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MaxAirTimeDiff)
+
+            }
 
 
 
@@ -193,8 +225,7 @@
             var TimeText = d3.select('#TimeText')
                         .append("text")
                         .attr("color","beige")
-                        
-
+            
 
             var tooltip = d3.select('body')
             .append('div')
