@@ -30,7 +30,7 @@
                     </td>
                     <td>
                          <h5>Airport</h5>
-                        <div id="dropdownButtonOrginDestination"></div>
+                        <div id="dropdownButtonAirlines"></div>
                     </td>
                     <td>
                         <h5>Speed</h5>
@@ -82,6 +82,8 @@
             let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
 
             d3.csv(AirlineLink).then(airlinedata=>{
+                console.log(airlinedata)
+                airlinedata.push({Name:"All Airlines",IATA:"all"})
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
                     .append('select')
                     
@@ -90,8 +92,8 @@
                     .data(airlinedata)
                     .enter()
                     .append('option')
-                    .text(function (d) { return d.text; }) 
-                    .attr("value", function (d) { return d.value; }) 
+                    .text(function (d) { return d.Name; }) 
+                    .attr("value", function (d) { return d.IATA; }) 
 
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
@@ -160,7 +162,6 @@
 
             dropdownButtonVisulisation.on("change", function(d) {
                 let option = d3.select(this).property("value")
-                console.log(option)
                 open(option,"_self")
                 })
 
@@ -269,7 +270,7 @@
                         .attr("x2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("y2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
                         .attr("stroke-width", 1)
-                        .attr("stroke", d => {console.log(d.DEPARTURE_DELAY); return  myColor(d.DEPARTURE_DELAY) })
+                        .attr("stroke", d => {return  myColor(d.DEPARTURE_DELAY) })
                         .attr("stroke-dasharray", "4")
                         .style("opacity", 0)
 
