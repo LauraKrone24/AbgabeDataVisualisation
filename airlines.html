@@ -47,6 +47,11 @@
                         <div id="Colorscale" width="580" height="40"></div>
                     </td>
                 </tr>
+                <tr id="Addinfo">
+                    <td>
+                            <h6></h6>
+                    </td>
+                </tr>
             </table> 
            
         </div>
@@ -79,7 +84,7 @@
                 load()
                 })
                 
-            let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
+            let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/2cb7b72100634f8c256d7d96073be2b0de58153a/Airlines.csv'
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 console.log(airlinedata)
