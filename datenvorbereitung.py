@@ -51,12 +51,12 @@ dfAirlineSummary = pd.DataFrame()
 i=0; 
 for a in dfAirlineGrouped: 
     i=i+1
-    dfAirlineSummary= dfAirlineSummary.append({"IATA":a[1]["AIRLINE"].iloc[0],"AvgOrgDelay":a[1]["DEPARTURE_DELAY"].mean(),"MaxOrgDelay":a[1]["DEPARTURE_DELAY"].max(),"MinOrgDelay":a[1]["DEPARTURE_DELAY"].min(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].mean(),"MaxDestDelay":a[1]["DESTINATION_DELAY"].max(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":a[1]["AirTimeDiff"].mean(),"MaxAirTimeDiff":a[1]["AirTimeDiff"].max(),"MinAirTimeDiff":a[1]["AirTimeDiff"].min()},ignore_index = True)
+    dfAirlineSummary= dfAirlineSummary.append({"IATA":a[1]["AIRLINE"].iloc[0],"AvgOrgDelay":a[1]["DEPARTURE_DELAY"].mean(),"MaxOrgDelay":a[1]["DEPARTURE_DELAY"].max(),"MinOrgDelay":a[1]["DEPARTURE_DELAY"].min(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].mean(),"MaxDestDelay":a[1]["DESTINATION_DELAY"].max(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":a[1]["AirTimeDiff"].mean(),"MaxAirTimeDiff":a[1]["AirTimeDiff"].max(),"MinAirTimeDiff":a[1]["AirTimeDiff"].min(),"Count":len(a[1].index)},ignore_index = True)
 
 
 
 result = pd.merge(df2, dfAirlineSummary, how="outer",on="IATA")
-result= result.append({"Name":" All Airlines","IATA":"all","AvgOrgDelay":a[1]["DEPARTURE_DELAY"].mean(),"MaxOrgDelay":a[1]["DEPARTURE_DELAY"].max(),"MinOrgDelay":a[1]["DEPARTURE_DELAY"].min(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].mean(),"MaxDestDelay":a[1]["DESTINATION_DELAY"].max(),"AvgDestDelay":a[1]["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":a[1]["AirTimeDiff"].mean(),"MaxAirTimeDiff":a[1]["AirTimeDiff"].max(),"MinAirTimeDiff":a[1]["AirTimeDiff"].min()},ignore_index = True)
+result= result.append({"Name":" All Airlines","IATA":"all","AvgOrgDelay":df["DEPARTURE_DELAY"].mean(),"MaxOrgDelay":df["DEPARTURE_DELAY"].max(),"MinOrgDelay":df["DEPARTURE_DELAY"].min(),"AvgDestDelay":df["DESTINATION_DELAY"].mean(),"MaxDestDelay":df["DESTINATION_DELAY"].max(),"AvgDestDelay":df["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":df["AirTimeDiff"].mean(),"MaxAirTimeDiff":df["AirTimeDiff"].max(),"MinAirTimeDiff":df["AirTimeDiff"].min(),"Count":len(df.index)},ignore_index = True)
 
 
 df2 = result.sort_values(by="Name")
