@@ -41,7 +41,8 @@ dfDestDelaySummary.to_csv("DestDelaySummary.csv")
 
 #Dataset for names of Airlines 
 Airlines = df["AIRLINE"].unique()
-df2 = pd.read_csv("https://storage.googleapis.com/kagglesdsdata/datasets/2253/3806/airlines.csv?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20230330%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20230330T155223Z&X-Goog-Expires=259200&X-Goog-SignedHeaders=host&X-Goog-Signature=4be41636bdf5d8521c92338a74b2ab6e5dd72616f36831f5da23c6b89d6f09dc4f1e5e20df5f2d83b02a4c84f93fd848251ff28c98927a1a0c48ea881af7885cf091d26e71847c383544a98217cc5cdb99300c08dd907642eea3fd848709a03dbac1ad62cea9a233c944f39f4345d448274ef20b2a8160dfc9efcd3c95332e9ae857e8aeb63fc4dd89692faa4acac30c11664bef607f8313f06dd97ca0cc7a5d2f8f0fe9d374d10c4ce585be5a3caf2272fd0eb2de51b3e342b95e598a67f810cbd9f6e02b3aa5dc2bd322db3418d5ad5f2b112c231d4ac766f23fe2b321eeca76c27fcfbcbb101603e49ed150abda503d15523e30ab5c39f5e919357c328d65")
+#Datenset wurde runtergenommen also Code auskommentiert und nur noch zur nachvollziehbarkeit vorhanden
+df2 = pd.read_csv("OrgAirlineData.csv")
 df2= df2[["Name","IATA"]]
 df2 = df2[df2["IATA"].isin(Airlines)].sort_values(by="IATA")
 
@@ -57,6 +58,49 @@ for a in dfAirlineGrouped:
 result = pd.merge(df2, dfAirlineSummary, how="outer",on="IATA")
 result= result.append({"Name":" All Airlines","IATA":"all","AvgOrgDelay":round(df["DEPARTURE_DELAY"].mean(),2),"MaxOrgDelay":df["DEPARTURE_DELAY"].max(),"MinOrgDelay":df["DEPARTURE_DELAY"].min(),"AvgDestDelay":round(df["DESTINATION_DELAY"].mean(),2),"MaxDestDelay":df["DESTINATION_DELAY"].max(),"MinDestDelay":df["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":round(df["AirTimeDiff"].mean(),2),"MaxAirTimeDiff":df["AirTimeDiff"].max(),"MinAirTimeDiff":df["AirTimeDiff"].min(),"Count":len(df.index)},ignore_index = True)
 
-
 df2 = result.sort_values(by="Name")
 df2.to_csv("Airlines.csv")
+
+
+
+#Connections by Airport 
+
+dfConnections = df.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT"])
+
+
+dfConnectionsummary ={}
+for a in dfConnections: 
+    org = a[0][0]
+    dest = a[0][1]
+    
+    dfConnectionsummary[org+","+dest] = len(a[1].index)
+
+#print(dfConnectionsummary)
+
+Airports = df["ORIGIN_AIRPORT"].append(df["DESTINATION_AIRPORT"]).unique()
+Airports= np.sort(Airports)
+
+csvString = ""
+
+
+for org in Airports:
+    
+    for dest in Airports: 
+        if(org+","+dest in dfConnectionsummary):
+            csvString+= str(dfConnectionsummary[org+","+dest])+";"
+        else:
+            csvString+= "0;"
+    csvString.strip(",")
+    csvString+="\n"
+
+
+
+f = open("Connections.csv", "w")
+f.write(csvString)
+f.close()
+
+
+        
+ 
+
+
