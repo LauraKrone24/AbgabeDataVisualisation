@@ -61,11 +61,19 @@ result= result.append({"Name":" All Airlines","IATA":"all","AvgOrgDelay":round(d
 df2 = result.sort_values(by="Name")
 df2.to_csv("Airlines.csv")
 
-
-
+df3 = pd.read_csv("airports.csv")
+df3 = df3[["IATA","STATE"]]
+df3
+df = pd.merge(df, df3, left_on='ORIGIN_AIRPORT', right_on='IATA')
+df.drop('IATA', axis=1, inplace=True)
+df.rename(columns={"STATE": "OrgState"}, inplace=True)
+df = pd.merge(df, df3, left_on='DESTINATION_AIRPORT', right_on='IATA')
+df.drop('IATA', axis=1, inplace=True)
+df.rename(columns={"STATE": "DestState"}, inplace=True)
+print(df)
 #Connections by Airport 
 
-dfConnections = df.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT"])
+dfConnections = df.groupby(["OrgState","DestState"])
 
 
 dfConnectionsummary ={}
@@ -77,19 +85,19 @@ for a in dfConnections:
 
 #print(dfConnectionsummary)
 
-Airports = df["ORIGIN_AIRPORT"].append(df["DESTINATION_AIRPORT"]).unique()
-Airports= np.sort(Airports)
+States = df["OrgState"].astype("str").append(df["DestState"]).astype("str").unique()
+States = np.sort(States)
 
 csvString = ""
-for org in Airports:
+for org in States:
     csvString+=org+","
 
 csvString.strip(",")
 csvString+="\n"
 
-for org in Airports:
+for org in States:
     
-    for dest in Airports: 
+    for dest in States: 
         if(org+","+dest in dfConnectionsummary):
             csvString+= str(dfConnectionsummary[org+","+dest])+","
         else:

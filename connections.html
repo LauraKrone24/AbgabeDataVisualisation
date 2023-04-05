@@ -71,26 +71,20 @@
                     
                     var array = []
                     for (let i = 0; i<Object.keys(data).length;i++){
-                        let StringArray =[]
-                        let intArray = []
                         
+                        let intArray = []
                         let append = false;
                         if (data[i]!= undefined){
-                                Object.keys(data[i]).forEach(element => {
-                                StringArray=element.split(",")
-                                StringArray.forEach(x=>{
-                                    intArray.push(parseInt(x))
-                                    
-                                    parseInt(x)>=5?append=true: null  
-                                    
-                                })
+                                Object.values(data[i]).forEach(element => {
+                                element>=15?append=true: null
+                                intArray.push(element)
                             });
                             
-                            append?array.push(intArray):null
+                            append?array.push(intArray): null
                         }
-                    
+                        
                     }
-                    console.log(data)
+                    console.log(array)
                     
                     var myColor = d3.scaleLinear().domain([-60,0,60])
                     .range(["green","white", "red"])
@@ -100,8 +94,8 @@
                     // create the svg area
                     var svg = d3.select("#chord")
                     .append("svg")
-                        .attr("width", 880)
-                        .attr("height", 880)
+                        .attr("width", 800)
+                        .attr("height", 800)
                     .append("g")
                         .attr("transform", "translate(440,440)")
 
@@ -142,7 +136,7 @@
                         .radius(400)
                         )
                         .style("fill", d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255))
-                        
+                        .style("stroke", "black")
 
 
                     
