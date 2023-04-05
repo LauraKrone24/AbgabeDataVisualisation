@@ -87,9 +87,9 @@ for org in Airports:
     
     for dest in Airports: 
         if(org+","+dest in dfConnectionsummary):
-            csvString+= str(dfConnectionsummary[org+","+dest])+";"
+            csvString+= str(dfConnectionsummary[org+","+dest])+","
         else:
-            csvString+= "0;"
+            csvString+= "0,"
     csvString.strip(",")
     csvString+="\n"
 
