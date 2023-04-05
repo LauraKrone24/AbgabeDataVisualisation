@@ -7,30 +7,28 @@
 - Barchart Verspätungsvergleich (Durchschnittliche vs Max) mit Stundenregler ? oder Animation (Button)
     --> d3 ? Geht zur Not mit selbst erstellten Boxen 
 
-- Chord Diagramm Flugverbindungen (Fluhäfen oder Länder)
-    --> plotly! Einbindung über HTML ? Filter durch 2 verschiedene Links
-    --> 2. Datensat, dass Flughafenkürzel mit Land / Stadt in Verbindung bringt
+* Chord Diagramm Flugverbindungen (Fluhäfen oder Länder)
+    - Datenvorbereitung
+    - Einfaches Chord Diagramm in d3
+    - Farben für Verspätungen von verbindung (HighLowAvg)
+    - 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt --> 2 Optionen
 
 +* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
-    Punktgröße= Anzahl flüge gestartet
-    Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
+    + Punktgröße= Anzahl flüge gestartet
+    + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
     ? Tooltip zu Flughafeninfos (Exakte Zahlen, Land und Stadtinfos) --> https://observablehq.com/@stephanebachelier/mapbox-d3
     ? Colorlegend https://observablehq.com/@d3/color-legend
+    - 2. Tablerow für zusätzliche Infos 
+    -? 2. Tablerow mit Visualisierung 
 
 +* Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
-    + 3. Datenset zu Airline Kürzeln? --> im Filter 
-    + Visualisierung von Verspätungen? 
+    + 2. Datenset zu Airline Kürzeln --> im Filter 
+    + Visualisierung von Verspätungen
     ? Colorlegend https://observablehq.com/@d3/color-legend
     + Animierung nach Zeit (verfeinern) 
     ? Kreise durch Flugzeuge ersetzen 
-    ? 2. Tablerow für zusätzliche Infos 
-
-
-
-Python To-Do
-+ Daten nach Start-Flughäfen groupen für Delay
-+ Daten nach End-Flughäfen groupen für Delay
-- Daten nach Airlines groupen
+    + 2. Tablerow für zusätzliche Infos 
+    -? 2. Tablerow mit Visualisierung 
 
 
 Herausfinden: 
@@ -38,3 +36,8 @@ Herausfinden:
 - Boxplots in d3?
 - Histogramm in d3?
 - Animierte Barcharts in d3?
+
+
+Zusätzliche To-Dos
+- Durch CSS Menu hübsch machen (style.css)
+- Code sortieren und Kommentieren
