@@ -81,7 +81,11 @@ Airports = df["ORIGIN_AIRPORT"].append(df["DESTINATION_AIRPORT"]).unique()
 Airports= np.sort(Airports)
 
 csvString = ""
+for org in Airports:
+    csvString+=org+","
 
+csvString.strip(",")
+csvString+="\n"
 
 for org in Airports:
     
