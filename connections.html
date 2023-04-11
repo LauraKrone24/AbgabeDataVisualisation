@@ -34,8 +34,17 @@
             </table> 
            
         </div>
+        <table>
+            <tr>
+                <td>
+                    <div id="chord"></div>
+                </td>
+                <td>
+                    <div id="legend"></div>
+                </td>
+            </tr>
+        </table>
         
-        <div id="chord"></div>
         
 
 
@@ -91,7 +100,7 @@
                     
                     
                     
-
+                    console.log(colors)
                     
                     States = Object.keys(data[0])
                     
@@ -145,7 +154,7 @@
                             + (d.angle > Math.PI ? "rotate(180)" : "")
                         })
                         .text(function(d,i) {return States[i];  })
-                        .attr("class", "Text")
+                        
                     
                     svg.datum(res)
                     .append("g")
@@ -184,6 +193,32 @@
                         }
                         
                     })
+
+                    svg2 =  d3.select("#legend")
+                    .append("svg")
+                        .attr("width", 300)
+                        .attr("height", 600)
+
+                    var g = svg2.selectAll("text")
+                        .data(States)
+                        .enter()
+                        .append("g")
+
+
+                    g.append("rect")
+                        .attr("x", 80)
+                        .attr("y",function(d,i){console.log((32+(i*12)));return (32+(i*12))})
+                        .attr('width', 10)
+                        .attr("height",10)
+                        .attr('fill', function(d,i) { return(colors[i])})
+
+                    g.append("text")
+                        .attr("class","legendText")
+                        .attr("x",100)
+                        .attr("y",function(d,i){console.log((32+(i*12))); return (40+(i*12.25))})
+                        .text(function(d){return d})
+                       
+                    
 
 
                         

@@ -11,9 +11,9 @@
     + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
     + Einfaches Chord Diagramm in d3
     + Anzeige Interaktivität
-    * Tooltip mit zusatzinfos
-    - Labels für State
-    - Legende Statekürzel
+    + Tooltip mit zusatzinfos
+    + Labels für State
+    * Legende Statekürzel
     
 
 +* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)

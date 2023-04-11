@@ -65,3 +65,7 @@ svg {
     stroke: none;
     opacity: 5%;
 }
+.legendText{
+    font-size:x-small;
+    
+}
