@@ -56,3 +56,12 @@ svg {
     width: 100%;
 
 }
+.selected{
+   
+    stroke: "black";
+    opacity: 100%;
+}
+.unselected{
+    stroke: none;
+    opacity: 5%;
+}
