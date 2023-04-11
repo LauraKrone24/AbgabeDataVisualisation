@@ -7,11 +7,14 @@
 - Barchart Verspätungsvergleich (Durchschnittliche vs Max) mit Stundenregler ? oder Animation (Button)
     --> d3 ? Geht zur Not mit selbst erstellten Boxen 
 
-* Chord Diagramm Flugverbindungen (Fluhäfen oder Länder)
-    - Datenvorbereitung
-    - Einfaches Chord Diagramm in d3
-    - Farben für Verspätungen von verbindung (HighLowAvg)
-    - 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt --> 2 Optionen
+* Chord Diagramm Flugverbindungen (States)
+    + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
+    + Einfaches Chord Diagramm in d3
+    + Anzeige Interaktivität
+    * Tooltip mit zusatzinfos
+    - Labels für State
+    - Legende Statekürzel
+    
 
 +* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
     + Punktgröße= Anzahl flüge gestartet

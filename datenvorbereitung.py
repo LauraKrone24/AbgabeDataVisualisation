@@ -85,7 +85,7 @@ for a in dfConnections:
 
 #print(dfConnectionsummary)
 
-States = df["OrgState"].astype("str").append(df["DestState"]).astype("str").unique()
+States = df["OrgState"].dropna().astype("str").append(df["DestState"].dropna()).astype("str").unique()
 States = np.sort(States)
 
 csvString = ""

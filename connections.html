@@ -57,6 +57,8 @@
                 let option = d3.select(this).property("value")
                     open(option,"_self")
                 })   
+            
+            var tooltip 
 
             load()
             function load()
@@ -70,80 +72,125 @@
                     
                     
                     var array = []
+                    var colors = []
                     for (let i = 0; i<Object.keys(data).length;i++){
                         
                         let intArray = []
-                        let append = false;
+                        
                         if (data[i]!= undefined){
                                 Object.values(data[i]).forEach(element => {
-                                element>=15?append=true: null
-                                intArray.push(element)
+                                
+                                intArray.push(parseInt(element))
                             });
                             
-                            append?array.push(intArray): null
+                            array.push(intArray)
+                            colors.push(d3.rgb(Math.random() * 255, 0, Math.random() * 122))
                         }
                         
                     }
-                    console.log(array)
                     
-                    var myColor = d3.scaleLinear().domain([-60,0,60])
-                    .range(["green","white", "red"])
                     
-                 
+                    
 
-                    // create the svg area
+                    
+                    States = Object.keys(data[0])
+                    
+
+                    var tooltip = d3.select("#chord")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+
                     var svg = d3.select("#chord")
                     .append("svg")
-                        .attr("width", 800)
-                        .attr("height", 800)
+                        .attr("width", 600)
+                        .attr("height", 600)
                     .append("g")
-                        .attr("transform", "translate(440,440)")
+                        .attr("transform", "translate(400,400)")
 
-                    // create input data: a square matrix that provides flow between entities
-                    
-
-                    // give this matrix to d3.chord(): it will calculates all the info we need to draw arc and ribbon
                     var res = d3.chord()
-                        .padAngle(0.05)     // padding between entities (black arc)
+                        .padAngle(0.05)     
                         .sortSubgroups(d3.descending)
                         (array)
 
-                    // add the groups on the inner part of the circle
-                    svg
-                    .datum(res)
+                    
+                    var group = svg.datum(res)
                     .append("g")
                     .selectAll("g")
                     .data(function(d) { return d.groups; })
                     .enter()
                     .append("g")
-                    .append("path")
-                        .style("fill", "grey")
-                        .style("stroke", "black")
-                        .attr("d", d3.arc()
-                        .innerRadius(400)
-                        .outerRadius(410)
+
+                    var grouppath = group.append("path")
+                    .style("fill", function(d,i){ return colors[i] })
+                    .style("stroke", "black")
+                    .attr("d", d3.arc()
+                        .innerRadius(300)
+                        .outerRadius(315)
                         )
 
-                    // Add the links between groups
-                    svg
-                    .datum(res)
+                    group.append("text")
+                        .each(function(d) { d.angle = ((d.startAngle + d.endAngle) / 2);})
+                        .attr("dy", ".25em")
+                        .attr("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+                        .attr("transform", function(d,i) {
+                           
+                            return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                            + "translate(" + (300 + 25) + ")" //how close the labels are to the outer arc
+                            + (d.angle > Math.PI ? "rotate(180)" : "")
+                        })
+                        .text(function(d,i) {return States[i];  })
+                        .attr("class", "Text")
+                    
+                    svg.datum(res)
                     .append("g")
                     .selectAll("path")
                     .data(function(d) { return d; })
                     .enter()
                     .append("path")
                         .attr("d", d3.ribbon()
-                        .radius(400)
+                        .radius(300)
                         )
-                        .style("fill", d3.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255))
-                        .style("stroke", "black")
+                    .style("fill",function(d) { return(colors[d.source.index])} )
+                    .style("stroke", "black")
+                    .attr("class", "unselected")
+                    .on("mouseover", function(d) { 
+                        
+                            tooltip
+                                .style("opacity", 1)
+                                .html("Flights <br>" + States[d.source.index]+" - " + States[d.target.index]+ ":"+d.source.value+"<br>"+ States[d.target.index]+" - " + States[d.source.index]+ ":"+d.target.value)
+                                .style("left", (d3.event.pageX + 15) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px")
+                         
+                            
+                            })
+                    .on("mouseleave", function(d){tooltip.style("opacity", 0)})
+                    .on("click",function(d){
+                        
+                        let clicked = d3.select(this)
+                        
+                        if(clicked.style('opacity') < 1){
+                            clicked.attr('class', 'selected')
+                            //console.log("selected")
+                        }
+                        else{
+                            //console.log("unselect")
+                            clicked.attr('class', 'unselected')
+                        }
+                        
+                    })
 
 
-                    
-
-                    
-
+                        
                    
+                    
+
+                        
                    
 
                   
@@ -154,6 +201,7 @@
 
             }
 
+           
           
             
         </script>
