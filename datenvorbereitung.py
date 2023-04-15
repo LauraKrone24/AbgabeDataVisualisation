@@ -90,19 +90,19 @@ States = np.sort(States)
 
 csvString = ""
 for org in States:
-    csvString+=org+","
+    csvString+=org+";"
 
-csvString.strip(",")
+csvString.strip(";")
 csvString+="\n"
 
 for org in States:
     
     for dest in States: 
-        if(org+","+dest in dfConnectionsummary):
-            csvString+= str(dfConnectionsummary[org+","+dest])+","
+        if(org+";"+dest in dfConnectionsummary):
+            csvString+= str(dfConnectionsummary[org+","+dest])+";"
         else:
             csvString+= "{'count':0,'Org.Delay':0,'Dest.Delay':0}"
-    csvString.strip(",")
+    csvString.strip(";")
     csvString+="\n"
 
 

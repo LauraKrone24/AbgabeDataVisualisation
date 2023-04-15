@@ -95,7 +95,7 @@
               
                 d3.csv(connection).then(data=>{
                     
-                    
+                    console.log(data)
                     var array = []
                     var colors = []
                     for (let i = 0; i<Object.keys(data).length;i++){
@@ -104,7 +104,7 @@
                         
                         if (data[i]!= undefined){
                                 Object.values(data[i]).forEach(element => {
-                                console.log(element)
+                                //console.log(element)
                                 intArray.push(parseInt(element))
                             });
                             
