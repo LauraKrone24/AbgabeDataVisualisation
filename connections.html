@@ -98,10 +98,13 @@
                     
                     var array = []
                     var colors = []
-                    var myColor = d3.scaleLinear().domain([-60,0,60]).range(["green","white", "red"])
-                    for (let i = 0; i<Object.keys(data).length;i++){
+                    let destDelayArray = []
+                    let orgDelayArray = []
+                     for (let i = 0; i<Object.keys(data).length;i++){
                         
                         let intArray = []
+                        let destDelayInnerArray = []
+                        let orgDelayInnerArray = []
                         
                         if (data[i]!= undefined){
                                 Object.values(data[i]).forEach(element => {
@@ -109,13 +112,15 @@
                                         let dataelement = JSON.parse(element)
                                         console.log(dataelement.count)
                                         intArray.push(parseInt(dataelement.count))
-                                       
-                                        ovgDelayColor = myColor(dataelement.Org.Delay)
+                                        destDelayInnerArray.push(dataelement.DestDelay)
+                                        orgDelayInnerArray.push(dataelement.OrgDelay)
                                     }
                                 
                             });
                             
                             array.push(intArray)
+                            destDelayArray.push(destDelayInnerArray)
+                            orgDelayArray.push(orgDelayInnerArray)
                             colors.push(d3.rgb(Math.random() * 255, 0, Math.random() * 122))
                         }
                         
@@ -198,7 +203,17 @@
                         
                         tooltip
                             .style("opacity", 1)
-                            .html("Flights <br>" + States[d.source.index]+" -> " + States[d.target.index]+ ":"+d.source.value+"<br>"+ States[d.target.index]+" -> " + States[d.source.index]+ ":"+d.target.value)
+                            .html(()=>{text = "Flights <br>"
+                             + States[d.source.index]+" -> " + States[d.target.index]+
+                              "<br> Count: "+d.source.value+
+                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.source.index][d.target.index]+
+                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.source.index][d.target.index]
+                              d.source.index != d.target.index?text =text+ 
+                              "<br>"+ States[d.target.index]+" -> " + States[d.source.index]+
+                              "<br>Count: "+d.target.value+
+                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.target.index][d.source.index]+
+                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.target.index][d.source.index]:null;
+                            return text})
                             .style("left", (d3.event.pageX + 15) + "px")
                             .style("top", (d3.event.pageY - 28) + "px")
                          
