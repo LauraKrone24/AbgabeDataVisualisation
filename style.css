@@ -12,21 +12,33 @@ body {
     
 }
 h5{
-    color:beige; 
+    color:#eeeeee; 
 }
 table{
-    background-color: #292929;
+    background-color: #0c1713;
     width: 100%;
     height: 100%;
+   
+}
+.Visualisation{
+    background-color: #eeeeee;
+    height: 100%;
+    
 }
 
 select{
-    background-color:#292929;
-    color:beige; 
+  background-color:#0c1713; 
+  color: #eeeeee;
+  border: none;
+  margin: 0;
+  
+  
+  
 }
-.dropdown{
-    background-color: #292929;
+option:hover{
+    background-color: #bc8da0;
 }
+
 svg {
     position: absolute;
     width: 100%;
@@ -42,12 +54,14 @@ svg {
     position: absolute;
 }
 #TimeText{
-    color:beige; 
+    color:#eeeeee; 
 }
 
 #Addinfo{
-    color: beige;
-     
+    color: #eeeeee;
+}
+#Addinfo{
+    color: #eeeeee;
 }
 #chord{
     text-align:start;
@@ -57,13 +71,13 @@ svg {
 
 }
 .selected{
-   
-    stroke: "black";
+    stroke: "#0c1713";
     opacity: 100%;
+    
 }
 .unselected{
     stroke: none;
-    opacity: 5%;
+    opacity: 2.5%;
 }
 .legendText{
     font-size:x-small;

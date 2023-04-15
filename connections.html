@@ -20,10 +20,14 @@
         
         <div id = "Options">     
             <table >
-                <tr id="tableheader">
+                <tr height = 5px></tr>
+                <tr id="tableheader" width="50%">
                     <td>
                         <h5>Visualisation</h5>
                         <div id="dropdownButtonVisulisation"></div>
+                    </td>
+                    <td valign='bottom'>
+                        <div id="unselect"></div>
                     </td>
                    
                     
@@ -34,13 +38,18 @@
             </table> 
            
         </div>
-        <table>
+        <table class = "Visualisation">
             <tr>
-                <td>
-                    <div id="chord"></div>
+                <td width ="70%">
+                    <div height="800px" id="chord"></div>
                 </td>
                 <td>
                     <div id="legend"></div>
+                </td>
+            </tr>
+            <tr>
+                <td height="1000px">
+
                 </td>
             </tr>
         </table>
@@ -67,6 +76,13 @@
                     open(option,"_self")
                 })   
             
+            var unselect = d3.select('#unselect')
+                .append("text")
+                .style("color","#eeeeee")
+                .style("font-size","larger")
+                .text("Unselect all")
+
+            
             var tooltip 
 
             load()
@@ -88,7 +104,7 @@
                         
                         if (data[i]!= undefined){
                                 Object.values(data[i]).forEach(element => {
-                                
+                                console.log(element)
                                 intArray.push(parseInt(element))
                             });
                             
@@ -100,7 +116,7 @@
                     
                     
                     
-                    console.log(colors)
+                    
                     
                     States = Object.keys(data[0])
                     
@@ -117,10 +133,10 @@
 
                     var svg = d3.select("#chord")
                     .append("svg")
-                        .attr("width", 600)
-                        .attr("height", 600)
+                        .attr("width", 800)
+                        .attr("height", 800)
                     .append("g")
-                        .attr("transform", "translate(400,400)")
+                        .attr("transform", "translate(340,340)")
 
                     var res = d3.chord()
                         .padAngle(0.05)     
@@ -134,13 +150,16 @@
                     .data(function(d) { return d.groups; })
                     .enter()
                     .append("g")
+                    
+                    
+
 
                     var grouppath = group.append("path")
                     .style("fill", function(d,i){ return colors[i] })
                     .style("stroke", "black")
                     .attr("d", d3.arc()
-                        .innerRadius(300)
-                        .outerRadius(315)
+                        .innerRadius(250)
+                        .outerRadius(275)
                         )
 
                     group.append("text")
@@ -150,34 +169,34 @@
                         .attr("transform", function(d,i) {
                            
                             return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                            + "translate(" + (300 + 25) + ")" //how close the labels are to the outer arc
+                            + "translate(" + (285) + ")" 
                             + (d.angle > Math.PI ? "rotate(180)" : "")
                         })
                         .text(function(d,i) {return States[i];  })
                         
                     
-                    svg.datum(res)
+                    let chord = svg.datum(res)
                     .append("g")
                     .selectAll("path")
                     .data(function(d) { return d; })
                     .enter()
                     .append("path")
                         .attr("d", d3.ribbon()
-                        .radius(300)
+                        .radius(250)
                         )
                     .style("fill",function(d) { return(colors[d.source.index])} )
                     .style("stroke", "black")
                     .attr("class", "unselected")
                     .on("mouseover", function(d) { 
                         
-                            tooltip
-                                .style("opacity", 1)
-                                .html("Flights <br>" + States[d.source.index]+" - " + States[d.target.index]+ ":"+d.source.value+"<br>"+ States[d.target.index]+" - " + States[d.source.index]+ ":"+d.target.value)
-                                .style("left", (d3.event.pageX + 15) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px")
+                        tooltip
+                            .style("opacity", 1)
+                            .html("Flights <br>" + States[d.source.index]+" -> " + States[d.target.index]+ ":"+d.source.value+"<br>"+ States[d.target.index]+" -> " + States[d.source.index]+ ":"+d.target.value)
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
                          
                             
-                            })
+                        })
                     .on("mouseleave", function(d){tooltip.style("opacity", 0)})
                     .on("click",function(d){
                         
@@ -185,53 +204,69 @@
                         
                         if(clicked.style('opacity') < 1){
                             clicked.attr('class', 'selected')
-                            //console.log("selected")
                         }
                         else{
-                            //console.log("unselect")
                             clicked.attr('class', 'unselected')
                         }
                         
                     })
+
+
+                    group.on("click",function (d, i) {
+                        chord.classed("unselected", function(p) {
+                        return p.source.index != i && p.target.index != i;
+                        });
+                        chord.classed("selected", function(p) {
+                        return p.source.index == i || p.target.index == i;
+                        });
+
+		            })
+                    
+
+                    
+                    unselect.on("click",function (d, i) {chord.classed("unselected",true)})
+                  
+
+
 
                     svg2 =  d3.select("#legend")
                     .append("svg")
                         .attr("width", 300)
                         .attr("height", 600)
 
-                    var g = svg2.selectAll("text")
-                        .data(States)
-                        .enter()
-                        .append("g")
-
-
-                    g.append("rect")
-                        .attr("x", 80)
-                        .attr("y",function(d,i){console.log((32+(i*12)));return (32+(i*12))})
-                        .attr('width', 10)
-                        .attr("height",10)
-                        .attr('fill', function(d,i) { return(colors[i])})
-
-                    g.append("text")
-                        .attr("class","legendText")
-                        .attr("x",100)
-                        .attr("y",function(d,i){console.log((32+(i*12))); return (40+(i*12.25))})
-                        .text(function(d){return d})
-                       
+                    let StateLink = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/States.csv" 
                     
+                    d3.csv(StateLink).then(StateData=>{
+
+                        let AddState=[{state:"Virgin Islands",abbreviation:"VI"},{state:"Puerto Rico",abbreviation:"PR"},{state:"Guam",abbreviation:"GU"}] 
+                        StateData= StateData.concat(AddState)
+
+                        var g = svg2.selectAll("text")
+                            .data(States)
+                            .enter()
+                            .append("g")
 
 
-                        
-                   
-                    
+                        g.append("rect")
+                            .attr("x", 80)
+                            .attr("y",function(d,i){return (10+(i*12))})
+                            .attr('width', 10)
+                            .attr("height",10)
+                            .attr('fill', function(d,i) { return(colors[i])})
 
-                        
-                   
+                        g.append("text")
+                            .attr("class","legendText")
+                            .attr("x",100)
+                            .attr("y",function(d,i){ return (18+(i*12.25))})
+                            .text(function(d){
+                                let filtered = StateData.filter(x => {  return  (x.abbreviation)== d})[0]
+                                if(d==""){return""}
+                                typeof filtered =="undefined" ?  text = d+" - Terretory not found":  text = d+" - "+StateData.filter(x => {  return  (x.abbreviation)== d})[0].state
+                                return text
+                            })
 
-                  
-
-                    
-                   
+                    })
+                     
                  })
 
             }

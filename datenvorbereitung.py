@@ -41,7 +41,6 @@ dfDestDelaySummary.to_csv("DestDelaySummary.csv")
 
 #Dataset for names of Airlines 
 Airlines = df["AIRLINE"].unique()
-#Datenset wurde runtergenommen also Code auskommentiert und nur noch zur nachvollziehbarkeit vorhanden
 df2 = pd.read_csv("OrgAirlineData.csv")
 df2= df2[["Name","IATA"]]
 df2 = df2[df2["IATA"].isin(Airlines)].sort_values(by="IATA")
@@ -71,9 +70,11 @@ df = pd.merge(df, df3, left_on='DESTINATION_AIRPORT', right_on='IATA')
 df.drop('IATA', axis=1, inplace=True)
 df.rename(columns={"STATE": "DestState"}, inplace=True)
 print(df)
-#Connections by Airport 
+
+#Connections by State 
 
 dfConnections = df.groupby(["OrgState","DestState"])
+
 
 
 dfConnectionsummary ={}
@@ -81,10 +82,9 @@ for a in dfConnections:
     org = a[0][0]
     dest = a[0][1]
     
-    dfConnectionsummary[org+","+dest] = len(a[1].index)
+    dfConnectionsummary[org+","+dest] = {"count":len(a[1].index),"Org.Delay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"Dest.Delay":round(a[1]["DESTINATION_DELAY"].mean(),2)}
 
-#print(dfConnectionsummary)
-
+print(dfConnectionsummary)
 States = df["OrgState"].dropna().astype("str").append(df["DestState"].dropna()).astype("str").unique()
 States = np.sort(States)
 
@@ -101,7 +101,7 @@ for org in States:
         if(org+","+dest in dfConnectionsummary):
             csvString+= str(dfConnectionsummary[org+","+dest])+","
         else:
-            csvString+= "0,"
+            csvString+= "{'count':0,'Org.Delay':0,'Dest.Delay':0}"
     csvString.strip(",")
     csvString+="\n"
 
