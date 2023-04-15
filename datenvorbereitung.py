@@ -106,7 +106,7 @@ for org in States:
     csvString+="\n"
 
 
-
+csvString = csvString.replace("\'","\"")
 f = open("Connections.csv", "w")
 f.write(csvString)
 f.close()
