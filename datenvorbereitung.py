@@ -98,7 +98,7 @@ csvString+="\n"
 for org in States:
     
     for dest in States: 
-        if(org+";"+dest in dfConnectionsummary):
+        if(org+","+dest in dfConnectionsummary):
             csvString+= str(dfConnectionsummary[org+","+dest])+";"
         else:
             csvString+= "{'count':0,'Org.Delay':0,'Dest.Delay':0};"
