@@ -82,7 +82,7 @@ for a in dfConnections:
     org = a[0][0]
     dest = a[0][1]
     
-    dfConnectionsummary[org+","+dest] = {"count":len(a[1].index),"Org.Delay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"Dest.Delay":round(a[1]["DESTINATION_DELAY"].mean(),2)}
+    dfConnectionsummary[org+","+dest] = {"count":len(a[1].index),"OrgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"DestDelay":round(a[1]["DESTINATION_DELAY"].mean(),2)}
 
 print(dfConnectionsummary)
 States = df["OrgState"].dropna().astype("str").append(df["DestState"].dropna()).astype("str").unique()
@@ -101,7 +101,7 @@ for org in States:
         if(org+","+dest in dfConnectionsummary):
             csvString+= str(dfConnectionsummary[org+","+dest])+";"
         else:
-            csvString+= "{'count':0,'Org.Delay':0,'Dest.Delay':0};"
+            csvString+= "{'count':0,'OrgDelay':0,'DestDelay':0};"
     csvString.strip(";")
     csvString+="\n"
 

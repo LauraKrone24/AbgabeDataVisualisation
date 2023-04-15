@@ -98,15 +98,21 @@
                     
                     var array = []
                     var colors = []
+                    var myColor = d3.scaleLinear().domain([-60,0,60]).range(["green","white", "red"])
                     for (let i = 0; i<Object.keys(data).length;i++){
                         
                         let intArray = []
                         
                         if (data[i]!= undefined){
                                 Object.values(data[i]).forEach(element => {
-                                let dataelement = JSON.parse(element)
-                                console.log(dataelement)
-                                intArray.push(parseInt(element))
+                                    if(element!=undefined && element!=""){
+                                        let dataelement = JSON.parse(element)
+                                        console.log(dataelement.count)
+                                        intArray.push(parseInt(dataelement.count))
+                                       
+                                        ovgDelayColor = myColor(dataelement.Org.Delay)
+                                    }
+                                
                             });
                             
                             array.push(intArray)
