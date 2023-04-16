@@ -3,8 +3,6 @@
 <html>
 
     <head>
-        <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css" rel="stylesheet" />
-        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js"></script>
         <script src="https://d3js.org/d3.v4.min.js"></script>
         <script src="https://d3js.org/queue.v1.min.js"></script>
         <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
@@ -30,8 +28,12 @@
                         <div id="dropdownButtonHighAvgLow"></div>
                     </td>
                     <td>
-                         <h5>Airport</h5>
+                         <h5>Option of Interest</h5>
                         <div id="dropdownButtonOrginDestination"></div>
+                    </td>
+                    <td>
+                        <h5>Sort Option</h5>
+                        <div id="dropdownButtonAscDesc"></div>
                     </td>
                     <td>
                         <h5>Speed</h5>
@@ -51,17 +53,23 @@
             </table> 
            
         </div>
+        <div id="BarChart" width="100%" height="1000px"></div>
         
-        <div id="map"></div>
-        
-
 
 
         <script type="text/javascript">
             var HigAvgLow=2;
-            var OrginDestination=1; 
-            var AnimationSpeed = 1000;
+            var OrginDestAirline=1; 
+            var AnimationSpeed = 2000;
             var StartHour=0; 
+            var AscDesc = 1;
+            var LinesInHour = {}
+            for(let i=-1;i<24;i++){
+
+                i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0
+                        
+            }
+            
             
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
@@ -78,9 +86,28 @@
             dropdownButtonHighAvgLow.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 HigAvgLow= option;
+                console.log(HigAvgLow)
                 load()
                 })
+               
+            var dropdownButtonAscDesc = d3.select("#dropdownButtonAscDesc")
+                .append('select')
                 
+            dropdownButtonAscDesc 
+                .selectAll('myOptions') 
+                .data([{text:"Ascending",value:1},{text:"Descending",value:2}])
+                .attr("class","dropdown")
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonAscDesc.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                AscDesc= option;
+                console.log(AscDesc)
+                load()
+                })
 
 
             var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
@@ -88,7 +115,7 @@
                 
             dropdownButtonOrginDestination
                 .selectAll('myOptions') 
-                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2}])
+                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline",value:3}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -96,7 +123,7 @@
 
             dropdownButtonOrginDestination.on("change", function(d) {
                 let option = d3.select(this).property("value")
-                OrginDestination = option;
+                OrginDestAirline = option;
                 load()
                 })
 
@@ -107,7 +134,7 @@
                 
             dropdownButtonAnimationspeed 
                 .selectAll('myOptions') 
-                .data([{text:"x 3600     ",value:1000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
+                .data([{text:"x 1800     ",value:2000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -135,9 +162,7 @@
                 StartHour = option;
                 if(StartHour!= -1)
                 {
-                    
                     AnimationSpeed= dropdownButtonAnimationspeed.property("value");
-                    console.log("Animationspeed:"+AnimationSpeed)
                 }
                 load()
                 })
@@ -156,62 +181,55 @@
 
             dropdownButtonVisulisation.on("change", function(d) {
                 let option = d3.select(this).property("value")
-                console.log(option)
+                
                 open(option,"_self")
                 })
 
-            var view = "map"
-            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
-
-            var map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/dark-v9',
-                zoom: 3,
-                center: [-104.386330, 43.753746]
-            });
-
-
-            map.on("viewreset", load);
-            map.on("moveend", load);
-            
-           
-
-            var canvas = map.getCanvasContainer();
-            var svg = d3.select(canvas).append("svg");
-
-            
                             
             var TimeText = d3.select('#TimeText')
                         .append("text")
                         .attr("color","beige")
 
+            var svg = d3.select("#BarChart")
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","5000px")
 
-            var tooltip = d3.select('body')
-            .append('div')
-            .attr('class', 'tt')
-
-            tooltip
-              .append('div')
-              .attr('class', 'label')
+        
 
             load()
             function load()
             {
-
+                Delay = []
+                svg.selectAll("*").remove()
                 TimeText.interrupt()
                 let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
                 let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
-                var CSVLink; 
-                OrginDestination==1?CSVLink= orgAirportsDelay:CSVLink= destAirportsDelay
+                let AirlineData = ""
+                let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
+                let AirlineInfo = ""
 
+
+                var CSVLink; 
+                var AddLink; 
+                switch(OrginDestAirline){
+                    case "2": CSVLink = destAirportsDelay; AddLink=AirportInfo; break;
+                    case "3": CSVLink = AirlineData;Addinfo = AirlineInfo; break;
+                    default: CSVLink = orgAirportsDelay; AddLink=AirportInfo; break;
+                }
+
+                for(let i=-1;i<24;i++){
+                    i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0    
+                }
                 
-                svg.selectAll("*").remove()
+
+               
                 
-                d3.csv(CSVLink,(x)=> {
-                
-                if (!x.AIRPORT_POS.includes('nan')) {
-                 x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
-                 return x}}).then(data=>{
+
+
+                d3.csv(CSVLink).then(data=>{
+                    d3.csv(AddLink).then(addData=>{
+
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
                     if (StartHour ==-1){
@@ -221,50 +239,84 @@
                     
                     var myColor = d3.scaleLinear().domain([-15,0,45])
                     .range(["green","white", "red"])
+
+                    switch(HigAvgLow){
+                        case "1": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","HighDelay")):data = data.sort(dynamicSortMultiple("Hour","-HighDelay")); break;
+                        case "3": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","LowDelay")):data = data.sort(dynamicSortMultiple("Hour","-LowDelay")); break;
+                        default:  AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","AvgDelay")):data = data.sort(dynamicSortMultiple("Hour","-AvgDelay")); break;
+                    }
+
+                    console.log(data)
                     
 
+                    g = svg.selectAll("g")
+                        .data(data)
+                        .enter()
+                        .append("g")
+
+                    
+                    
+                    g.append("rect")
+                        .attr("x",(d,i)=>{
+                            LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
+                            switch(HigAvgLow){
+                                case "1": Delay.push(d.HighDelay);  break;
+                                case "3": Delay.push(d.LowDelay) ;break;
+                                default: Delay.push(d.AvgDelay); break;
+                            }
+                            let x =Delay[i]<0?(405+parseFloat(Delay[i])*5):405;
+                            console.log(Delay)
+                            return x})
+                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >15?-50: (30+rank*20)})
+                        .attr("height",15)
+                        .attr("width",(d,i)=>{return (Math.abs(Delay[i]))*5})
+                        .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
+                        .attr("stroke","black")
+                        .style("opacity",0)
+                        .transition()
+                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                        .style("opacity",1)
+                        .transition()
+                        .duration(AnimationSpeed)
+                        .remove()
+
+                    g.append("text")
+                        .attr("x",(d,i)=>{return Delay[i]<0?410:10})
+                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>15?-50:(40+rank*20)})
+                        .attr("color","black")
+                        .text((d,i)=>{
+                            let found = addData.find(element=>element.IATA==d.Airport);
+                            return found!=undefined?found.AIRPORT+"("+found.IATA+")":d.Airport;
+                        })
+                        .style("opacity",0)
+                        .attr("class","legendText")
+                        .transition()
+                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                        .style("opacity",1)
+                        .transition()
+                        .duration(AnimationSpeed)
+                        .remove()
+                    
                     var x = d3.scaleLinear()
-                        .domain([0, 5])
-                        .range([0, 1000]);
+                        .domain([-60, 70])
+                        .range([0, 1300]);
 
-                    var y = d3.scaleLinear()
-                        .domain([10, 0])
-                        .range([0, 500])
-
-                    var line = d3.line()
-                        .x((d) => x(d.x))
-                        .y((d) => y(d.y))
-                    
-                    g = svg.selectAll("circle")
-                    .data(data)
-                    .enter()
-                    .append('g')
-                   
-                    circles = g.append('circle')
-                    .attr("cx", d => {
-                        return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).x
-                    })
-                    .attr("cy", d => {
-                        return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).y
-                    })
-                    .attr("r",d => { return d.Count })
-                    .style('fill', d => {
+                
+                    svg.append("g")
+                        .attr("transform", "translate(-195, 20)")
+                        .call(d3.axisTop(x));
+                
+                    svg.append("g")
+                        .attr("transform", "translate(1120, 17.5)")
+                        .append("text")
+                        .text("Delay in min ")
+                        .attr("color","black")
                         
-                        if(HigAvgLow==1) {return myColor(d.HighDelay) }
-                        if(HigAvgLow==2) {return myColor(d.AvgDelay) }
-                        if(HigAvgLow==3) {return myColor(d.LowDelay) }
-                    })
-                    .style("opacity",0)
-                    .transition()
-                    .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
-                    .style("opacity",1)
-                    .transition()
-                    .duration(AnimationSpeed)
-                    .remove()
-
-                   
 
                     
+
+
+                    //For TimeText Only 
                     if(StartHour==-1)
                     {
                         TimeText.text("2015-01-01")
@@ -290,45 +342,46 @@
                         }
                     }
 
-                    var colorscaleArray = Array.from(Array(60).keys())
-                    var colorscale = d3.scaleSequential()
-                    .interpolator(d3.interpolator("green","white","red"))
-                    .domain([-15,0,45])
-
-                    var xScale = d3.scaleLinear()
-                    .domain([0,60])
-                    .range([0, 580]);
-
-                   
-                    d3.select("Colorscale" + id).AIRPORT_POS("rect")
-                    .data(colorscaleArray)
-                    .enter()
-                    .append("rect")
-                    .attr("x", (d) => Math.floor(xScale(d)))
-                    .attr("y", 100)
-                    .attr("z-index",90)
-                    .attr("height", 40)
-                    .attr("width", (d) => {
-                        if (d == 59) {
-                            return 6;
-                        }
-                        return Math.floor(xScale(d+1)) - Math.floor(xScale(d)) + 1;
-                    })
-                    .attr("fill", (d) => colorscale(d));
-                 })
+                    
+                })})
 
             }
 
-            function project(d) {
-                return map.project(new mapboxgl.LngLat(d[0], d[1]));
+            function lineSumTillHour(hour){
+                let sum = 0; 
+
+                for (let i = 0;i<hour;i++){
+                    
+
+                    i<10? sum = sum+LinesInHour["0"+i+""]:sum =sum+LinesInHour[""+i+""]
+                }
+                
+                return sum; 
             }
 
-            
-            function projectPoint(lon, lat) {
-                var point = map.project(new mapboxgl.LngLat(lon, lat));
-                return point
-
+            function dynamicSortMultiple() {
+                var props = arguments;
+                return function (obj1, obj2) {
+                    var i = 0, result = 0, numberOfProperties = props.length;
+                    while(result === 0 && i < numberOfProperties) {
+                        result = dynamicSort(props[i])(obj1, obj2);
+                        i++;
+                    }
+                    return result;
+                }
             }
+            function dynamicSort(property) {
+                var sortOrder = 1;
+                if(property[0] === "-") {
+                    sortOrder = -1;
+                    property = property.substr(1);
+                }
+                return function (a,b) {
+                    var result = (parseFloat(a[property]) < parseFloat(b[property])) ? -1 : (parseFloat(a[property])  > parseFloat (b[property])) ? 1 : 0;
+                    return result * sortOrder;
+                }
+            }
+        
             
         </script>
     </body>

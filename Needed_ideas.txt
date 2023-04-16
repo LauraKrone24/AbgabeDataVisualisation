@@ -4,22 +4,27 @@
 - Histogramm von Flughafen Verspätungen (nach Kategorien) nach Zeit(stündlich) (Filter: Range und Abstandsbreite (z.b. Halbstundentakt))
     --> geht das in d3 ? sonst nur allgemein Gesamt als HTML apspeichern filter öffnet entsprechend andern Link 
 
-- Barchart Verspätungsvergleich (Durchschnittliche vs Max) mit Stundenregler ? oder Animation (Button)
-    --> d3 ? Geht zur Not mit selbst erstellten Boxen 
+* Barchart Verspätungsvergleich Animation
+    * Auswahl Airline, Dest Flughafen, Org Flughafen  
+    + Auswahl high Avg Low Delay  
+    + Animation der Balken  
+    + Sortierung der Position der Balken nach  Rank
+    + Label 
+    - Tooltip 
+    ? Color Legend 
 
-* Chord Diagramm Flugverbindungen (States)
++ Chord Diagramm Flugverbindungen (States)
     + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
     + Einfaches Chord Diagramm in d3
     + Anzeige Interaktivität
     + Tooltip mit zusatzinfos
     + Labels für State
-    * Legende Statekürzel
+    + Legende Statekürzel
     
 
 +* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
     + Punktgröße= Anzahl flüge gestartet
     + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
-    ? Tooltip zu Flughafeninfos (Exakte Zahlen, Land und Stadtinfos) --> https://observablehq.com/@stephanebachelier/mapbox-d3
     ? Colorlegend https://observablehq.com/@d3/color-legend
     - 2. Tablerow für zusätzliche Infos 
     -? 2. Tablerow mit Visualisierung 
@@ -35,12 +40,11 @@
 
 
 Herausfinden: 
-- Datensets 3 
 - Boxplots in d3?
 - Histogramm in d3?
-- Animierte Barcharts in d3?
 
 
 Zusätzliche To-Dos
 - Durch CSS Menu hübsch machen (style.css)
 - Code sortieren und Kommentieren
+- Dokumentationschreiben 
