@@ -147,7 +147,7 @@
                 
                 dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"}])
+                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"Verspätungsvergleich.html"}])
                 .attr("class","dropdown")
                 .enter()
                 .append('option')
@@ -250,9 +250,9 @@
                     .attr("r",d => { return d.Count })
                     .style('fill', d => {
                         
-                        if(HigAvgLow==1) {return myColor(d.HighDelay) }
-                        if(HigAvgLow==2) {return myColor(d.AvgDelay) }
-                        if(HigAvgLow==3) {return myColor(d.LowDelay) }
+                        if(HigAvgLow==1) {return d.HighDelay<-15?"Green":myColor(d.HighDelay) }
+                        if(HigAvgLow==2) {return d.AvgDelay<-15?"Green":myColor(d.AvgDelay) }
+                        if(HigAvgLow==3) {return d.LowDelay<-15?"Green":myColor(d.LowDelay)  }
                     })
                     .style("opacity",0)
                     .transition()

@@ -60,7 +60,7 @@
         <script type="text/javascript">
             var HigAvgLow=2;
             var OrginDestAirline=1; 
-            var AnimationSpeed = 2000;
+            var AnimationSpeed = 3000;
             var StartHour=0; 
             var AscDesc = 1;
             var LinesInHour = {}
@@ -86,7 +86,7 @@
             dropdownButtonHighAvgLow.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 HigAvgLow= option;
-                console.log(HigAvgLow)
+                
                 load()
                 })
                
@@ -105,7 +105,7 @@
             dropdownButtonAscDesc.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 AscDesc= option;
-                console.log(AscDesc)
+                
                 load()
                 })
 
@@ -115,7 +115,7 @@
                 
             dropdownButtonOrginDestination
                 .selectAll('myOptions') 
-                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline",value:3}])
+                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline at Depature",value:3},{text:"Airline at Destination",value:4}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -134,7 +134,7 @@
                 
             dropdownButtonAnimationspeed 
                 .selectAll('myOptions') 
-                .data([{text:"x 1800     ",value:2000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
+                .data([{text:"x 1200     ",value:3000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -172,7 +172,7 @@
                 
                 dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"}])
+                .data([{text:"Delay Comparison",value:"Verspätungsvergleich.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"}])
                 .attr("class","dropdown")
                 .enter()
                 .append('option')
@@ -196,25 +196,37 @@
                 .attr("height","5000px")
 
         
-
+            var tooltip = d3.select("#BarChart")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+            
             load()
             function load()
             {
+                console.log("load:"+HigAvgLow+","+OrginDestAirline+", "+AnimationSpeed+","+StartHour+", "+AscDesc)
                 Delay = []
                 svg.selectAll("*").remove()
                 TimeText.interrupt()
                 let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
                 let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
-                let AirlineData = ""
+                let AirlineOrgData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineOrgDelaySummary.csv"
+                let AirlineDestData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineDestDelaySummary.csv"
                 let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
-                let AirlineInfo = ""
+                let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
 
 
                 var CSVLink; 
                 var AddLink; 
                 switch(OrginDestAirline){
                     case "2": CSVLink = destAirportsDelay; AddLink=AirportInfo; break;
-                    case "3": CSVLink = AirlineData;Addinfo = AirlineInfo; break;
+                    case "3": CSVLink = AirlineOrgData;AddLink = AirlineInfo; break;
+                    case "4": CSVLink = AirlineDestData;AddLink = AirlineInfo; break;
                     default: CSVLink = orgAirportsDelay; AddLink=AirportInfo; break;
                 }
 
@@ -240,13 +252,15 @@
                     var myColor = d3.scaleLinear().domain([-15,0,45])
                     .range(["green","white", "red"])
 
+                  
+
                     switch(HigAvgLow){
                         case "1": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","HighDelay")):data = data.sort(dynamicSortMultiple("Hour","-HighDelay")); break;
                         case "3": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","LowDelay")):data = data.sort(dynamicSortMultiple("Hour","-LowDelay")); break;
                         default:  AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","AvgDelay")):data = data.sort(dynamicSortMultiple("Hour","-AvgDelay")); break;
                     }
 
-                    console.log(data)
+                    //console.log(data)
                     
 
                     g = svg.selectAll("g")
@@ -257,7 +271,10 @@
                     
                     
                     g.append("rect")
+                    .transition()
+                        .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
                         .attr("x",(d,i)=>{
+                            
                             LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
                             switch(HigAvgLow){
                                 case "1": Delay.push(d.HighDelay);  break;
@@ -265,33 +282,36 @@
                                 default: Delay.push(d.AvgDelay); break;
                             }
                             let x =Delay[i]<0?(405+parseFloat(Delay[i])*5):405;
-                            console.log(Delay)
+                            //console.log(Delay)
                             return x})
                         .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >15?-50: (30+rank*20)})
                         .attr("height",15)
                         .attr("width",(d,i)=>{return (Math.abs(Delay[i]))*5})
                         .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
                         .attr("stroke","black")
-                        .style("opacity",0)
-                        .transition()
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
                         .style("opacity",1)
                         .transition()
                         .duration(AnimationSpeed)
                         .remove()
 
                     g.append("text")
-                        .attr("x",(d,i)=>{return Delay[i]<0?410:10})
+                        .style("opacity",0)
+                        .transition()
+                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                        .attr("x",(d,i)=>{return Delay[i]<0?10:10})
                         .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>15?-50:(40+rank*20)})
                         .attr("color","black")
                         .text((d,i)=>{
-                            let found = addData.find(element=>element.IATA==d.Airport);
-                            return found!=undefined?found.AIRPORT+"("+found.IATA+")":d.Airport;
+                            if(parseInt(OrginDestAirline)<=2){
+                                let found = addData.find(element=> element.IATA==d.Airport);
+                                return found!=undefined?found.AIRPORT+"("+found.IATA+")":d.Airport;
+                            }else{
+                                let found = addData.find(element=> element.IATA==d.Airline);
+                                return found!=undefined?found.Name+"("+found.IATA+")":d.Airline;
+                            }
+                            
                         })
-                        .style("opacity",0)
                         .attr("class","legendText")
-                        .transition()
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
                         .style("opacity",1)
                         .transition()
                         .duration(AnimationSpeed)
@@ -312,8 +332,28 @@
                         .text("Delay in min ")
                         .attr("color","black")
                         
-
                     
+                    
+                    g.on("mouseover",function(d,i){
+                        tooltip
+                            .style("opacity",1)
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                            .html(()=>{
+                                if(parseInt(OrginDestAirline)<=2){
+                                    let found = addData.find(element=> element.IATA==d.Airport);
+                                     found!=undefined?text=found.AIRPORT+"("+found.IATA+")":text=d.Airport;
+                                }else{
+                                    let found = addData.find(element=> element.IATA==d.Airline);
+                                     found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
+                                }
+                                text+=(StartHour==-1)?"<br>Avg Count/Hour:"+d.Count :"<br>Count:"+d.Count;  
+                                text+="<br>Delay:"+Delay[i]; 
+                                return text
+                            })
+                         
+                    })
+                    .on("mouseout", function(d){ tooltip.style("opacity", 0)})
 
 
                     //For TimeText Only 

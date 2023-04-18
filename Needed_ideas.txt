@@ -1,16 +1,25 @@
-- einfaches Boxplot zu Verspätungen (Filter: Abflug Vs Ankuft)
-    --> in Plotly: Abspeichern als Image oder HTML und Einbindung in HTML seite ? 
 
-- Histogramm von Flughafen Verspätungen (nach Kategorien) nach Zeit(stündlich) (Filter: Range und Abstandsbreite (z.b. Halbstundentakt))
-    --> geht das in d3 ? sonst nur allgemein Gesamt als HTML apspeichern filter öffnet entsprechend andern Link 
+-  Histogram wie vielen Flüge am Stunde pro Flughafen / pro Airline
+    - Aufschlüsselung nach zu früh, pünktlich (+-5 min), zu spät
+    - Histogram
+    - Selektierbar Airline, Dest Flughafen, Org Flughafen
+    - Selektierbar Welcher Flughafen / Welche Airline 
+    - Tooltip 
 
-* Barchart Verspätungsvergleich Animation
-    * Auswahl Airline, Dest Flughafen, Org Flughafen  
+- ... mit welcher Airline welche Strecken
+    - groupen Org Dest Airline --> Infos Min max Avg
+    - Auswahl Org und Dest 
+    - Auswahl min Max Avg 
+    - Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
+
+
++* Barchart Verspätungsvergleich Animation
+    + Auswahl Airline, Dest Flughafen, Org Flughafen  
     + Auswahl high Avg Low Delay  
     + Animation der Balken  
     + Sortierung der Position der Balken nach  Rank
     + Label 
-    - Tooltip 
+    + Tooltip 
     ? Color Legend 
 
 + Chord Diagramm Flugverbindungen (States)
@@ -26,22 +35,22 @@
     + Punktgröße= Anzahl flüge gestartet
     + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
     ? Colorlegend https://observablehq.com/@d3/color-legend
-    - 2. Tablerow für zusätzliche Infos 
-    -? 2. Tablerow mit Visualisierung 
+    
 
 +* Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
     + 2. Datenset zu Airline Kürzeln --> im Filter 
     + Visualisierung von Verspätungen
-    ? Colorlegend https://observablehq.com/@d3/color-legend
     + Animierung nach Zeit (verfeinern) 
-    ? Kreise durch Flugzeuge ersetzen 
     + 2. Tablerow für zusätzliche Infos 
+    - Filter für Tag 
     -? 2. Tablerow mit Visualisierung 
+    ? Kreise durch Flugzeuge ersetzen 
+    ? Colorlegend https://observablehq.com/@d3/color-legend
 
 
 Herausfinden: 
 - Boxplots in d3?
-- Histogramm in d3?
+
 
 
 Zusätzliche To-Dos

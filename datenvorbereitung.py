@@ -3,6 +3,7 @@ import numpy as np
 import json
 
 df = pd.read_csv("https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv")
+
 #Origin Delay CSV
 dfOriginAirportsDelay =df[["ORIGIN_AIRPORT","ORIGIN_AIRPORT_POS","DEPARTURE_DELAY"]]
 dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"].str[11:13]
@@ -50,12 +51,12 @@ dfAirlineGrouped = df.groupby("AIRLINE")
 dfAirlineSummary = pd.DataFrame()
 
 for a in dfAirlineGrouped: 
-    dfAirlineSummary= dfAirlineSummary.append({"IATA":a[1]["AIRLINE"].iloc[0],"AvgOrgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"MaxOrgDelay":a[1]["DEPARTURE_DELAY"].max(),"MinOrgDelay":a[1]["DEPARTURE_DELAY"].min(),"AvgDestDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"MaxDestDelay":a[1]["DESTINATION_DELAY"].max(),"MinDestDelay":a[1]["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":round(a[1]["AirTimeDiff"].mean(),2),"MaxAirTimeDiff":a[1]["AirTimeDiff"].max(),"MinAirTimeDiff":a[1]["AirTimeDiff"].min(),"Count":len(a[1].index)},ignore_index = True)
+    dfAirlineSummary= dfAirlineSummary.append({"IATA":a[1]["AIRLINE"].iloc[0],"OrgDelayQ2":round(a[1]["DEPARTURE_DELAY"].quantile(.5)),"OrgDelayQ3":a[1]["DEPARTURE_DELAY"].quantile(.75),"OrgDelayQ1":a[1]["DEPARTURE_DELAY"].quantile(.25),"DestDelayQ2":a[1]["DESTINATION_DELAY"].quantile(.5),"DestDelayQ3":a[1]["DESTINATION_DELAY"].quantile(.75),"DestDelayQ1":a[1]["DESTINATION_DELAY"].quantile(.25),"AirTimeDiffQ2":a[1]["AirTimeDiff"].quantile(.5),"AirTimeDiffQ3":a[1]["AirTimeDiff"].quantile(.75),"AirTimeDiffQ1":a[1]["AirTimeDiff"].quantile(.25),"Count":len(a[1].index)},ignore_index = True)
 
 
 
 result = pd.merge(df2, dfAirlineSummary, how="outer",on="IATA")
-result= result.append({"Name":" All Airlines","IATA":"all","AvgOrgDelay":round(df["DEPARTURE_DELAY"].mean(),2),"MaxOrgDelay":df["DEPARTURE_DELAY"].max(),"MinOrgDelay":df["DEPARTURE_DELAY"].min(),"AvgDestDelay":round(df["DESTINATION_DELAY"].mean(),2),"MaxDestDelay":df["DESTINATION_DELAY"].max(),"MinDestDelay":df["DESTINATION_DELAY"].min(),"AvgAirTimeDiff":round(df["AirTimeDiff"].mean(),2),"MaxAirTimeDiff":df["AirTimeDiff"].max(),"MinAirTimeDiff":df["AirTimeDiff"].min(),"Count":len(df.index)},ignore_index = True)
+result= result.append({"Name":" All Airlines","IATA":"all","OrgDelayQ2":df["DEPARTURE_DELAY"].quantile(.5),"OrgDelayQ3":df["DEPARTURE_DELAY"].quantile(.75),"OrgDelayQ1":df["DEPARTURE_DELAY"].quantile(.25),"DestDelayQ2":df["DESTINATION_DELAY"].quantile(.5),"DestDelayQ3":df["DESTINATION_DELAY"].quantile(.75),"DestDelayQ1":df["DESTINATION_DELAY"].quantile(.25),"AirTimeDiffQ2":df["AirTimeDiff"].quantile(.5),"AirTimeDiffQ3":df["AirTimeDiff"].quantile(.75),"AirTimeDiffQ1":df["AirTimeDiff"].quantile(.25),"Count":len(df.index)},ignore_index = True)
 
 df2 = result.sort_values(by="Name")
 df2.to_csv("Airlines.csv")

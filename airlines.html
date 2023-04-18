@@ -52,48 +52,15 @@
                 <tr id="Addinfo">
                     <td> <br>
                             <h5>Depature Delay</h5>
-                            <table >
-                                <tr>
-                                   <td>Min</td> 
-                                   <td>Avg</td> 
-                                   <td>Max</td> 
-                                </tr>
-                                <tr>
-                                    <td><div id="DepMin"></div></td> 
-                                    <td><div id="DepAvg"></div></td> 
-                                    <td><div id="DepMax"></div></td> 
-                                 </tr>
-                            </table>
+                            <div id="DepatureDelayBox"></div>
                     </td>
                     <td> <br>
                             <h5>Air Time Difference</h5>
-                            <table >
-                                <tr>
-                                    <td>Min</td> 
-                                    <td>Avg</td> 
-                                    <td>Max</td> 
-                                </tr>
-                                <tr>
-                                    <td><div id="ATDMin"></div></td> 
-                                    <td><div id="ATDAvg"></div></td> 
-                                    <td><div id="ATDMax"></div></td> 
-                                </tr>
-                            </table>
+                            <div id="AirTimeDiffBox"></div>
                     </td>
                     <td> <br>
                             <h5>Destination Delay</h5>
-                            <table >
-                                <tr>
-                                    <td>Min</td> 
-                                    <td>Avg</td> 
-                                    <td>Max</td> 
-                                </tr>
-                                <tr>
-                                    <td><div id="DestMin"></div></td> 
-                                    <td><div id="DestAvg"></div></td> 
-                                    <td><div id="DestMax"></div></td> 
-                                </tr>
-                            </table>
+                            <div id="DestDelayBox"></div>
                     </td>
                 </tr>
             </table> 
@@ -112,38 +79,8 @@
             
             d3.select("#Addinfo").style("display","none")
 
-            var DepMin = d3.select('#DepMin')
-                .append("text")
-                .attr("color","beige")
-
-            var DepAvg = d3.select('#DepAvg')
-                .append("text")
-                .attr("color","beige")
-            var DepMax = d3.select('#DepMax')
-                .append("text")
-                .attr("color","beige")
-
-            var ATDMin = d3.select('#ATDMin')
-                .append("text")
-                .attr("color","beige")
-
-            var ATDAvg = d3.select('#ATDAvg')
-                .append("text")
-                .attr("color","beige")
-            var ATDMax = d3.select('#ATDMax')
-                .append("text")
-                .attr("color","beige")
             
-            var DestMin = d3.select('#DestMin')
-                .append("text")
-                .attr("color","beige")
-
-            var DestAvg = d3.select('#DestAvg')
-                .append("text")
-                .attr("color","beige")
-            var DestMax = d3.select('#DestMax')
-                .append("text")
-                .attr("color","beige")
+              
             
             
                 
@@ -151,7 +88,13 @@
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 console.log(airlinedata)
-                loadAddinfo(airlinedata)
+                let found = airlinedata.filter(x=>{return x.IATA = Airline })[0]
+                console.log(found)
+                plotBoxPlot("#DepatureDelayBox",found.OrgDelayQ1,found.OrgDelayQ2,found.OrgDelayQ3)
+                plotBoxPlot("#AirTimeDiffBox",found.AirTimeDiffQ1,found.AirTimeDiffQ2,found.AirTimeDiffQ3)
+                plotBoxPlot("#DestDelayBox",found.DestDelayQ1,found.DestDelayQ2,found.DestDelayQ3)
+
+                
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
                     .append('select')
                     
@@ -166,7 +109,7 @@
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
                     Airline = option;
-                    loadAddinfo(airlinedata)
+                    
                     load()
                     })
                 
@@ -178,18 +121,10 @@
                 let checked = d3.select(this).property("checked")
                 checked?d3.select("#Addinfo").style("display",""):d3.select("#Addinfo").style("display","none")
             })
-            function loadAddinfo(airlinedata){
-                d3.select("#Addinfo").style("display",d3.select("input[type=checkbox]").property("checked"))
-                DepAvg.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].AvgOrgDelay)  
-                DepMin.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MinOrgDelay)
-                DepMax.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MaxOrgDelay)
-                ATDAvg.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].AvgAirTimeDiff)  
-                ATDMin.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MinAirTimeDiff)
-                ATDMax.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MaxAirTimeDiff)
-                DestAvg.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].AvgDestDelay)  
-                DestMin.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MinDestDelay)
-                DestMax.text(airlinedata.filter(x=>{return Airline==x.IATA})[0].MaxDestDelay)
-                
+            
+            function plotBoxPlot(ID,q1,q2,q3){
+                console.log(ID,q1,q2,q3)
+
             }
 
 
@@ -241,7 +176,7 @@
                 
             dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"Connections",value:"connections.html"}])
+                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"Verspätungsvergleich.html"}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
