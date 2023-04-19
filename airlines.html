@@ -12,13 +12,14 @@
 
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+        <title>Airline Info </title>
     </head>
 
     <body >
         
         
-        <div id = "Options">     
+        <div id = "Options">    
+            <span><h2 >AirlineInfo</h2> </span>
             <table >
                 <tr><td><br></td></tr>
                 <tr id="tableheader">
@@ -49,19 +50,24 @@
                     
                 </tr>
                 
-                <tr id="Addinfo">
-                    <td> <br>
+                <tr id="Addinfo" height="150px">
+                    <td class="Box"width="220px"> <br>
                             <h5>Depature Delay</h5>
-                            <div id="DepatureDelayBox"></div>
+                            <div  id="DepatureDelayBox"></div>
                     </td>
-                    <td> <br>
+                    <td class="Box" width="220px"> <br>
                             <h5>Air Time Difference</h5>
                             <div id="AirTimeDiffBox"></div>
                     </td>
-                    <td> <br>
+                    <td class="Box" width="220px"> <br>
                             <h5>Destination Delay</h5>
                             <div id="DestDelayBox"></div>
                     </td>
+                    <td width="220px" class="Count"> 
+                        <br><br>
+                        <h5>Count Flights of the Day </h5>
+                        <div class="Count" id="CountText" ></div>
+                </td>
                 </tr>
             </table> 
            
@@ -76,9 +82,26 @@
             var Airline="all"; 
             var AnimationSpeed = 1000;
             var StartHour=0; 
+            var boxSvg = [];
             
             d3.select("#Addinfo").style("display","none")
+            var tooltip = d3.selectAll(".Box")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+                    .style("color","black")
 
+            var CountText = d3.select('#CountText')
+                .append("text")
+                .attr("color","beige")
+
+
+            d3.selectAll(".Count").on("mouseover",()=>{tooltip.style("opacity", 0)})
             
               
             
@@ -88,12 +111,7 @@
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 console.log(airlinedata)
-                let found = airlinedata.filter(x=>{return x.IATA = Airline })[0]
-                console.log(found)
-                plotBoxPlot("#DepatureDelayBox",found.OrgDelayQ1,found.OrgDelayQ2,found.OrgDelayQ3)
-                plotBoxPlot("#AirTimeDiffBox",found.AirTimeDiffQ1,found.AirTimeDiffQ2,found.AirTimeDiffQ3)
-                plotBoxPlot("#DestDelayBox",found.DestDelayQ1,found.DestDelayQ2,found.DestDelayQ3)
-
+                loadBoxPlots(airlinedata)
                 
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
                     .append('select')
@@ -109,23 +127,102 @@
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
                     Airline = option;
-                    
+                    loadBoxPlots(airlinedata)
                     load()
                     })
                 
                 
 
             });
+            function loadBoxPlots (airlinedata){
+                let found = airlinedata.filter(x=>{return x.IATA == Airline })[0]
+                console.log(found)
+                CountText.text(found.Count)
+                boxSvg.forEach(element => {
+                    element.selectAll("*").remove()
+                    
+                });
+                plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
+                plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
+                plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
+
+            }
+            function plotBoxPlot(number,ID,q1,q2,q3){
+                let interQuantileRange = q3 - q1
+                let min = q1 - 1.5 * interQuantileRange
+                let max = q1 + 1.5 * interQuantileRange
+            
+                boxSvg[number] = d3.select(ID).append("svg")
+                boxSvg[number].attr("width",200)
+                    .attr("height",50)
+                    .attr("value",(d)=>{
+                        min,max,q1,q2,q3
+                        text = "Values"
+                        text += "<br>Q1: "+q1
+                        text += "<br>Median: "+q2
+                        text += "<br>Q3: "+q3
+                        return text; 
+
+                    })
+
+                console.log(boxSvg[number].attr("value"))
+                boxSvg[number].on("mouseover",function(d){
+                    
+                    tooltipString = d3.select(this).attr("value")
+                    tooltip.style("opacity", 1)
+                        .html(tooltipString)
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+                }) 
+                boxSvg[number].on("mouseleave",function(d){tooltip.style("opacity", 0)   
+                })
+                    
+                boxSvg[number].append("g")
+                    .attr("transform",
+                            "translate(0,20)")
+                    .call(d3.axisTop(boxX))
+                    .attr("stroke", "#eeeeee")
+                    
+                
+                boxSvg[number].append("line")
+                    .attr("y1", 35)
+                    .attr("y2", 35)
+                    .attr("x1",boxX(min) )
+                    .attr("x2", boxX(max)  )
+                    .attr("stroke", "#eeeeee")
+                
+                boxSvg[number].append("rect")
+                    .attr("y", 25)
+                    .attr("x", boxX(q1) )
+                    .attr("height", 20 )
+                    .attr("width", (boxX(q3)-boxX(q1)) )
+                    .attr("stroke", "black")
+                    .style("fill", "#5B2333")
+
+                boxSvg[number].selectAll(".vertLine")
+                .data([min,q2,max])
+                .enter()
+                .append("line")
+                    .attr("y1", 20)
+                    .attr("y2", 50)
+                    .attr("x1",(d)=>boxX(d) )
+                    .attr("x2",(d)=> boxX(d)  )
+                    .attr("class","vertLine")
+                    .attr("stroke", "#eeeeee")  
+                  
+                
+            }
 
             d3.select("input[type=checkbox]").on("change",function(d){
                 let checked = d3.select(this).property("checked")
                 checked?d3.select("#Addinfo").style("display",""):d3.select("#Addinfo").style("display","none")
             })
-            
-            function plotBoxPlot(ID,q1,q2,q3){
-                console.log(ID,q1,q2,q3)
 
-            }
+            var boxX  = d3.scaleLinear()
+                .domain([-65,60])
+                .range([0,200]);
+
+            
 
 
 
@@ -176,7 +273,7 @@
                 
             dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"Verspätungsvergleich.html"}])
+                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"DelayComparison.html"}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 

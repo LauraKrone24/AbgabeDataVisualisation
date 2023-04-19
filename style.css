@@ -15,9 +15,10 @@ h5{
     color:#eeeeee; 
 }
 table{
-    background-color: #0c1713;
+    background-color: #222222;
     width: 100%;
     height: 100%;
+    font: 700 16px Helvetica;
    
 }
 .Visualisation{
@@ -27,7 +28,7 @@ table{
 }
 
 select{
-  background-color:#0c1713; 
+  background-color:#222222; 
   color: #eeeeee;
   border: none;
   margin: 0;
@@ -60,9 +61,7 @@ svg {
 #Addinfo{
     color: #eeeeee;
 }
-#Addinfo{
-    color: #eeeeee;
-}
+
 #chord{
     text-align:start;
     vertical-align: middle;
@@ -71,7 +70,7 @@ svg {
 
 }
 .selected{
-    stroke: "#0c1713";
+    stroke: "#222222";
     opacity: 100%;
     
 }
@@ -83,3 +82,11 @@ svg {
     font-size:x-small;
     
 }
+
+h2{
+    text-align: center;
+    color:#5B2333;
+    font:  Open Sans;
+    
+}
+
