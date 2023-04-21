@@ -36,9 +36,7 @@ select{
   
   
 }
-option:hover{
-    background-color: #bc8da0;
-}
+
 
 svg {
     position: absolute;
@@ -60,11 +58,12 @@ svg {
 
 #Addinfo{
     color: #eeeeee;
+    
 }
 
 #chord{
     text-align:start;
-    vertical-align: middle;
+    vertical-align:middle;
     height: 90%;
     width: 100%;
 
@@ -89,4 +88,19 @@ h2{
     font:  Open Sans;
     
 }
+h5,h6{
+    text-align: center;
+    font:  Open Sans;
+    
+}
+td{
+    text-align:center;
+}
+.Uncentered{
+    text-align: start;
+}
 
+.LegendLable{
+    font: 14px sans-serif;
+    color: #eee;
+}

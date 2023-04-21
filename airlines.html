@@ -23,23 +23,23 @@
             <table >
                 <tr><td><br></td></tr>
                 <tr id="tableheader">
-                    <td>
+                    <td width="220px">
                         <h5>Visualisation</h5>
                         <div id="dropdownButtonVisulisation"></div>
                     </td>
-                    <td>
+                    <td width="220px">
                          <h5>Airline</h5>
                         <div id="dropdownButtonAirlines"></div>
                     </td>
-                    <td>
+                    <td width="220px">
                         <h5>Speed</h5>
                         <div id="dropdownButtonAnimationspeed"></div>
                     </td>
-                    <td>
+                    <td width="220px">
                         <h5>Starthour</h5>
                         <div id="dropdownButtonAnimationStart"></div>
                     </td>
-                    <td style="text-align:center"> 
+                    <td width="200px"> 
                         <h5>Show Add Info</h5> 
                         <input type="checkbox">
                     </td>
@@ -51,23 +51,24 @@
                 </tr>
                 
                 <tr id="Addinfo" height="150px">
-                    <td class="Box"width="220px"> <br>
-                            <h5>Depature Delay</h5>
-                            <div  id="DepatureDelayBox"></div>
+                    <td class="Box"width="220px"> 
+                            <h6>Depature Delay</h6>
+                            <div class="Uncentered"  id="DepatureDelayBox"></div>
                     </td>
-                    <td class="Box" width="220px"> <br>
-                            <h5>Air Time Difference</h5>
-                            <div id="AirTimeDiffBox"></div>
+                    <td class="Box" width="220px"> 
+                            <h6>Air Time Difference</h6>
+                            <div class="Uncentered" id="AirTimeDiffBox"></div>
                     </td>
-                    <td class="Box" width="220px"> <br>
-                            <h5>Destination Delay</h5>
-                            <div id="DestDelayBox"></div>
+                    <td class="Box" width="220px"> 
+                            <h6>Destination Delay</h6>
+                            <div class="Uncentered" id="DestDelayBox"></div>
                     </td>
                     <td width="220px" class="Count"> 
-                        <br><br>
-                        <h5>Count Flights of the Day </h5>
+                        <br>
+                        <h6>Count Flights of the Day </h6>
                         <div class="Count" id="CountText" ></div>
                 </td>
+                
                 </tr>
             </table> 
            
@@ -83,6 +84,66 @@
             var AnimationSpeed = 1000;
             var StartHour=0; 
             var boxSvg = [];
+
+            var view = "map"
+            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
+
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/dark-v9',
+                zoom: 3,
+                center: [-104.386330, 43.753746]
+            });
+
+
+            map.on("viewreset", load);
+            map.on("moveend", load);
+            
+           
+
+            var canvas = map.getCanvasContainer();
+            var svg = d3.select(canvas).append("svg")
+
+            var myColor = d3.scaleLinear().domain([-60,0,60,120,240])
+                    .range(["green","white","yellow","orange", "red"])
+            var array = [];
+
+            for(let i = -60;i<240;i=i+0.1){
+                array.push(i)
+            }
+
+            colorSvg = d3.select(canvas).append("svg")
+            ColorLable = colorSvg.append("text")
+                    .attr("class","LegendLable")
+                    .attr("x",1170)
+                    .attr("y",520)
+                    .attr("fill","#eeeeee")
+                    .text("Delay in min")
+
+            Colorscale = colorSvg.selectAll("rect")
+            .data(array)
+            .enter()
+            .append("rect")
+            .attr("x",(d,i)=>{return 1020+(d)})
+            .attr("y",550)
+            .attr("height",20)
+            .attr("width",0.1)
+            .attr("fill",(d)=>{return myColor(d)})
+
+            var ColorX  = d3.scaleLinear()
+                .domain([-60,240])
+                .range([0,300]);
+
+            ColorAxis = colorSvg.append("g")
+                    .attr("transform",
+                            "translate(960,550)")
+                    .call(d3.axisTop(ColorX))
+                    .attr("stroke", "#eeeeee")
+                    
+
+
+
+
             
             d3.select("#Addinfo").style("display","none")
             var tooltip = d3.selectAll(".Box")
@@ -215,7 +276,30 @@
 
             d3.select("input[type=checkbox]").on("change",function(d){
                 let checked = d3.select(this).property("checked")
-                checked?d3.select("#Addinfo").style("display",""):d3.select("#Addinfo").style("display","none")
+                if(checked){
+                    d3.select("#Addinfo").style("display","")
+                    map.flyTo({
+                        center:[-104.386330, 30],
+                        zoom: 2.25,
+                    })
+                    ColorLable.attr("y",370)
+                    Colorscale.attr("y",400)
+                    ColorAxis.attr("transform",
+                            "translate(1000,400)")
+                    load
+                }else{
+                    d3.select("#Addinfo").style("display","none")
+                    map.flyTo({
+                        center:[-104.386330, 43.753746],
+                        zoom: 3,
+                    })
+                    ColorLable.attr("y",520)
+                    Colorscale.attr("y",550)
+                    ColorAxis.attr("transform",
+                            "translate(1000,550)")
+                    
+                    load
+                }
             })
 
             var boxX  = d3.scaleLinear()
@@ -258,12 +342,10 @@
             dropdownButtonAnimationStart.on("change", function(d) {
                 let option = d3.select(this).property("value")
                 StartHour = option;
-                if(StartHour!= -1)
-                {
-                    
-                    AnimationSpeed= dropdownButtonAnimationspeed.property("value");
+
+                AnimationSpeed= dropdownButtonAnimationspeed.property("value");
                     console.log("Animationspeed:"+AnimationSpeed)
-                }
+                
                 load()
                 })
 
@@ -285,30 +367,13 @@
                 })
 
             
-            var view = "map"
-            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
-
-            var map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/dark-v9',
-                zoom: 3,
-                center: [-104.386330, 43.753746]
-            });
-
-
-            map.on("viewreset", load);
-            map.on("moveend", load);
-            
            
-
-            var canvas = map.getCanvasContainer();
-            var svg = d3.select(canvas).append("svg");
 
             
                             
             var TimeText = d3.select('#TimeText')
                         .append("text")
-                        .attr("color","beige")
+                        .attr("color","#eeeeee")
             
 
             
@@ -333,13 +398,10 @@
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
                     Airline!="all"? data = data.filter(x=>{return Airline==x.AIRLINE}): 
                     console.log(data)
-                    if (StartHour ==-1){
-                        AnimationSpeed =  1000000000000; 
-                    }
                     
                     
-                    var myColor = d3.scaleLinear().domain([-60,0,60])
-                    .range(["green","white", "red"])
+                    
+                   
                     
 
                     var x = d3.scaleLinear()
@@ -360,7 +422,7 @@
                         .append('g')
 
                     g.append("circle")
-                        .attr("r", 5)
+                        .attr("r", 2)
                         .attr("cx", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("cy", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
                         .style('fill', d => { return myColor(d.DEPARTURE_DELAY) })
@@ -383,7 +445,7 @@
                         .attr("y1", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
                         .attr("x2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("y2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
-                        .attr("stroke-width", 1)
+                        .attr("stroke-width", 0.5)
                         .attr("stroke", d => {return  myColor(d.DEPARTURE_DELAY) })
                         .attr("stroke-dasharray", "4")
                         .style("opacity", 0)
@@ -402,30 +464,25 @@
                    
 
                     
-                    if(StartHour==-1)
-                    {
-                        TimeText.text("2015-01-01")
-                           
-                    }
-                    else{
-                        for(let i = StartHour; i<24;i++)
-                         {
-                       
-                            if(i<=9){
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .text("2015-01-01 0"+i+":00:00")
-                                .duration(AnimationSpeed)
-                                
-                            }else{
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .duration(AnimationSpeed)
-                                .text("2015-01-01 "+i+":00:00")
-                                
-                            }
+                    
+                    for(let i = StartHour; i<24;i++)
+                        {
+                    
+                        if(i<=9){
+                            TimeText.transition()
+                            .delay((i-StartHour) * AnimationSpeed  )
+                            .text("2015-01-01 0"+i+":00:00")
+                            .duration(AnimationSpeed)
+                            
+                        }else{
+                            TimeText.transition()
+                            .delay((i-StartHour) * AnimationSpeed  )
+                            .duration(AnimationSpeed)
+                            .text("2015-01-01 "+i+":00:00")
+                            
                         }
                     }
+                    
 
                     
                    

@@ -16,8 +16,8 @@
         
         
         <div id = "Options">     
-            <span><h2 >Delay Comparison</h2> </span>
             <table >
+                <tr><td><br></td></tr>
                 <tr id="tableheader">
                     <td>
                         <h5>Visualisation</h5>
@@ -43,8 +43,7 @@
                         <h5>Starthour</h5>
                         <div id="dropdownButtonAnimationStart"></div>
                     </td>
-                    <td >
-                        <h5>Date and Time</h5> 
+                    <td valign='bottom'>
                         <div id="TimeText"></div>
                     </td>
                     <td>    
@@ -62,7 +61,7 @@
 
         <script type="text/javascript">
             var HigAvgLow=2;
-            var OrginDestAirline=1; 
+            var OrgDest=1; 
             var AnimationSpeed = 3000;
             var StartHour=-1; 
             var AscDesc = 1;
@@ -118,7 +117,7 @@
                 
             dropdownButtonOrginDestination
                 .selectAll('myOptions') 
-                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline at Depature",value:3},{text:"Airline at Destination",value:4}])
+                .data([{text:"Airline at Depature",value:1},{text:"Airline at Destination",value:2}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -126,7 +125,7 @@
 
             dropdownButtonOrginDestination.on("change", function(d) {
                 let option = d3.select(this).property("value")
-                OrginDestAirline = option;
+                OrgDest = option;
                 load()
                 })
 
@@ -188,11 +187,11 @@
                 open(option,"_self")
                 })
             
-                var myColor = d3.scaleLinear().domain([-60,0,60,120,240])
-                    .range(["green","white","yellow","orange", "red"])
+                var myColor = d3.scaleLinear().domain([-60,0,60])
+                        .range(["green","white", "red"])
                 var array = [];
 
-                for(let i = -60;i<240;i=i+0.1){
+                for(let i = -60;i<60;i=i+0.1){
                     array.push(i)
                 }
 
@@ -208,19 +207,19 @@
                 .data(array)
                 .enter()
                 .append("rect")
-                .attr("x",(d,i)=>{return 1020+(d)})
+                .attr("x",(d,i)=>{return 1120+(d*2)})
                 .attr("y",550)
                 .attr("height",20)
-                .attr("width",0.1)
+                .attr("width",0.2)
                 .attr("fill",(d)=>{return myColor(d)})
 
                 var ColorX  = d3.scaleLinear()
-                    .domain([-60,240])
-                    .range([0,300]);
+                    .domain([-60,60])
+                    .range([0,240]);
 
                 colorSvg.append("g")
                         .attr("transform",
-                                "translate(960,550)")
+                                "translate(1000,550)")
                         .call(d3.axisTop(ColorX))
                         .attr("stroke", "#222222")
                             
@@ -250,22 +249,11 @@
                  Delay = []
                 svg.selectAll("*").remove()
                 TimeText.interrupt()
-                let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
-                let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
-                let AirlineOrgData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineOrgDelaySummary.csv"
-                let AirlineDestData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineDestDelaySummary.csv"
-                let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
-                let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
+                
 
-
-                var CSVLink; 
+                var CSVLink =""; 
                 var AddLink; 
-                switch(OrginDestAirline){
-                    case "2": CSVLink = destAirportsDelay; AddLink=AirportInfo; break;
-                    case "3": CSVLink = AirlineOrgData;AddLink = AirlineInfo; break;
-                    case "4": CSVLink = AirlineDestData;AddLink = AirlineInfo; break;
-                    default: CSVLink = orgAirportsDelay; AddLink=AirportInfo; break;
-                }
+                
 
                 for(let i=-1;i<24;i++){
                     i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0    
@@ -340,12 +328,12 @@
                         .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(40+rank*20)})
                         .attr("color","black")
                         .text((d,i)=>{
-                            if(parseInt(OrginDestAirline)<=2){
+                            if(parseInt(OrgDest)<=2){
                                 let found = addData.find(element=> element.IATA==d.Airport);
-                                return found!=undefined?found.AIRPORT+"  ("+found.IATA+")":d.Airport;
+                                return found!=undefined?found.AIRPORT+"("+found.IATA+")":d.Airport;
                             }else{
                                 let found = addData.find(element=> element.IATA==d.Airline);
-                                return found!=undefined?found.Name+" ("+found.IATA+")":d.Airline;
+                                return found!=undefined?found.Name+"("+found.IATA+")":d.Airline;
                             }
                             
                         })
@@ -379,14 +367,14 @@
                             .style("left", (d3.event.pageX + 15) + "px")
                             .style("top", (d3.event.pageY - 28) + "px")
                             .html(()=>{
-                                if(parseInt(OrginDestAirline)<=2){
+                                if(parseInt(OrgDest)<=2){
                                     let found = addData.find(element=> element.IATA==d.Airport);
                                      found!=undefined?text=found.AIRPORT+"("+found.IATA+")":text=d.Airport;
                                 }else{
                                     let found = addData.find(element=> element.IATA==d.Airline);
                                      found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
                                 }
-                                text+=(StartHour==-1)?"<br>Avg Flight Count/Hour: "+d.Count :"<br>Flight Count: "+d.Count;  
+                                text+=(StartHour==-1)?"<br>Avg Count/Hour:"+d.Count :"<br>Count:"+d.Count;  
                                 text+="<br>Delay:"+Delay[i]; 
                                 return text
                             })
@@ -398,7 +386,7 @@
                     //For TimeText Only 
                     if(StartHour==-1)
                     {
-                        TimeText.text("Daily Avg: 2015-01-01")
+                        TimeText.text("2015-01-01")
                            
                     }
                     else{

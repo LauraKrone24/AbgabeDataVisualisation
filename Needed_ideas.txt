@@ -12,15 +12,17 @@
     - Auswahl min Max Avg 
     - Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
 
+    Graphideen:  Netzgraph
 
-+* Barchart Verspätungsvergleich Animation
+
++ Barchart Verspätungsvergleich Animation
     + Auswahl Airline, Dest Flughafen, Org Flughafen  
     + Auswahl high Avg Low Delay  
     + Animation der Balken  
     + Sortierung der Position der Balken nach  Rank
     + Label 
-    + Tooltip 
-    ? Color Legend 
+    + Tooltip fixen
+    + Color Legend 
 
 + Chord Diagramm Flugverbindungen (States)
     + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
@@ -31,25 +33,26 @@
     + Legende Statekürzel
     
 
-+* Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
++ Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
     + Punktgröße= Anzahl flüge gestartet
     + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
-    ? Colorlegend https://observablehq.com/@d3/color-legend
+    + Colorlegend https://observablehq.com/@d3/color-legend
+    + Größenlegende
     
 
-+* Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
++ Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
     + 2. Datenset zu Airline Kürzeln --> im Filter 
     + Visualisierung von Verspätungen
     + Animierung nach Zeit (verfeinern) 
     + 2. Tablerow für zusätzliche Infos 
-    - Filter für Tag 
-    -? 2. Tablerow mit Visualisierung 
+    + 2. Tablerow mit Visualisierung 
+    + Colorlegend https://observablehq.com/@d3/color-legend
     ? Kreise durch Flugzeuge ersetzen 
-    ? Colorlegend https://observablehq.com/@d3/color-legend
+    + Korrektur de Positionen wenn Addinfo ausgeklappt ist
 
 
 Herausfinden: 
-- Boxplots in d3?
++ Boxplots in d3?
 
 
 
@@ -57,3 +60,5 @@ Zusätzliche To-Dos
 - Durch CSS Menu hübsch machen (style.css)
 - Code sortieren und Kommentieren
 - Dokumentationschreiben 
++ Start mit Daily Avg statt Animation 
+? Ggf falls nötig absolute px  zahlen zu relative % zahlen umwandeln 
