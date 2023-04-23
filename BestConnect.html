@@ -24,31 +24,18 @@
                         <div id="dropdownButtonVisulisation"></div>
                     </td>
                     <td>
-                        <h5>Delay of Interest</h5>
-                        <div id="dropdownButtonHighAvgLow"></div>
+                        <h5>Choose Org. Airport</h5>
+                        <div id="dropdownButtonOrgAirport"></div>
                     </td>
                     <td>
-                         <h5>Option of Interest</h5>
-                        <div id="dropdownButtonOrginDestination"></div>
+                         <h5>Choose Dest. Airport</h5>
+                        <div id="dropdownButtonDestAirport"></div>
                     </td>
                     <td>
-                        <h5>Sort Option</h5>
-                        <div id="dropdownButtonAscDesc"></div>
+                        <h5>Choose Hour</h5>
+                        <div id="dropdownButtonHour"></div>
                     </td>
-                    <td>
-                        <h5>Speed</h5>
-                        <div id="dropdownButtonAnimationspeed"></div>
-                    </td>
-                    <td>
-                        <h5>Starthour</h5>
-                        <div id="dropdownButtonAnimationStart"></div>
-                    </td>
-                    <td valign='bottom'>
-                        <div id="TimeText"></div>
-                    </td>
-                    <td>    
-                        <div id="Colorscale" width="580" height="40"></div>
-                    </td>
+                   
                 </tr>
             </table> 
            
@@ -60,114 +47,9 @@
 
 
         <script type="text/javascript">
-            var HigAvgLow=2;
-            var OrgDest=1; 
-            var AnimationSpeed = 3000;
-            var StartHour=-1; 
-            var AscDesc = 1;
-            var LinesInHour = {}
-            for(let i=-1;i<24;i++){
-
-                i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0
-                        
-            }
-            
-            
-            var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
-                .append('select')
-                
-            dropdownButtonHighAvgLow 
-                .selectAll('myOptions') 
-                .data([{text:"Avg Delay",value:2},{text:"Highest Delay",value:1},{text:"Lowest Delay",value:3}])
-                .attr("class","dropdown")
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonHighAvgLow.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                HigAvgLow= option;
-                
-                load()
-                })
-               
-            var dropdownButtonAscDesc = d3.select("#dropdownButtonAscDesc")
-                .append('select')
-                
-            dropdownButtonAscDesc 
-                .selectAll('myOptions') 
-                .data([{text:"Ascending",value:1},{text:"Descending",value:2}])
-                .attr("class","dropdown")
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonAscDesc.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                AscDesc= option;
-                
-                load()
-                })
-
-
-            var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
-                .append('select')
-                
-            dropdownButtonOrginDestination
-                .selectAll('myOptions') 
-                .data([{text:"Airline at Depature",value:1},{text:"Airline at Destination",value:2}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonOrginDestination.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                OrgDest = option;
-                load()
-                })
-
-
-
-            var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
-                .append('select')
-                
-            dropdownButtonAnimationspeed 
-                .selectAll('myOptions') 
-                .data([{text:"x 1200     ",value:3000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonAnimationspeed.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                AnimationSpeed= option;
-                load()
-                })
-
-            var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
-                .append('select')
-                
-            dropdownButtonAnimationStart
-                .selectAll('myOptions') 
-                .data([{text:"Daily Avg.",value:-1},{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonAnimationStart.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                StartHour = option;
-                if(StartHour!= -1)
-                {
-                    AnimationSpeed= dropdownButtonAnimationspeed.property("value");
-                }
-                load()
-                })
+            var OrgAirport="";
+            var DestAirport=""; 
+            var Hour=-1; 
 
             var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
                 .append('select')
@@ -186,51 +68,108 @@
                 
                 open(option,"_self")
                 })
+
+            let Airportlink = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
+            d3.csv(Airportlink).then(airportData=>{
+                var dropdownButtonOrgAirport = d3.select("#dropdownButtonOrgAirport")
+                    .append('select')
+                    
+                    dropdownButtonOrgAirport
+                    .selectAll('myOptions') 
+                    .data(airportData)
+                    .enter()
+                    .append('option')
+                    .text(function (d) { return d.IATA+" - "+d.AIRPORT; }) 
+                    .attr("value", function (d) { return d.IATA; }) 
+
+                    dropdownButtonOrgAirport.on("change", function(d) {
+                    let option = d3.select(this).property("value")
+                    OrgAirport = option;
+                    
+                    load()
+                    })
+
+
+                var dropdownButtonDestAirport = d3.select("#dropdownButtonDestAirport")
+                    .append('select')
+                    
+                dropdownButtonDestAirport
+                    .selectAll('myOptions') 
+                    .data(airportData)
+                    .enter()
+                    .append('option')
+                    .text(function (d) { return d.IATA+" - "+d.AIRPORT; }) 
+                    .attr("value", function (d) { return d.IATA; }) 
+
+                dropdownButtonDestAirport.on("change", function(d) {
+                    let option = d3.select(this).property("value")
+                    DestAirport = option;
+                    
+                    load()
+                    })
+                
+
+                    
+            })
             
-                var myColor = d3.scaleLinear().domain([-60,0,60])
-                        .range(["green","white", "red"])
-                var array = [];
 
-                for(let i = -60;i<60;i=i+0.1){
-                    array.push(i)
-                }
-
-                colorSvg = d3.select("#legend").append("svg")
-                colorSvg.append("text")
-                        .attr("class","LegendLable")
-                        .attr("x",1170)
-                        .attr("y",520)
-                        .attr("fill","#222222")
-                        .text("Delay in min")
-
-                colorSvg.selectAll("rect")
-                .data(array)
+            var dropdownButtonHour = d3.select("#dropdownButtonHour")
+                .append('select')
+                
+            dropdownButtonHour
+                .selectAll('myOptions') 
+                .data([{text:"All Day",value:-1},{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23}])
                 .enter()
-                .append("rect")
-                .attr("x",(d,i)=>{return 1120+(d*2)})
-                .attr("y",550)
-                .attr("height",20)
-                .attr("width",0.2)
-                .attr("fill",(d)=>{return myColor(d)})
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
 
-                var ColorX  = d3.scaleLinear()
-                    .domain([-60,60])
-                    .range([0,240]);
+            dropdownButtonHour.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                Hour = option;
+                
+                load()
+                })
 
-                colorSvg.append("g")
-                        .attr("transform",
-                                "translate(1000,550)")
-                        .call(d3.axisTop(ColorX))
-                        .attr("stroke", "#222222")
+           
+            
+            var myColor = d3.scaleLinear().domain([-60,0,60])
+                    .range(["green","white", "red"])
+            var array = [];
+
+            for(let i = -60;i<60;i=i+0.1){
+                array.push(i)
+            }
+
+            colorSvg = d3.select("#legend").append("svg")
+            colorSvg.append("text")
+                    .attr("class","LegendLable")
+                    .attr("x",1170)
+                    .attr("y",520)
+                    .attr("fill","#222222")
+                    .text("Delay in min")
+
+            colorSvg.selectAll("rect")
+            .data(array)
+            .enter()
+            .append("rect")
+            .attr("x",(d,i)=>{return 1120+(d*2)})
+            .attr("y",550)
+            .attr("height",20)
+            .attr("width",0.2)
+            .attr("fill",(d)=>{return myColor(d)})
+
+            var ColorX  = d3.scaleLinear()
+                .domain([-60,60])
+                .range([0,240]);
+
+            colorSvg.append("g")
+                    .attr("transform",
+                            "translate(1000,550)")
+                    .call(d3.axisTop(ColorX))
+                    .attr("stroke", "#222222")
                             
-            var TimeText = d3.select('#TimeText')
-                        .append("text")
-                        .attr("color","beige")
-
-            var svg = d3.select("#BarChart")
-                .append("svg")
-                .attr("width","100%")
-                .attr("height","5000px")
+            
 
         
             var tooltip = d3.select("#BarChart")
@@ -246,208 +185,24 @@
             load()
             function load()
             {
-                 Delay = []
-                svg.selectAll("*").remove()
-                TimeText.interrupt()
+                
                 
 
-                var CSVLink =""; 
-                var AddLink; 
+                var CSVLink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/BestConnectSummary.csv"; 
                 
-
-                for(let i=-1;i<24;i++){
-                    i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0    
-                }
                 
-               
-
-               
-                
-
-
                 d3.csv(CSVLink).then(data=>{
-                    d3.csv(AddLink).then(addData=>{
-
-                    data = data.filter(x => { return  (x.Hour*1)>= StartHour})
-
-                    if (StartHour ==-1){
-                        AnimationSpeed =  1000000000000; 
-                    }
-                    
-                    
-                    
-
-                  
-
-                    switch(HigAvgLow){
-                        case "1": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","HighDelay")):data = data.sort(dynamicSortMultiple("Hour","-HighDelay")); break;
-                        case "3": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","LowDelay")):data = data.sort(dynamicSortMultiple("Hour","-LowDelay")); break;
-                        default:  AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","AvgDelay")):data = data.sort(dynamicSortMultiple("Hour","-AvgDelay")); break;
-                    }
-
-                    
-                    
-
-                    g = svg.selectAll("g")
-                        .data(data)
-                        .enter()
-                        .append("g")
-
-                    
-                    
-                    g.append("rect")
-                    .transition()
-                        .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
-                        .attr("x",(d,i)=>{
-                            
-                            LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
-                            switch(HigAvgLow){
-                                case "1": Delay.push(d.HighDelay);  break;
-                                case "3": Delay.push(d.LowDelay) ;break;
-                                default: Delay.push(d.AvgDelay); break;
-                            }
-                            let x =Delay[i]<0?(405+parseFloat(Delay[i])*5):405;
-                           
-                            
-                            return x})
-                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >9?-50: (30+rank*20)})
-                        .attr("height",15)
-                        .attr("width",(d,i)=>{return (Math.abs(Delay[i]!=0?Delay[i]:0.01))*5})
-                        .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
-                        .attr("stroke","black")
-                        .style("opacity",1)
-                        .transition()
-                        .duration(AnimationSpeed)
-                        .remove()
-
-                    g.append("text")
-                        .style("opacity",0)
-                        .transition()
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
-                        .attr("x",(d,i)=>{return Delay[i]<0?10:10})
-                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(40+rank*20)})
-                        .attr("color","black")
-                        .text((d,i)=>{
-                            if(parseInt(OrgDest)<=2){
-                                let found = addData.find(element=> element.IATA==d.Airport);
-                                return found!=undefined?found.AIRPORT+"("+found.IATA+")":d.Airport;
-                            }else{
-                                let found = addData.find(element=> element.IATA==d.Airline);
-                                return found!=undefined?found.Name+"("+found.IATA+")":d.Airline;
-                            }
-                            
-                        })
-                        .attr("class","legendText")
-                        .style("opacity",1)
-                        .transition()
-                        .duration(AnimationSpeed)
-                        .remove()
-                    
-                    var x = d3.scaleLinear()
-                        .domain([-60, 120])
-                        .range([0, 900]);
-
-                
-                    svg.append("g")
-                        .attr("transform", "translate(105, 20)")
-                        .call(d3.axisTop(x));
-                
-                    svg.append("g")
-                        .attr("transform", "translate(1120, 17.5)")
-                        .append("text")
-                        .text("Delay in min ")
-                        .attr("color","black")
-                        
-                    
-                    
-                    g.on("mouseover",function(d,i){
-                        console.log("hihi")
-                        tooltip
-                            .style("opacity",1)
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
-                            .html(()=>{
-                                if(parseInt(OrgDest)<=2){
-                                    let found = addData.find(element=> element.IATA==d.Airport);
-                                     found!=undefined?text=found.AIRPORT+"("+found.IATA+")":text=d.Airport;
-                                }else{
-                                    let found = addData.find(element=> element.IATA==d.Airline);
-                                     found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
-                                }
-                                text+=(StartHour==-1)?"<br>Avg Count/Hour:"+d.Count :"<br>Count:"+d.Count;  
-                                text+="<br>Delay:"+Delay[i]; 
-                                return text
-                            })
-                         
+                    data =  data.filter(element=>{
+                        return (element.OrgAirport==OrgAirport&&element.DestAirport==DestAirport)
                     })
-                    .on("mouseout", function(d){ tooltip.style("opacity", 0)})
+                    console.log(OrgAirport,DestAirport,data)
 
-
-                    //For TimeText Only 
-                    if(StartHour==-1)
-                    {
-                        TimeText.text("2015-01-01")
-                           
-                    }
-                    else{
-                        for(let i = StartHour; i<24;i++)
-                         {
-                       
-                            if(i<=9){
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .text("2015-01-01 0"+i+":00:00")
-                                .duration(AnimationSpeed)
-                                
-                            }else{
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .duration(AnimationSpeed)
-                                .text("2015-01-01 "+i+":00:00")
-                                
-                            }
-                        }
-                    }
-
-                    
-                })})
+                    })
 
             }
 
-            function lineSumTillHour(hour){
-                let sum = 0; 
+            
 
-                for (let i = 0;i<hour;i++){
-                    
-
-                    i<10? sum = sum+LinesInHour["0"+i+""]:sum =sum+LinesInHour[""+i+""]
-                }
-                
-                return sum; 
-            }
-
-            function dynamicSortMultiple() {
-                var props = arguments;
-                return function (obj1, obj2) {
-                    var i = 0, result = 0, numberOfProperties = props.length;
-                    while(result === 0 && i < numberOfProperties) {
-                        result = dynamicSort(props[i])(obj1, obj2);
-                        i++;
-                    }
-                    return result;
-                }
-            }
-            function dynamicSort(property) {
-                var sortOrder = 1;
-                if(property[0] === "-") {
-                    sortOrder = -1;
-                    property = property.substr(1);
-                }
-                return function (a,b) {
-                    var result = (parseFloat(a[property]) < parseFloat(b[property])) ? -1 : (parseFloat(a[property])  > parseFloat (b[property])) ? 1 : 0;
-                    return result * sortOrder;
-                }
-            }
         
             
         </script>
