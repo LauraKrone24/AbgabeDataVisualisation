@@ -26,7 +26,7 @@
                         <div id="dropdownButtonVisulisation"></div>
                     </td>
                     <td valign='bottom'>
-                        <div id="unselect"></div>
+                        <button type="button" onclick="unselect()">Unselect All</button>
                     </td>
                    
                     
@@ -39,7 +39,7 @@
         </div>
         <table class = "Visualisation">
             <tr>
-                <td width ="70%">
+                <td width ="50%">
                     <div height="800px" id="chord"></div>
                 </td>
                 <td>
@@ -47,9 +47,7 @@
                 </td>
             </tr>
             <tr>
-                <td height="1000px">
-
-                </td>
+                <td height="1000px"></td>
             </tr>
         </table>
         
@@ -58,6 +56,7 @@
 
 
         <script type="text/javascript">
+            var unselect;
             var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
                 .append('select')
                 
@@ -75,11 +74,7 @@
                     open(option,"_self")
                 })   
             
-            var unselect = d3.select('#unselect')
-                .append("text")
-                .style("color","#eeeeee")
-                .style("font-size","larger")
-                .text("Unselect all")
+            
 
             
             var tooltip 
@@ -109,7 +104,7 @@
                                 Object.values(data[i]).forEach(element => {
                                     if(element!=undefined && element!=""){
                                         let dataelement = JSON.parse(element)
-                                        console.log(dataelement.count)
+                                        //console.log(dataelement.count)
                                         intArray.push(parseInt(dataelement.count))
                                         destDelayInnerArray.push(dataelement.DestDelay)
                                         orgDelayInnerArray.push(dataelement.OrgDelay)
@@ -147,7 +142,7 @@
                         .attr("width", 800)
                         .attr("height", 800)
                     .append("g")
-                        .attr("transform", "translate(340,340)")
+                        .attr("transform", "translate(400,320)")
 
                     var res = d3.chord()
                         .padAngle(0.05)     
@@ -169,8 +164,8 @@
                     .style("fill", function(d,i){ return colors[i] })
                     .style("stroke", "black")
                     .attr("d", d3.arc()
-                        .innerRadius(250)
-                        .outerRadius(275)
+                        .innerRadius(245)
+                        .outerRadius(265)
                         )
 
                     group.append("text")
@@ -180,7 +175,7 @@
                         .attr("transform", function(d,i) {
                            
                             return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                            + "translate(" + (285) + ")" 
+                            + "translate(" + (275) + ")" 
                             + (d.angle > Math.PI ? "rotate(180)" : "")
                         })
                         .text(function(d,i) {return States[i];  })
@@ -193,7 +188,7 @@
                     .enter()
                     .append("path")
                         .attr("d", d3.ribbon()
-                        .radius(250)
+                        .radius(245)
                         )
                     .style("fill",function(d) { return(colors[d.source.index])} )
                     .style("stroke", "black")
@@ -204,14 +199,14 @@
                             .style("opacity", 1)
                             .html(()=>{text = "Flights <br>"
                              + States[d.source.index]+" -> " + States[d.target.index]+
-                              "<br> Count: "+d.source.value+
-                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.source.index][d.target.index]+
-                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.source.index][d.target.index]
+                              "<br>Flight Count: "+d.source.value+
+                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.source.index][d.target.index]+"min"+
+                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.source.index][d.target.index]+"min"
                               d.source.index != d.target.index?text =text+ 
                               "<br>"+ States[d.target.index]+" -> " + States[d.source.index]+
-                              "<br>Count: "+d.target.value+
-                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.target.index][d.source.index]+
-                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.target.index][d.source.index]:null;
+                              "<br>Flight Count: "+d.target.value+
+                              "<br>Avg. Org. Delay: "+ orgDelayArray[d.target.index][d.source.index]+"min"+
+                              "<br>Avg. Dest. Delay: "+ destDelayArray[d.target.index][d.source.index]+"min":null;
                             return text})
                             .style("left", (d3.event.pageX + 15) + "px")
                             .style("top", (d3.event.pageY - 28) + "px")
@@ -235,18 +230,17 @@
 
                     group.on("click",function (d, i) {
                         chord.classed("unselected", function(p) {
-                        return p.source.index != i && p.target.index != i;
-                        });
-                        chord.classed("selected", function(p) {
-                        return p.source.index == i || p.target.index == i;
-                        });
-
+                                return p.source.index != i && p.target.index != i;
+                            });
+                            chord.classed("selected", function(p) {
+                            return p.source.index == i || p.target.index == i;
+                            });
 		            })
                     
-
-                    
-                    unselect.on("click",function (d, i) {chord.classed("unselected",true)})
+                    unselect= function(){chord.classed("unselected",true)}
                   
+                    
+                    
 
 
 
@@ -269,16 +263,16 @@
 
 
                         g.append("rect")
-                            .attr("x", 80)
-                            .attr("y",function(d,i){return (10+(i*12))})
+                            .attr("x", 0)
+                            .attr("y",function(d,i){return (10+(i*11.5))})
                             .attr('width', 10)
                             .attr("height",10)
                             .attr('fill', function(d,i) { return(colors[i])})
 
                         g.append("text")
                             .attr("class","legendText")
-                            .attr("x",100)
-                            .attr("y",function(d,i){ return (18+(i*12.25))})
+                            .attr("x",20)
+                            .attr("y",function(d,i){ return (18+(i*11.75))})
                             .text(function(d){
                                 let filtered = StateData.filter(x => {  return  (x.abbreviation)== d})[0]
                                 if(d==""){return""}
@@ -286,11 +280,22 @@
                                 return text
                             })
 
+                        g.on("click",(d,i)=>{
+                            chord.classed("unselected", function(p) {
+                                return p.source.index != i && p.target.index != i;
+                            });
+                            chord.classed("selected", function(p) {
+                            return p.source.index == i || p.target.index == i;
+                            });
+                        })
+
                     })
                      
                  })
 
             }
+
+            
 
            
           

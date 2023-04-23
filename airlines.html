@@ -52,7 +52,7 @@
                 
                 <tr id="Addinfo" height="150px">
                     <td class="Box"width="220px"> 
-                            <h6>Depature Delay</h6>
+                            <h6>Departure Delay</h6>
                             <div class="Uncentered"  id="DepatureDelayBox"></div>
                     </td>
                     <td class="Box" width="220px"> 
@@ -65,7 +65,7 @@
                     </td>
                     <td width="220px" class="Count"> 
                         <br>
-                        <h6>Count Flights of the Day </h6>
+                        <h6>Number of Flights (Day) </h6>
                         <div class="Count" id="CountText" ></div>
                 </td>
                 
@@ -104,8 +104,8 @@
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg")
 
-            var myColor = d3.scaleLinear().domain([-60,0,60,120,240])
-                    .range(["green","white","yellow","orange", "red"])
+            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
+                    .range(["#002800","#65A765","white","yellow","orange", "red"])
             var array = [];
 
             for(let i = -60;i<240;i=i+0.1){
@@ -203,25 +203,28 @@
                     element.selectAll("*").remove()
                     
                 });
-                plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
-                plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
-                plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
+                plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayMin),parseFloat(found.OrgDelayMax),parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
+                plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffMin),parseFloat(found.AirTimeDiffMax),parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
+                plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayMin),parseFloat(found.DestDelayMax),parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
 
             }
-            function plotBoxPlot(number,ID,q1,q2,q3){
+            function plotBoxPlot(number,ID,pMin,pMax,q1,q2,q3){
                 let interQuantileRange = q3 - q1
-                let min = q1 - 1.5 * interQuantileRange
-                let max = q1 + 1.5 * interQuantileRange
-            
+                let min = q1 - 1.5 * interQuantileRange<pMin?pMin:q1 - 1.5 * interQuantileRange
+                let max = q3 + 1.5 * interQuantileRange>pMax?pMax:q3 + 1.5 * interQuantileRange
+                console.log("Info"+pMin+" "+min)
+
                 boxSvg[number] = d3.select(ID).append("svg")
                 boxSvg[number].attr("width",200)
                     .attr("height",50)
                     .attr("value",(d)=>{
-                        min,max,q1,q2,q3
+                        //min,max,q1,q2,q3
                         text = "Values"
-                        text += "<br>Q1: "+q1
-                        text += "<br>Median: "+q2
-                        text += "<br>Q3: "+q3
+                        text += "<br>Min: "+min+"min"
+                        text += "<br>Q1: "+q1+"min"
+                        text += "<br>Median: "+q2+"min"
+                        text += "<br>Q3: "+q3+"min"
+                        text += "<br>Max: "+max+"min"
                         return text; 
 
                     })
@@ -239,10 +242,15 @@
                 })
                     
                 boxSvg[number].append("g")
+                    .attr("fill","#eeeeee")
+                    .style("font", "9px times")
+                    .attr("stroke","#eeeeee")
                     .attr("transform",
                             "translate(0,20)")
+                    
                     .call(d3.axisTop(boxX))
-                    .attr("stroke", "#eeeeee")
+                    //.attr("stroke","#eeeeee")
+                    //.attr("stroke-width","1.5")
                     
                 
                 boxSvg[number].append("line")
@@ -285,7 +293,7 @@
                     ColorLable.attr("y",370)
                     Colorscale.attr("y",400)
                     ColorAxis.attr("transform",
-                            "translate(1000,400)")
+                            "translate(960,400)")
                     load
                 }else{
                     d3.select("#Addinfo").style("display","none")
@@ -296,7 +304,7 @@
                     ColorLable.attr("y",520)
                     Colorscale.attr("y",550)
                     ColorAxis.attr("transform",
-                            "translate(1000,550)")
+                            "translate(960,550)")
                     
                     load
                 }

@@ -122,7 +122,7 @@
             var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
                 
-            dropdownButtonAnimationStart
+            var dropdownButtonAnimationStartOptions = dropdownButtonAnimationStart
                 .selectAll('myOptions') 
                 .data([{text:"Daily Avg.",value:-1},{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23}])
                 .enter()
@@ -179,8 +179,8 @@
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg");
 
-            var myColor = d3.scaleLinear().domain([-60,0,60,120,240])
-                    .range(["green","white","yellow","orange", "red"])
+            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
+                    .range(["#002800","#65A765","white","yellow","orange", "red"])
             var array = [];
 
             for(let i = -60;i<240;i=i+0.1){
@@ -331,6 +331,18 @@
                     .duration(AnimationSpeed)
                     .remove()
 
+                    // Reset to Daily Avg after Animation
+                    setTimeout(function(){ 
+                        if(StartHour!=-1){
+                            dropdownButtonAnimationStartOptions.property("selected",(d)=>{
+                                console.log(d.value)
+                                return d.value==-1
+                            })
+                            StartHour=-1
+                            load()
+                        }
+                        
+                    }, (25-StartHour)*AnimationSpeed);  
                    
 
                     
