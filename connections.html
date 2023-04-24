@@ -153,7 +153,7 @@
                     var group = svg.datum(res)
                     .append("g")
                     .selectAll("g")
-                    .data(function(d) { return d.groups; })
+                    .data(function(d) { console.log(d.groups); return d.groups; })
                     .enter()
                     .append("g")
                     
