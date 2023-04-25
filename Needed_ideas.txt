@@ -9,10 +9,10 @@
 - ... mit welcher Airline welche Strecken
     - groupen Org Dest Airline --> Infos Min max Avg
     - Auswahl Org und Dest 
-    - Auswahl min Max Avg 
+    - Display min Max Avg 
     - Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
 
-    Graphideen:  Netzgraph
+    Graphideen: Lollipop ? 
 
 
 + Barchart Verspätungsvergleich Animation
