@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 
-df = pd.read_csv("https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv")
-
+df = pd.read_csv("https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv")
 #Origin Delay CSV
 dfOriginAirportsDelay =df[["ORIGIN_AIRPORT","ORIGIN_AIRPORT_POS","DEPARTURE_DELAY"]]
 dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"].str[11:13]
@@ -11,10 +10,10 @@ dfOriginAirportsDelayDay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT"])
 dfOriginAirportsDelay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT","hour"])
 dfOrigDelaySummary = pd.DataFrame()
 for a in dfOriginAirportsDelayDay:
-    dfOrigDelaySummary= dfOrigDelaySummary.append({"Airport":a[1]["ORIGIN_AIRPORT"].iloc[0],"Hour":"-1","AIRPORT_POS":a[1]["ORIGIN_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24,2)}, ignore_index = True)
+    dfOrigDelaySummary= dfOrigDelaySummary.append({"Airport":a[1]["ORIGIN_AIRPORT"].iloc[0],"Hour":"-1","AIRPORT_POS":a[1]["ORIGIN_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
  
 for a in dfOriginAirportsDelay:
-    dfOrigDelaySummary= dfOrigDelaySummary.append({"Airport":a[1]["ORIGIN_AIRPORT"].iloc[0],"Hour": a[1]["hour"].iloc[0],"AIRPORT_POS":a[1]["ORIGIN_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index)}, ignore_index = True)
+    dfOrigDelaySummary= dfOrigDelaySummary.append({"Airport":a[1]["ORIGIN_AIRPORT"].iloc[0],"Hour": a[1]["hour"].iloc[0],"AIRPORT_POS":a[1]["ORIGIN_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/31,2)}, ignore_index = True)
     
  
 dfOrigDelaySummary = dfOrigDelaySummary.sort_values(by=["Hour","Count"],ascending=[True, False]) 
@@ -29,10 +28,10 @@ dfDestinationAirportsDelay = dfDestinationAirportsDelay.groupby(["DESTINATION_AI
 
 dfDestDelaySummary = pd.DataFrame()
 for a in dfDestinationAirportsDelayDay:
-    dfDestDelaySummary= dfDestDelaySummary.append({"Airport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":"-1","AIRPORT_POS":a[1]["DESTINATION_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/(24),2)}, ignore_index = True)
+    dfDestDelaySummary= dfDestDelaySummary.append({"Airport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":"-1","AIRPORT_POS":a[1]["DESTINATION_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/(24)/31,2)}, ignore_index = True)
  
 for a in dfDestinationAirportsDelay:
-    dfDestDelaySummary= dfDestDelaySummary.append({"Airport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour": a[1]["hour"].iloc[0],"AIRPORT_POS":a[1]["DESTINATION_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":len(a[1].index)}, ignore_index = True)
+    dfDestDelaySummary= dfDestDelaySummary.append({"Airport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour": a[1]["hour"].iloc[0],"AIRPORT_POS":a[1]["DESTINATION_AIRPORT_POS"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/31,2)}, ignore_index = True)
     
  
 dfDestDelaySummary = dfDestDelaySummary.sort_values(by=["Hour","Count"],ascending=[True, False]) 
@@ -127,13 +126,13 @@ dfAirlineDelayDest = dfAirlineDelay.groupby(["AIRLINE","DestHour"])
 dfAirlineDelaySummaryOrg = pd.DataFrame()
 dfAirlineDelaySummaryDest = pd.DataFrame()
 for a in dfAirlineDelayDay:
-    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":  round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24,2)}, ignore_index = True)
-    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/24,2)}, ignore_index = True)
+    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":  round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
+    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
  
 for a in dfAirlineDelayOrg:
-    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour": a[1]["OrgHour"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index)}, ignore_index = True)
+    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour": a[1]["OrgHour"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/31,2)}, ignore_index = True)
 for a in dfAirlineDelayDest:
-    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour": a[1]["DestHour"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":len(a[1].index)}, ignore_index = True)
+    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour": a[1]["DestHour"].iloc[0],"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/31,2)}, ignore_index = True)
     
  
 dfAirlineDelaySummaryOrg = dfAirlineDelaySummaryOrg.sort_values(by="Hour") 
@@ -160,7 +159,6 @@ dfBestConnectSummary = dfBestConnectSummary.sort_values(by=["OrgAirport","DestAi
 dfBestConnectSummary.to_csv("BestConnectSummary.csv")
 
 
-df4 = df4.sort_values(by="IATA")
-df4.fil
+
 # hier noch filter ob Airport überhaupt in Best Connection Summaray
 df4.to_csv("SortedAirports.csv")
