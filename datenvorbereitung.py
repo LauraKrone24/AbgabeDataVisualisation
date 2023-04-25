@@ -161,4 +161,10 @@ dfBestConnectSummary.to_csv("BestConnectSummary.csv")
 
 
 # hier noch filter ob Airport überhaupt in Best Connection Summaray
-#df4.to_csv("SortedAirports.csv")
+df4 = df4.sort_values(by=["IATA"])
+
+Airports = df["ORIGIN_AIRPORT"].dropna().astype("str").append(df["DESTINATION_AIRPORT"].dropna()).astype("str").unique()
+
+
+df4 = df4[ df4.IATA.isin(Airports)]
+df4.to_csv("SortedAirports.csv")

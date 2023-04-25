@@ -208,10 +208,10 @@
 
                     data.forEach(element => {
 
-                            max = max<element.MaxDelayOrg?element.MaxDelayOrg:max;
-                            max = max<element.MaxDelayDest?element.MaxDelayDest:max;
-                            min = min>element.MinDelayOrg?element.MinDelayOrg:min;
-                            min = min>element.MinDelayDest?element.MinDelayDest:min;
+                            max = max<parseFloat(element.MaxDelayOrg)?parseFloat(element.MaxDelayOrg):max;
+                            max = max<parseFloat(element.MaxDelayDest)?parseFloat(element.MaxDelayDest):max;
+                            min = min>parseFloat(element.MinDelayOrg)?parseFloat(element.MinDelayOrg):min;
+                            min = min>parseFloat(element.MinDelayDest)?parseFloat(element.MinDelayDest):min;
                             
                             usedata.push({Title:element.Airline+" - Depature",MinDelay:element.MinDelayOrg,AvgDelay:element.AvgDelayOrg,MaxDelay:element.MaxDelayOrg})
                             usedata.push({Title:element.Airline+" - Destination",MinDelay:element.MinDelayDest,AvgDelay:element.AvgDelayDest,MaxDelay:element.MaxDelayDest})
@@ -220,6 +220,7 @@
                     min = Math.floor(min/10)*10-10
                     max = Math.ceil(max/10)*10+10
 
+                    console.log(min,max)
                     console.log(usedata)
                     var x = d3.scaleLinear()
                     .domain([min, max])
@@ -227,7 +228,7 @@
 
                     var y = d3.scaleBand()
                         .range([ 0, height ])
-                        .domain(usedata.map(function(d) { console.log(d.Title); return d.Title; }))
+                        .domain(usedata.map(function(d) { return d.Title; }))
                         .padding(1);
 
                     if(count!=0){

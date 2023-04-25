@@ -67,11 +67,7 @@
             var StartHour=-1; 
             var AscDesc = 1;
             var LinesInHour = {}
-            for(let i=-1;i<24;i++){
-
-                i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0
-                        
-            }
+           
             
             
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
@@ -268,7 +264,7 @@
                 }
 
                 for(let i=-1;i<24;i++){
-                    i<10? LinesInHour["0"+i+""]=0:LinesInHour[""+i+""]=0    
+                    LinesInHour[""+i+""]=0    
                 }
                 
                
@@ -280,6 +276,7 @@
                 d3.csv(CSVLink).then(data=>{
                     d3.csv(AddLink).then(addData=>{
 
+                        console.log(data)
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
                     if (StartHour ==-1){
@@ -313,6 +310,7 @@
                         .attr("x",(d,i)=>{
                             
                             LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
+                            console.log("Lines in Hour: "+LinesInHour[""+d.Hour+""])
                             switch(HigAvgLow){
                                 case "1": Delay.push(d.HighDelay);  break;
                                 case "3": Delay.push(d.LowDelay) ;break;
@@ -441,9 +439,7 @@
                 let sum = 0; 
 
                 for (let i = 0;i<hour;i++){
-                    
-
-                    i<10? sum = sum+LinesInHour["0"+i+""]:sum =sum+LinesInHour[""+i+""]
+                    sum = sum+LinesInHour[""+i+""]
                 }
                 
                 return sum; 
