@@ -31,10 +31,7 @@
                          <h5>Choose Dest. Airport</h5>
                         <div id="dropdownButtonDestAirport"></div>
                     </td>
-                    <td>
-                        <h5>Choose Hour</h5>
-                        <div id="dropdownButtonHour"></div>
-                    </td>
+                   
                    
                 </tr>
             </table> 
@@ -113,25 +110,6 @@
             })
             
 
-            var dropdownButtonHour = d3.select("#dropdownButtonHour")
-                .append('select')
-                
-            dropdownButtonHour
-                .selectAll('myOptions') 
-                .data([{text:"All Day",value:-1},{text:"00",value:0},{text:"01",value:1},{text:"02",value:2},{text:"03",value:3},{text:"04",value:4},{text:"05",value:5},{text:"06",value:6},{text:"07",value:7},{text:"08",value:8},{text:"09",value:9},{text:"10",value:10},{text:"11",value:11},{text:"12",value:12},{text:"13",value:13},{text:"14",value:14},{text:"15",value:15},{text:"16",value:16},{text:"17",value:17},{text:"18",value:18},{text:"19",value:19},{text:"20",value:20},{text:"21",value:21},{text:"22",value:22},{text:"23",value:23}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonHour.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                Hour = option;
-                
-                load()
-                })
-
-           
             
             var myColor = d3.scaleLinear().domain([-60,0,60])
                     .range(["green","white", "red"])
@@ -196,7 +174,7 @@
                     svg.selectAll("*").remove()
                     data =  data.filter(element=>{
                         
-                        return (element.OrgAirport==OrgAirport&&element.DestAirport==DestAirport&&parseInt(element.Hour) == Hour)
+                        return (element.OrgAirport==OrgAirport&&element.DestAirport==DestAirport)
                     })
                     console.log(OrgAirport,DestAirport,data)
 

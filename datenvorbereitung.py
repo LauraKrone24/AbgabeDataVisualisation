@@ -152,8 +152,6 @@ for a in dfBestConnectDay:
     dfBestConnectSummary = dfBestConnectSummary.append({"OrgAirport":a[1]["ORIGIN_AIRPORT"].iloc[0],"DestAirport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":-1,"Airline":a[1]["AIRLINE"].iloc[0],"MinDelayDest":a[1]["DESTINATION_DELAY"].min(),"AvgDelayDest":a[1]["DESTINATION_DELAY"].mean(),"MaxDelayDest":a[1]["DESTINATION_DELAY"].max(),"MinDelayOrg":a[1]["DEPARTURE_DELAY"].min(),"AvgDelayOrg":a[1]["DEPARTURE_DELAY"].mean(),"MaxDelayOrg":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index)},ignore_index = True)
 
 
-for a in dfBestConnect: 
-    dfBestConnectSummary = dfBestConnectSummary.append({"OrgAirport":a[1]["ORIGIN_AIRPORT"].iloc[0],"DestAirport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":a[1]["hour"].iloc[0],"Airline":a[1]["AIRLINE"].iloc[0],"MinDelayDest":a[1]["DESTINATION_DELAY"].min(),"AvgDelayDest":a[1]["DESTINATION_DELAY"].mean(),"MaxDelayDest":a[1]["DESTINATION_DELAY"].max(),"MinDelayOrg":a[1]["DEPARTURE_DELAY"].min(),"AvgDelayOrg":a[1]["DEPARTURE_DELAY"].mean(),"MaxDelayOrg":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index)},ignore_index = True)
 
 dfBestConnectSummary = dfBestConnectSummary.sort_values(by=["OrgAirport","DestAirport","Hour"])
 dfBestConnectSummary.to_csv("BestConnectSummary.csv")
