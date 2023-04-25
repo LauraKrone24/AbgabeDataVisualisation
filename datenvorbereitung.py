@@ -63,8 +63,7 @@ df2.to_csv("Airlines.csv")
 
 df3 = pd.read_csv("airports.csv")
 df4 = df3
-df4 = df4.sort_values(by="IATA")
-df4.to_csv("SortedAirports.csv")
+
 
 df3 = df3[["IATA","STATE"]]
 
@@ -159,3 +158,9 @@ for a in dfBestConnect:
 
 dfBestConnectSummary = dfBestConnectSummary.sort_values(by=["OrgAirport","DestAirport","Hour"])
 dfBestConnectSummary.to_csv("BestConnectSummary.csv")
+
+
+df4 = df4.sort_values(by="IATA")
+df4.fil
+# hier noch filter ob Airport überhaupt in Best Connection Summaray
+df4.to_csv("SortedAirports.csv")
