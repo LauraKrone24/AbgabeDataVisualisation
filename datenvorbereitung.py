@@ -117,8 +117,8 @@ f.close()
 #Airline Delay 
 
 dfAirlineDelay =df[["AIRLINE","DEPARTURE_DELAY","DESTINATION_DELAY"]]
-dfAirlineDelay["DestHour"]=df["SCHEDULED_DESTINATION"].str[11:13]
-dfAirlineDelay["OrgHour"]=df["SCHEDULED_DEPARTURE"].str[11:13]
+dfAirlineDelay["DestHour"]=df["SCHEDULED_DESTINATION"]%60
+dfAirlineDelay["OrgHour"]=df["SCHEDULED_DEPARTURE"]%60
 dfAirlineDelayDay = dfAirlineDelay.groupby(["AIRLINE"])
 dfAirlineDelayOrg = dfAirlineDelay.groupby(["AIRLINE","OrgHour"])
 dfAirlineDelayDest = dfAirlineDelay.groupby(["AIRLINE","DestHour"])
@@ -126,8 +126,8 @@ dfAirlineDelayDest = dfAirlineDelay.groupby(["AIRLINE","DestHour"])
 dfAirlineDelaySummaryOrg = pd.DataFrame()
 dfAirlineDelaySummaryDest = pd.DataFrame()
 for a in dfAirlineDelayDay:
-    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":  round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
-    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":"-1","AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
+    dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":-1,"AvgDelay":  round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
+    dfAirlineDelaySummaryDest= dfAirlineDelaySummaryDest.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour":-1,"AvgDelay":round(a[1]["DESTINATION_DELAY"].mean(),2),"LowDelay":a[1]["DESTINATION_DELAY"].min(),"HighDelay":a[1]["DESTINATION_DELAY"].max(),"Count":round(len(a[1].index)/24/31,2)}, ignore_index = True)
  
 for a in dfAirlineDelayOrg:
     dfAirlineDelaySummaryOrg= dfAirlineDelaySummaryOrg.append({"Airline":a[1]["AIRLINE"].iloc[0],"Hour": a[1]["OrgHour"].iloc[0],"AvgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"LowDelay":a[1]["DEPARTURE_DELAY"].min(),"HighDelay":a[1]["DEPARTURE_DELAY"].max(),"Count":round(len(a[1].index)/31,2)}, ignore_index = True)
@@ -143,7 +143,7 @@ dfAirlineDelaySummaryDest.to_csv("AirlineDestDelaySummary.csv")
         
 #Datenvorbereitung für Vis 5 - Best Connection 
 dfBestConnect = df
-dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"].str[11:13]
+dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"]%60
 dfBestConnectDay = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","AIRLINE"])
 dfBestConnect = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","hour","AIRLINE"])
 
@@ -161,4 +161,4 @@ dfBestConnectSummary.to_csv("BestConnectSummary.csv")
 
 
 # hier noch filter ob Airport überhaupt in Best Connection Summaray
-df4.to_csv("SortedAirports.csv")
+#df4.to_csv("SortedAirports.csv")
