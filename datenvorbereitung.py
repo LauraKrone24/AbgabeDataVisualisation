@@ -5,7 +5,7 @@ import json
 df = pd.read_csv("https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv")
 #Origin Delay CSV
 dfOriginAirportsDelay =df[["ORIGIN_AIRPORT","ORIGIN_AIRPORT_POS","DEPARTURE_DELAY"]]
-dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"].str[11:13]
+dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"]%60
 dfOriginAirportsDelayDay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT"])
 dfOriginAirportsDelay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT","hour"])
 dfOrigDelaySummary = pd.DataFrame()
@@ -22,7 +22,7 @@ dfOrigDelaySummary.to_csv("OrigDelaySummary.csv")
 
 #Destination Delay CSV
 dfDestinationAirportsDelay =df[["DESTINATION_AIRPORT","DESTINATION_AIRPORT_POS","DESTINATION_DELAY"]]
-dfDestinationAirportsDelay["hour"]=df["SCHEDULED_DESTINATION"].str[11:13]
+dfDestinationAirportsDelay["hour"]=df["SCHEDULED_DESTINATION"]%60
 dfDestinationAirportsDelayDay = dfDestinationAirportsDelay.groupby(["DESTINATION_AIRPORT"])
 dfDestinationAirportsDelay = dfDestinationAirportsDelay.groupby(["DESTINATION_AIRPORT","hour"])
 
