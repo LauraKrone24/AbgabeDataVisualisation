@@ -5,7 +5,7 @@ import json
 df = pd.read_csv("https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv")
 #Origin Delay CSV
 dfOriginAirportsDelay =df[["ORIGIN_AIRPORT","ORIGIN_AIRPORT_POS","DEPARTURE_DELAY"]]
-dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"]%60
+dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"]//100
 dfOriginAirportsDelayDay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT"])
 dfOriginAirportsDelay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT","hour"])
 dfOrigDelaySummary = pd.DataFrame()
@@ -22,7 +22,7 @@ dfOrigDelaySummary.to_csv("OrigDelaySummary.csv")
 
 #Destination Delay CSV
 dfDestinationAirportsDelay =df[["DESTINATION_AIRPORT","DESTINATION_AIRPORT_POS","DESTINATION_DELAY"]]
-dfDestinationAirportsDelay["hour"]=df["SCHEDULED_DESTINATION"]%60
+dfDestinationAirportsDelay["hour"]=df["SCHEDULED_DESTINATION"]//100
 dfDestinationAirportsDelayDay = dfDestinationAirportsDelay.groupby(["DESTINATION_AIRPORT"])
 dfDestinationAirportsDelay = dfDestinationAirportsDelay.groupby(["DESTINATION_AIRPORT","hour"])
 
@@ -117,8 +117,8 @@ f.close()
 #Airline Delay 
 
 dfAirlineDelay =df[["AIRLINE","DEPARTURE_DELAY","DESTINATION_DELAY"]]
-dfAirlineDelay["DestHour"]=df["SCHEDULED_DESTINATION"]%60
-dfAirlineDelay["OrgHour"]=df["SCHEDULED_DEPARTURE"]%60
+dfAirlineDelay["DestHour"]=df["SCHEDULED_DESTINATION"]//100
+dfAirlineDelay["OrgHour"]=df["SCHEDULED_DEPARTURE"]//100
 dfAirlineDelayDay = dfAirlineDelay.groupby(["AIRLINE"])
 dfAirlineDelayOrg = dfAirlineDelay.groupby(["AIRLINE","OrgHour"])
 dfAirlineDelayDest = dfAirlineDelay.groupby(["AIRLINE","DestHour"])
@@ -143,7 +143,7 @@ dfAirlineDelaySummaryDest.to_csv("AirlineDestDelaySummary.csv")
         
 #Datenvorbereitung für Vis 5 - Best Connection 
 dfBestConnect = df
-dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"]%60
+dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"]//100
 dfBestConnectDay = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","AIRLINE"])
 dfBestConnect = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","hour","AIRLINE"])
 
