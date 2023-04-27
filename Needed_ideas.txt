@@ -6,13 +6,15 @@
     - Selektierbar Welcher Flughafen / Welche Airline 
     - Tooltip 
 
-- ... mit welcher Airline welche Strecken
-    - groupen Org Dest Airline --> Infos Min max Avg
-    - Auswahl Org und Dest 
-    - Display min Max Avg 
-    - Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
+- Lollipop Graph mit welcher Airline welche Strecken
+    + groupen Org Dest Airline --> Infos Min max Avg
+    + Auswahl Org und Dest 
+    + Display min Max Avg 
+    * Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
+    - Tooltip
+    * Filter optionen um dropdownbutton zu filtern 
 
-    Graphideen: Lollipop ? 
+    
 
 
 + Barchart Verspätungsvergleich Animation

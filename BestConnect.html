@@ -12,7 +12,7 @@
         <title>Delay Comparison </title>
     </head>
 
-    <body >
+    <body  >
         
         
         <div id = "Options">     
@@ -23,6 +23,7 @@
                         <h5>Visualisation</h5>
                         <div id="dropdownButtonVisulisation"></div>
                     </td>
+                  
                     <td>
                         <h5>Choose Org. Airport</h5>
                         <div id="dropdownButtonOrgAirport"></div>
@@ -31,6 +32,14 @@
                          <h5>Choose Dest. Airport</h5>
                         <div id="dropdownButtonDestAirport"></div>
                     </td>
+                    <td>
+                        <h5>Filter Options</h5>
+                        <div id="FilterCheckbox">
+                            <input type="radio" name="filterButton" value=0 checked> No Filters<br>
+                            <input type="radio" name="filterButton" value=1> Filter Origin Airportlist<br>
+                            <input type="radio" name="filterButton" value=2> Filter Destination Airportlist<br>
+                        </div>
+                    </td>
                    
                    
                 </tr>
@@ -38,16 +47,21 @@
            
         </div>
         <div id="legend"></div>
-        <div id="Visualisation" width="100%" height="1000px"></div>
+        <div id="Visualisation" width="100%" ></div>
         
         
 
 
         <script type="text/javascript">
-            var OrgAirport="ABE";
-            var DestAirport="ATL"; 
+            var OrgAirport="*";
+            var DestAirport="*"; 
             var Hour=-1; 
+            var filteroption = 0; 
+            var DestAirports = [];
+            var OrgAirports = [];
+            
 
+            
             var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
                 .append('select')
                 
@@ -66,47 +80,76 @@
                 open(option,"_self")
                 })
 
-            let Airportlink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
-            d3.csv(Airportlink).then(airportData=>{
-                var dropdownButtonOrgAirport = d3.select("#dropdownButtonOrgAirport")
-                    .append('select')
-                    
-                    dropdownButtonOrgAirport
-                    .selectAll('myOptions') 
-                    .data(airportData)
-                    .enter()
-                    .append('option')
-                    .text(function (d) { return d.IATA+" - "+d.AIRPORT; }) 
-                    .attr("value", function (d) { return d.IATA; }) 
 
-                    dropdownButtonOrgAirport.on("change", function(d) {
-                    let option = d3.select(this).property("value")
-                    OrgAirport = option;
+            var dropdownButtonOrgAirport = d3.select("#dropdownButtonOrgAirport")
+                    .append('select') 
+            var dropdownButtonDestAirport = d3.select("#dropdownButtonDestAirport")
+                .append('select') 
+
+            loadDropDown();
+            
+
+            
+           function loadDropDown(){
+                let Airportlink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
+
+                d3.csv(Airportlink).then(airportData=>{
+                    console.log(OrgAirport,DestAirport)
+                    let DestAirportInfo=[];
+                    let OrgAirportInfo =[];
+
+                    filteroption == 1 ? airportData = airportData.filter(element=>{element.IATA ==DestAirport?DestAirportInfo.push(element) : null ;return OrgAirports.includes(element.IATA)}):null
+                    filteroption == 2 ? airportData = airportData.filter(element=>{element.IATA ==OrgAirport?OrgAirportInfo.push(element) : null ; return DestAirports.includes(element.IATA) }):null
+
+                    airportData = [{IATA:"*",AIRPORT:"All Airports"},...airportData]
+                    console.log(airportData)
+
+                    dropdownButtonOrgAirport.selectAll("*").remove()
+                    dropdownButtonDestAirport.selectAll("*").remove()
+                        
+                        dropdownButtonOrgAirport
+                        .selectAll('myOptions') 
+                        .data(filteroption==2?OrgAirportInfo:airportData)
+                        .enter()
+                        .append('option')
+                        .text(function (d) { return d.IATA+" - "+d.AIRPORT }) 
+                        .attr("value", function (d) { return d.IATA; })
+                        
                     
-                    load()
-                    })
+                        dropdownButtonOrgAirport.on("change", function(d) {
+                        let option = d3.select(this).property("value")
+                        OrgAirport = option;
+                        
+                        load()
+                        })
 
 
-                var dropdownButtonDestAirport = d3.select("#dropdownButtonDestAirport")
-                    .append('select')
                     
-                dropdownButtonDestAirport
-                    .selectAll('myOptions') 
-                    .data(airportData)
-                    .enter()
-                    .append('option')
-                    .text(function (d) { return d.IATA+" - "+d.AIRPORT; }) 
-                    .attr("value", function (d) { return d.IATA; }) 
+                        
+                    dropdownButtonDestAirport
+                        .selectAll('myOptions') 
+                        .data(filteroption==1?DestAirportInfo:airportData )
+                        .enter()
+                        .append('option')
+                        .text(function (d) { return d.IATA+" - "+d.AIRPORT }) 
+                        .attr("value", function (d) { return d.IATA; }) 
+                        
 
-                dropdownButtonDestAirport.on("change", function(d) {
-                    let option = d3.select(this).property("value")
-                    DestAirport = option;
-                    
-                    load()
-                    })
-                
+                    dropdownButtonDestAirport.on("change", function(d) {
+                        let option = d3.select(this).property("value")
+                        DestAirport = option;
+                        
+                        load()
+                        })
+                 })
 
-                    
+           }
+
+           var filters = d3.selectAll("input");
+           filters.on("change", function(){
+                let option = d3.select(this).property("value")
+                filteroption = option; 
+                loadDropDown(); 
             })
             
 
@@ -123,7 +166,7 @@
             colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",1170)
-                    .attr("y",520)
+                    .attr("y",50)
                     .attr("fill","#222222")
                     .text("Delay in min")
 
@@ -131,8 +174,8 @@
             .data(array)
             .enter()
             .append("rect")
-            .attr("x",(d,i)=>{return 1120+(d*2)})
-            .attr("y",550)
+            .attr("x",(d,i)=>{return 1130+(d*2)})
+            .attr("y",60)
             .attr("height",20)
             .attr("width",0.2)
             .attr("fill",(d)=>{return myColor(d)})
@@ -143,15 +186,19 @@
 
             colorSvg.append("g")
                     .attr("transform",
-                            "translate(1000,550)")
-                    .call(d3.axisTop(ColorX))
+                            "translate(1010,80)")
+                    .call(d3.axisBottom(ColorX))
                     .attr("stroke", "#222222")
                             
             
 
         
-            var svg = d3.select("#Visualisation")
-                        .append("svg")
+            var container = d3.select("body")
+                        .append("div")
+                        .style("overflow-y","scroll")
+                        
+            var svg = container.append("svg")
+
                             
                             
             
@@ -170,12 +217,21 @@
                         
                         
                 d3.csv(CSVLink).then(data=>{
-                    console.log(data)
+                    DestAirports= []
+                    OrgAirports= []
+                    //console.log(data)
                     svg.selectAll("*").remove()
                     data =  data.filter(element=>{
                         
-                        return (element.OrgAirport==OrgAirport&&element.DestAirport==DestAirport)
+                        
+
+                        element.OrgAirport==OrgAirport? DestAirports.push(element.DestAirport):null
+                        element.DestAirport==DestAirport? OrgAirports.push(element.OrgAirport):null
+                        
+                        return ((OrgAirport!="*"?element.OrgAirport==OrgAirport:true)&&(DestAirport!="*"?element.DestAirport==DestAirport:true))
                     })
+                    //console.log("Found"+DestAirports, OrgAirports)
+
                     console.log(OrgAirport,DestAirport,data)
 
                     let count = data.length
@@ -191,14 +247,14 @@
                             min = min>parseFloat(element.MinDelayOrg)?parseFloat(element.MinDelayOrg):min;
                             min = min>parseFloat(element.MinDelayDest)?parseFloat(element.MinDelayDest):min;
                             
-                            usedata.push({Title:element.Airline+" - Depature",MinDelay:element.MinDelayOrg,AvgDelay:element.AvgDelayOrg,MaxDelay:element.MaxDelayOrg})
-                            usedata.push({Title:element.Airline+" - Destination",MinDelay:element.MinDelayDest,AvgDelay:element.AvgDelayDest,MaxDelay:element.MaxDelayDest})
+                            usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Depature",MinDelay:element.MinDelayOrg,AvgDelay:element.AvgDelayOrg,MaxDelay:element.MaxDelayOrg})
+                            usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Destination",MinDelay:element.MinDelayDest,AvgDelay:element.AvgDelayDest,MaxDelay:element.MaxDelayDest})
                     });
 
                     min = Math.floor(min/10)*10-10
                     max = Math.ceil(max/10)*10+10
-
-                    console.log(min,max)
+                    
+                    //console.log(min,max)
                     console.log(usedata)
                     var x = d3.scaleLinear()
                     .domain([min, max])
@@ -210,15 +266,18 @@
                         .padding(1);
 
                     if(count!=0){
-                        svg.append("g")
-                            .attr("transform", "translate(100," + (height+50) + ")")
-                            .call(d3.axisBottom(x))
+                        var XAxix  = svg.append("g")
+                            .attr("transform", "translate(150,50)")
+                            .call(d3.axisTop(x))
 
-                        
+                        svg.on("scroll",function(d,i){
+                            console.log("scroll");
+
+                        })
                         
                         
                         svg.append("g")
-                            .attr("transform", "translate(100,50)")
+                            .attr("transform", "translate(150,50)")
                             .call(d3.axisLeft(y))
 
                         svg.selectAll("myline")
@@ -231,7 +290,7 @@
                             .attr("y2", (d)=>{ return y(d.Title); })
                             .attr("stroke-width", "1px")
                             .attr("stroke","black")
-                            .attr("transform", "translate(100,50)")
+                            .attr("transform", "translate(150,50)")
 
                         svg.selectAll("mycircle")
                             .data(usedata)
@@ -239,11 +298,11 @@
                             .append("circle")
                             .attr("cx", (d)=>{ return x(d.MinDelay); })
                             .attr("cy", (d)=>{ return y(d.Title); })
-                            .attr("r", "2.5")
+                            .attr("r", "4")
                             .style("fill", (d)=>{return myColor(d.MinDelay)})
-                            .attr("transform", "translate(100,50)")
+                            .attr("transform", "translate(150,50)")
                             .attr("stroke","black")
-                            .attr("stroke-width", "0.2px")
+                            .attr("stroke-width", "0.5px")
                         
                         svg.selectAll("mycircle")
                             .data(usedata)
@@ -251,11 +310,23 @@
                             .append("circle")
                             .attr("cx", (d)=>{ return x(d.MaxDelay); })
                             .attr("cy", (d)=>{ return y(d.Title); })
-                            .attr("r", "2.5")
+                            .attr("r", "4")
                             .style("fill", (d)=>{return myColor(d.MaxDelay)})
-                            .attr("transform", "translate(100,50)")
+                            .attr("transform", "translate(150,50)")
                             .attr("stroke","black")
-                            .attr("stroke-width", "0.2px")
+                            .attr("stroke-width", "0.5px")
+
+                            svg.selectAll("myline")
+                            .data(usedata)
+                            .enter()
+                            .append("line")
+                            .attr("x1", (d)=>{ return x(d.AvgDelay); })
+                            .attr("x2", (d)=>{ return x(d.AvgDelay); })
+                            .attr("y1", (d)=>{ return y(d.Title)-5; })
+                            .attr("y2", (d)=>{ return y(d.Title)+5; })
+                            .attr("stroke-width", "2px")
+                            .attr("stroke","black")
+                            .attr("transform", "translate(150,50)")
 
 
 

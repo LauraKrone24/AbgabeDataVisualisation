@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
     
+    
 }
 
 #map {
@@ -23,7 +24,9 @@ table{
 }
 .Visualisation{
     background-color: #eeeeee;
-    height: 100%;
+    display: flex;
+    overflow-x:visible;
+    overflow-y: visible;
     
 }
 
@@ -32,8 +35,6 @@ select{
   color: #eeeeee;
   border: none;
   margin: 0;
-  
-  
   
 }
 
@@ -105,3 +106,10 @@ td{
     font: 14px sans-serif;
     color: #eee;
 }
+
+#FilterCheckbox{
+    font: 14px sans-serif;
+    color: #eee;
+    text-align:start;
+}
+
