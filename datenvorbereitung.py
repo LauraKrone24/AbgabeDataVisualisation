@@ -147,9 +147,11 @@ dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"]//100
 dfBestConnectDay = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","AIRLINE"])
 dfBestConnect = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","hour","AIRLINE"])
 
+
+
 dfBestConnectSummary = pd.DataFrame()
 for a in dfBestConnectDay: 
-    dfBestConnectSummary = dfBestConnectSummary.append({"OrgAirport":a[1]["ORIGIN_AIRPORT"].iloc[0],"DestAirport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":-1,"Airline":a[1]["AIRLINE"].iloc[0],"MinDelayDest":a[1]["DESTINATION_DELAY"].min(),"AvgDelayDest":a[1]["DESTINATION_DELAY"].mean(),"MaxDelayDest":a[1]["DESTINATION_DELAY"].max(),"MinDelayOrg":a[1]["DEPARTURE_DELAY"].min(),"AvgDelayOrg":a[1]["DEPARTURE_DELAY"].mean(),"MaxDelayOrg":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index)},ignore_index = True)
+    dfBestConnectSummary = dfBestConnectSummary.append({"OrgAirport":a[1]["ORIGIN_AIRPORT"].iloc[0],"DestAirport":a[1]["DESTINATION_AIRPORT"].iloc[0],"Hour":-1,"Airline":a[1]["AIRLINE"].iloc[0],"MinDelayDest":a[1]["DESTINATION_DELAY"].min(),"AvgDelayDest":round(a[1]["DESTINATION_DELAY"].mean(),2),"MaxDelayDest":a[1]["DESTINATION_DELAY"].max(),"MinDelayOrg":a[1]["DEPARTURE_DELAY"].min(),"AvgDelayOrg":round(a[1]["DEPARTURE_DELAY"].mean(),2),"MaxDelayOrg":a[1]["DEPARTURE_DELAY"].max(),"Count":len(a[1].index),"ScheduledTime":round(a[1]["SCHEDULED_TIME"].mean()),"ElapsedTimeMin":a[1]["ELAPSED_TIME"].min(),"ElapsedTimeAvg":round(a[1]["ELAPSED_TIME"].mean(),2),"ElapsedTimeMax":a[1]["ELAPSED_TIME"].max()},ignore_index = True)
 
 
 dfBestConnectSummary = dfBestConnectSummary.sort_values(by=["OrgAirport","DestAirport","Hour"])

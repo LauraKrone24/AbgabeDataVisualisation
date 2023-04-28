@@ -112,4 +112,18 @@ td{
     color: #eee;
     text-align:start;
 }
+div#Container{
+    height: 900px;
+    width: 800px;
+    overflow-y: auto;
+    }
+svg#Lollipop {
+      height: 1000000px;
+      width: 100%;
+      
+   }
+
+
+
+
 

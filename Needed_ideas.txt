@@ -10,9 +10,11 @@
     + groupen Org Dest Airline --> Infos Min max Avg
     + Auswahl Org und Dest 
     + Display min Max Avg 
-    * Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
+    + Anzeigen Graph für alleAirlines die diesen Flug geflogen sind 
     - Tooltip
-    * Filter optionen um dropdownbutton zu filtern 
+    + Filter optionen um dropdownbutton zu filtern 
+    + Überschrift einfügen
+    ? Ändern Verspätung in Zeit gebraucht -> oder Auswählbar Zeit / Verspätung 
 
     
 
@@ -51,10 +53,10 @@
     + Colorlegend https://observablehq.com/@d3/color-legend
     ? Kreise durch Flugzeuge ersetzen 
     + Korrektur de Positionen wenn Addinfo ausgeklappt ist
+    ? Tag Auswählbar? 
 
 
-Herausfinden: 
-+ Boxplots in d3?
+
 
 
 
@@ -62,5 +64,4 @@ Zusätzliche To-Dos
 - Durch CSS Menu hübsch machen (style.css)
 - Code sortieren und Kommentieren
 - Dokumentationschreiben 
-+ Start mit Daily Avg statt Animation 
 ? Ggf falls nötig absolute px  zahlen zu relative % zahlen umwandeln 

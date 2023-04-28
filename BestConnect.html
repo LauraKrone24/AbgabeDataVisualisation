@@ -6,7 +6,6 @@
         <script src="https://d3js.org/d3.v4.min.js"></script>
         <script src="https://d3js.org/queue.v1.min.js"></script>
         <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
-
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <title>Delay Comparison </title>
@@ -15,15 +14,18 @@
     <body  >
         
         
-        <div id = "Options">     
+        <div id = "Options"> 
+            <span><h2 >Best Connections</h2> </span>        
             <table >
-                <tr><td><br></td></tr>
                 <tr id="tableheader">
                     <td>
                         <h5>Visualisation</h5>
                         <div id="dropdownButtonVisulisation"></div>
                     </td>
-                  
+                    <td>
+                        <h5>Option to visualise</h5>
+                        <div id="dropdownButtonDelayTime"></div>
+                    </td>
                     <td>
                         <h5>Choose Org. Airport</h5>
                         <div id="dropdownButtonOrgAirport"></div>
@@ -46,8 +48,8 @@
             </table> 
            
         </div>
-        <div id="legend"></div>
-        <div id="Visualisation" width="100%" ></div>
+        
+        <div id="Container"></div>
         
         
 
@@ -55,10 +57,18 @@
         <script type="text/javascript">
             var OrgAirport="*";
             var DestAirport="*"; 
-            var Hour=-1; 
             var filteroption = 0; 
             var DestAirports = [];
             var OrgAirports = [];
+            var DelayTime =  0; 
+
+
+            var container = d3.select("#Container")
+                        .style("overflow-y","scroll")
+                        .attr("id","Container")
+                        
+            var svg = container.append("svg")
+                        .attr("id","Lollipop")
             
 
             
@@ -78,6 +88,23 @@
                 let option = d3.select(this).property("value")
                 
                 open(option,"_self")
+                })
+
+            var dropdownButtonDelayTime = d3.select("#dropdownButtonDelayTime")
+                .append('select')
+                
+            dropdownButtonDelayTime 
+                .selectAll('myOptions') 
+                .data([{text:"Delay",value:0},{text:"Time needed",value:1}])
+                .attr("class","dropdown")
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonDelayTime.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                
                 })
 
 
@@ -102,6 +129,9 @@
                     filteroption == 2 ? airportData = airportData.filter(element=>{element.IATA ==OrgAirport?OrgAirportInfo.push(element) : null ; return DestAirports.includes(element.IATA) }):null
 
                     airportData = [{IATA:"*",AIRPORT:"All Airports"},...airportData]
+
+                    OrgAirport =="*"?OrgAirportInfo=[{IATA:"*",AIRPORT:"All Airports"}]:null
+                    DestAirport =="*"?DestAirportInfo=[{IATA:"*",AIRPORT:"All Airports"}]:null
                     console.log(airportData)
 
                     dropdownButtonOrgAirport.selectAll("*").remove()
@@ -162,20 +192,33 @@
                 array.push(i)
             }
 
-            colorSvg = d3.select("#legend").append("svg")
-            colorSvg.append("text")
+            colorSvg = d3.select("#Container").append("svg").style("position", "fixed")
+            
+            var hiddenrect = colorSvg.append("rect")
+                            .attr("class","hiderect")
+                            .attr("x",0)
+                            .attr("y",520)
+                            .attr("height",1000)
+                            .attr("width","100%")
+                            .attr("fill","white")
+                            
+            
+                
+                
+
+            var colorlable = colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",1170)
-                    .attr("y",50)
+                    .attr("y",530)
                     .attr("fill","#222222")
                     .text("Delay in min")
 
-            colorSvg.selectAll("rect")
+            var colorscale = colorSvg.selectAll("rect")
             .data(array)
             .enter()
             .append("rect")
             .attr("x",(d,i)=>{return 1130+(d*2)})
-            .attr("y",60)
+            .attr("y",540)
             .attr("height",20)
             .attr("width",0.2)
             .attr("fill",(d)=>{return myColor(d)})
@@ -184,20 +227,16 @@
                 .domain([-60,60])
                 .range([0,240]);
 
-            colorSvg.append("g")
+            var colorAxis = colorSvg.append("g")
                     .attr("transform",
-                            "translate(1010,80)")
+                            "translate(1010,560)")
                     .call(d3.axisBottom(ColorX))
                     .attr("stroke", "#222222")
                             
             
-
+                    
         
-            var container = d3.select("body")
-                        .append("div")
-                        .style("overflow-y","scroll")
-                        
-            var svg = container.append("svg")
+            
 
                             
                             
@@ -221,12 +260,13 @@
                     OrgAirports= []
                     //console.log(data)
                     svg.selectAll("*").remove()
+                    console.log(svg)
                     data =  data.filter(element=>{
                         
                         
 
-                        element.OrgAirport==OrgAirport? DestAirports.push(element.DestAirport):null
-                        element.DestAirport==DestAirport? OrgAirports.push(element.OrgAirport):null
+                        element.OrgAirport==OrgAirport ||OrgAirport=="*"? DestAirports.push(element.DestAirport):null
+                        element.DestAirport==DestAirport||DestAirport=="*"? OrgAirports.push(element.OrgAirport):null
                         
                         return ((OrgAirport!="*"?element.OrgAirport==OrgAirport:true)&&(DestAirport!="*"?element.DestAirport==DestAirport:true))
                     })
@@ -239,6 +279,11 @@
                     var usedata = []
                     var max = 70;
                     var min = -10
+                    
+                    
+
+
+                    svg.attr("height",height+200)
 
                     data.forEach(element => {
 
@@ -250,7 +295,7 @@
                             usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Depature",MinDelay:element.MinDelayOrg,AvgDelay:element.AvgDelayOrg,MaxDelay:element.MaxDelayOrg})
                             usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Destination",MinDelay:element.MinDelayDest,AvgDelay:element.AvgDelayDest,MaxDelay:element.MaxDelayDest})
                     });
-
+                    console.log(svg)
                     min = Math.floor(min/10)*10-10
                     max = Math.ceil(max/10)*10+10
                     
@@ -265,19 +310,39 @@
                         .domain(usedata.map(function(d) { return d.Title; }))
                         .padding(1);
 
+                    
+
                     if(count!=0){
-                        var XAxix  = svg.append("g")
-                            .attr("transform", "translate(150,50)")
-                            .call(d3.axisTop(x))
+                        colorSvg.select("#XAxix").remove()
+                        var XAxix  = colorSvg.append("g")
+                            .attr("id","XAxix")
+                            .attr("transform", "translate(150,520)")
+                            .call(d3.axisBottom(x))
 
-                        svg.on("scroll",function(d,i){
-                            console.log("scroll");
+                            if(height<=500){
 
-                        })
+                                hiddenrect.attr("y",height+20)
+                                colorlable.attr("y",height+30)
+                                colorscale.attr("y",height+40)
+                                colorAxis.attr("transform",
+                                    "translate(1010,"+(height+60)+")")
+                                XAxix.attr("transform", "translate(150,"+(height+20)+")")
+
+                            }else{
+                                hiddenrect.attr("y",520)
+                                colorlable.attr("y",530)
+                                colorscale.attr("y",540)
+                                colorAxis.attr("transform",
+                                    "translate(1010,"+(560)+")")
+                                XAxix.attr("transform", "translate(150,"+(520)+")")
+
+                            }
+
+                        
                         
                         
                         svg.append("g")
-                            .attr("transform", "translate(150,50)")
+                            .attr("transform", "translate(150,20)")
                             .call(d3.axisLeft(y))
 
                         svg.selectAll("myline")
@@ -290,7 +355,7 @@
                             .attr("y2", (d)=>{ return y(d.Title); })
                             .attr("stroke-width", "1px")
                             .attr("stroke","black")
-                            .attr("transform", "translate(150,50)")
+                            .attr("transform", "translate(150,20)")
 
                         svg.selectAll("mycircle")
                             .data(usedata)
@@ -300,7 +365,7 @@
                             .attr("cy", (d)=>{ return y(d.Title); })
                             .attr("r", "4")
                             .style("fill", (d)=>{return myColor(d.MinDelay)})
-                            .attr("transform", "translate(150,50)")
+                            .attr("transform", "translate(150,20)")
                             .attr("stroke","black")
                             .attr("stroke-width", "0.5px")
                         
@@ -312,11 +377,11 @@
                             .attr("cy", (d)=>{ return y(d.Title); })
                             .attr("r", "4")
                             .style("fill", (d)=>{return myColor(d.MaxDelay)})
-                            .attr("transform", "translate(150,50)")
+                            .attr("transform", "translate(150,20)")
                             .attr("stroke","black")
                             .attr("stroke-width", "0.5px")
 
-                            svg.selectAll("myline")
+                        svg.selectAll("myline")
                             .data(usedata)
                             .enter()
                             .append("line")
@@ -326,7 +391,9 @@
                             .attr("y2", (d)=>{ return y(d.Title)+5; })
                             .attr("stroke-width", "2px")
                             .attr("stroke","black")
-                            .attr("transform", "translate(150,50)")
+                            .attr("transform", "translate(150,20)")
+
+                        
 
 
 
