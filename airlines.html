@@ -65,7 +65,7 @@
                     </td>
                     <td width="220px" class="Count"> 
                         <br>
-                        <h6>Number of Flights (Month) </h6>
+                        <h6>Number of Flights (Complete January) </h6>
                         <div class="Count" id="CountText" ></div>
                 </td>
                 
@@ -80,95 +80,51 @@
 
 
         <script type="text/javascript">
+
+//_______________________________________________________________________________________________________________________
+//________________________________Wichtige Variablen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
             var Airline="all"; 
             var AnimationSpeed = 1000;
             var StartHour=0; 
             var boxSvg = [];
+            var x = d3.scaleLinear()
+                .domain([0, 5])
+                .range([0, 1000]);
 
-            var view = "map"
-            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
+            var y = d3.scaleLinear()
+                .domain([10, 0])
+                .range([0, 500])
 
-            var map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/dark-v9',
-                zoom: 3,
-                center: [-104.386330, 43.753746]
-            });
-
-
-            map.on("viewreset", load);
-            map.on("moveend", load);
-            
-           
-
-            var canvas = map.getCanvasContainer();
-            var svg = d3.select(canvas).append("svg")
-
-            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
-                    .range(["#002800","#65A765","white","yellow","orange", "red"])
-            var array = [];
-
-            for(let i = -60;i<240;i=i+0.1){
-                array.push(i)
-            }
-
-            colorSvg = d3.select(canvas).append("svg")
-            ColorLable = colorSvg.append("text")
-                    .attr("class","LegendLable")
-                    .attr("x",1170)
-                    .attr("y",520)
-                    .attr("fill","#eeeeee")
-                    .text("Delay in min")
-
-            Colorscale = colorSvg.selectAll("rect")
-            .data(array)
-            .enter()
-            .append("rect")
-            .attr("x",(d,i)=>{return 1020+(d)})
-            .attr("y",550)
-            .attr("height",20)
-            .attr("width",0.1)
-            .attr("fill",(d)=>{return myColor(d)})
-
-            var ColorX  = d3.scaleLinear()
-                .domain([-60,240])
-                .range([0,300]);
-
-            ColorAxis = colorSvg.append("g")
-                    .attr("transform",
-                            "translate(960,550)")
-                    .call(d3.axisTop(ColorX))
-                    .attr("stroke", "#eeeeee")
-                    
+            var line = d3.line()
+                .x((d) => x(d.x))
+                .y((d) => y(d.y))
 
 
-
-
-            
-            d3.select("#Addinfo").style("display","none")
-            var tooltip = d3.selectAll(".Box")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "1px")
-                    .style("border-radius", "5px")
-                    .style("padding", "10px")
-                    .style("color","black")
-
-            var CountText = d3.select('#CountText')
-                .append("text")
-                .attr("color","beige")
-
-
-            d3.selectAll(".Count").on("mouseover",()=>{tooltip.style("opacity", 0)})
-            
-              
-            
-            
-                
             let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
+            let flights = 'https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv'
+                
+//_______________________________________________________________________________________________________________________
+//________________________________Dropdownbutton anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+            var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
+                .append('select')
+                
+            dropdownButtonVisulisation 
+                .selectAll('myOptions') 
+                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"State Connections",value:"connections.html"},{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Best Connections",value:"BestConnect.html"}])
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonVisulisation.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                    open(option,"_self")
+                })
+            
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 console.log(airlinedata)
@@ -191,133 +147,8 @@
                     loadBoxPlots(airlinedata)
                     load()
                     })
-                
-                
-
+               
             });
-            function loadBoxPlots (airlinedata){
-                let found = airlinedata.filter(x=>{return x.IATA == Airline })[0]
-                console.log(found)
-                CountText.text(found.Count)
-                boxSvg.forEach(element => {
-                    element.selectAll("*").remove()
-                    
-                });
-                plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayMin),parseFloat(found.OrgDelayMax),parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
-                plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffMin),parseFloat(found.AirTimeDiffMax),parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
-                plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayMin),parseFloat(found.DestDelayMax),parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
-
-            }
-            function plotBoxPlot(number,ID,pMin,pMax,q1,q2,q3){
-                let interQuantileRange = q3 - q1
-                let min = q1 - 1.5 * interQuantileRange<pMin?pMin:q1 - 1.5 * interQuantileRange
-                let max = q3 + 1.5 * interQuantileRange>pMax?pMax:q3 + 1.5 * interQuantileRange
-                console.log("Info"+pMin+" "+min)
-
-                boxSvg[number] = d3.select(ID).append("svg")
-                boxSvg[number].attr("width",200)
-                    .attr("height",50)
-                    .attr("value",(d)=>{
-                        //min,max,q1,q2,q3
-                        text = "Values"
-                        text += "<br>Min: "+min+"min"
-                        text += "<br>Q1: "+q1+"min"
-                        text += "<br>Median: "+q2+"min"
-                        text += "<br>Q3: "+q3+"min"
-                        text += "<br>Max: "+max+"min"
-                        return text; 
-
-                    })
-
-                console.log(boxSvg[number].attr("value"))
-                boxSvg[number].on("mouseover",function(d){
-                    
-                    tooltipString = d3.select(this).attr("value")
-                    tooltip.style("opacity", 1)
-                        .html(tooltipString)
-                        .style("left", (d3.event.pageX + 15) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px")
-                }) 
-                boxSvg[number].on("mouseleave",function(d){tooltip.style("opacity", 0)   
-                })
-                    
-                boxSvg[number].append("g")
-                    .attr("fill","#eeeeee")
-                    .style("font", "9px times")
-                    .attr("stroke","#eeeeee")
-                    .attr("transform",
-                            "translate(0,20)")
-                    
-                    .call(d3.axisTop(boxX))
-                    //.attr("stroke","#eeeeee")
-                    //.attr("stroke-width","1.5")
-                    
-                
-                boxSvg[number].append("line")
-                    .attr("y1", 35)
-                    .attr("y2", 35)
-                    .attr("x1",boxX(min) )
-                    .attr("x2", boxX(max)  )
-                    .attr("stroke", "#eeeeee")
-                
-                boxSvg[number].append("rect")
-                    .attr("y", 25)
-                    .attr("x", boxX(q1) )
-                    .attr("height", 20 )
-                    .attr("width", (boxX(q3)-boxX(q1)) )
-                    .attr("stroke", "black")
-                    .style("fill", "#5B2333")
-
-                boxSvg[number].selectAll(".vertLine")
-                .data([min,q2,max])
-                .enter()
-                .append("line")
-                    .attr("y1", 20)
-                    .attr("y2", 50)
-                    .attr("x1",(d)=>boxX(d) )
-                    .attr("x2",(d)=> boxX(d)  )
-                    .attr("class","vertLine")
-                    .attr("stroke", "#eeeeee")  
-                  
-                
-            }
-
-            d3.select("input[type=checkbox]").on("change",function(d){
-                let checked = d3.select(this).property("checked")
-                if(checked){
-                    d3.select("#Addinfo").style("display","")
-                    map.flyTo({
-                        center:[-104.386330, 30],
-                        zoom: 2.25,
-                    })
-                    ColorLable.attr("y",370)
-                    Colorscale.attr("y",400)
-                    ColorAxis.attr("transform",
-                            "translate(960,400)")
-                    load
-                }else{
-                    d3.select("#Addinfo").style("display","none")
-                    map.flyTo({
-                        center:[-104.386330, 43.753746],
-                        zoom: 3,
-                    })
-                    ColorLable.attr("y",520)
-                    Colorscale.attr("y",550)
-                    ColorAxis.attr("transform",
-                            "translate(960,550)")
-                    
-                    load
-                }
-            })
-
-            var boxX  = d3.scaleLinear()
-                .domain([-65,60])
-                .range([0,200]);
-
-            
-
-
-
 
             var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
                 .append('select')
@@ -356,74 +187,250 @@
                 
                 load()
                 })
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Checkbox für Addinfo ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
 
-
-            var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
-                .append('select')
-                
-            dropdownButtonVisulisation 
-                .selectAll('myOptions') 
-                .data([{text:"Delay from airlines",value:"airlines.html"},{text:"Delay at airports",value:"airports.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"DelayComparison.html"}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonVisulisation.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                    open(option,"_self")
-                })
-
-            
-           
-
-            
-                            
+                d3.select("input[type=checkbox]").on("change",function(d){
+                let checked = d3.select(this).property("checked")
+                if(checked){
+                    d3.select("#Addinfo").style("display","")
+                    map.flyTo({
+                        center:[-104.386330, 30],
+                        zoom: 2.25,
+                    })
+                    ColorLable.attr("y",370)
+                    Colorscale.attr("y",400)
+                    ColorAxis.attr("transform",
+                            "translate(960,400)")
+                    load
+                }else{
+                    d3.select("#Addinfo").style("display","none")
+                    map.flyTo({
+                        center:[-104.386330, 43.753746],
+                        zoom: 3,
+                    })
+                    ColorLable.attr("y",520)
+                    Colorscale.attr("y",550)
+                    ColorAxis.attr("transform",
+                            "translate(960,550)")
+                    
+                    load
+                }
+            })
+            //__________________________Anlegen Textlabel für Zeit___________________________
             var TimeText = d3.select('#TimeText')
                         .append("text")
                         .attr("color","#eeeeee")
+
+            //___________________________Addinfo defaultmäßig ausblenden____________________            
+            d3.select("#Addinfo").style("display","none")
+
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Tooltip ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+            var tooltip = d3.selectAll(".Box")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+                    .style("color","black")
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Addinfozeile ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+            //______________________benötigt für X Achse der Boxplots__________________________
+            var boxX  = d3.scaleLinear()
+                            .domain([-65,60])
+                            .range([0,200]);
+            
+                
+            //__________Funktion zum (Neu-)Befüllen der Addinfozeile __________________________
+            function loadBoxPlots (airlinedata){
+                let found = airlinedata.filter(x=>{return x.IATA == Airline })[0]
+                
+                CountText.text(found.Count)
+                boxSvg.forEach(element => {
+                    element.selectAll("*").remove()
+                    
+                });
+                plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayMin),parseFloat(found.OrgDelayMax),parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
+                plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffMin),parseFloat(found.AirTimeDiffMax),parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
+                plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayMin),parseFloat(found.DestDelayMax),parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
+
+            }
+            //______________________Funktion zum Plotten der Boxplots__________________________
+            function plotBoxPlot(number,ID,pMin,pMax,q1,q2,q3){
+                //______Ausrechnen benötigter Werte_____
+                let interQuantileRange = q3 - q1
+                let min = q1 - 1.5 * interQuantileRange<pMin?pMin:q1 - 1.5 * interQuantileRange
+                let max = q3 + 1.5 * interQuantileRange>pMax?pMax:q3 + 1.5 * interQuantileRange
+                
+
+                boxSvg[number] = d3.select(ID).append("svg")
+                boxSvg[number].attr("width",200)
+                    .attr("height",50)
+                    .attr("value",(d)=>{//Text der im Tooltip angezeigt werden soll
+                        text = "Values"
+                        text += "<br>Min: "+min+"min"
+                        text += "<br>Q1: "+q1+"min"
+                        text += "<br>Median: "+q2+"min"
+                        text += "<br>Q3: "+q3+"min"
+                        text += "<br>Max: "+max+"min"
+                        return text; 
+
+                    })
+
+                //__________(Un)Sichtbar machen des Tooltips_________
+                boxSvg[number].on("mouseover",function(d){
+                    
+                    tooltipString = d3.select(this).attr("value")
+                    tooltip.style("opacity", 1)
+                        .html(tooltipString)
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+                }) 
+                boxSvg[number].on("mouseleave",function(d){tooltip.style("opacity", 0)   
+                })
+                //_________Achse hinzufügen_______   
+                boxSvg[number].append("g")
+                    .attr("fill","#eeeeee")
+                    .style("font", "9px times")
+                    .attr("stroke","#eeeeee")
+                    .attr("transform",
+                            "translate(0,20)")
+                    
+                    .call(d3.axisTop(boxX))
+                //_________Horizontale Linie_______    
+                boxSvg[number].append("line")
+                    .attr("y1", 35)
+                    .attr("y2", 35)
+                    .attr("x1",boxX(min) )
+                    .attr("x2", boxX(max)  )
+                    .attr("stroke", "#eeeeee")
+                //_________Box hinzufügen_______ 
+                boxSvg[number].append("rect")
+                    .attr("y", 25)
+                    .attr("x", boxX(q1) )
+                    .attr("height", 20 )
+                    .attr("width", (boxX(q3)-boxX(q1)) )
+                    .attr("stroke", "black")
+                    .style("fill", "#5B2333")
+
+                //_________Vertikale Linen für Median, Min und Max hinzufügen_______ 
+                boxSvg[number].selectAll(".vertLine")
+                .data([min,q2,max])
+                .enter()
+                .append("line")
+                    .attr("y1", 20)
+                    .attr("y2", 50)
+                    .attr("x1",(d)=>boxX(d) )
+                    .attr("x2",(d)=> boxX(d)  )
+                    .attr("class","vertLine")
+                    .attr("stroke", "#eeeeee")  
+                  
+                
+            }
+            //____________________Zähler anzahl der geflogenen Flüge pro Airline im Januar hinzufügen__________________ 
+            var CountText = d3.select('#CountText')
+                .append("text")
+                .attr("color","beige")
+
+
+            d3.selectAll(".Count").on("mouseover",()=>{tooltip.style("opacity", 0)})
+            
+//_______________________________________________________________________________________________________________________
+//________________________________Karte anlegen und Svg hinzufügen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+
+            var view = "map"
+                mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
+
+                var map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/dark-v9',
+                    zoom: 3,
+                    center: [-104.386330, 43.753746]
+                });
+
+
+                map.on("viewreset", load);
+                map.on("moveend", load);
+                
             
 
-            
+                var canvas = map.getCanvasContainer();
+                var svg = d3.select(canvas).append("svg")
+              
+//_______________________________________________________________________________________________________________________
+//________________________________Farblegende anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
 
+            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
+                    .range(["#002800","#65A765","white","yellow","orange", "red"])
+            var array = [];
+
+            for(let i = -60;i<240;i=i+0.1){
+                array.push(i)
+            }
+
+            colorSvg = d3.select(canvas).append("svg")
+            ColorLable = colorSvg.append("text")
+                    .attr("class","LegendLable")
+                    .attr("x",1170)
+                    .attr("y",520)
+                    .attr("fill","#eeeeee")
+                    .text("Delay in min")
+
+            Colorscale = colorSvg.selectAll("rect")
+            .data(array)
+            .enter()
+            .append("rect")
+            .attr("x",(d,i)=>{return 1020+(d)})
+            .attr("y",550)
+            .attr("height",20)
+            .attr("width",0.1)
+            .attr("fill",(d)=>{return myColor(d)})
+
+            var ColorX  = d3.scaleLinear()
+                .domain([-60,240])
+                .range([0,300]);
+
+            ColorAxis = colorSvg.append("g")
+                    .attr("transform",
+                            "translate(960,550)")
+                    .call(d3.axisTop(ColorX))
+                    .attr("stroke", "#eeeeee")
+                    
+//_______________________________________________________________________________________________________________________
+//________________________________Hauptfunktion "load" ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+       
             load()
             function load()
             {
-
+                //____________________Zurücksetzen der Grafik__________________ 
                 TimeText.interrupt()
-                let flights = 'https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv'
-                
                 svg.selectAll("*").remove()
-                
+                //____________________Daten laden und Filtern__________________ 
                 d3.csv(flights,(x)=> {
-                
-                if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')) {
-                x.DESTINATION_AIRPORT_POS = JSON.parse(x.DESTINATION_AIRPORT_POS.replace(/\'/g, "\""))
-                x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
-                x.Hour = Number(x.SCHEDULED_DEPARTURE.substring(11,13)) +Number(x.SCHEDULED_DEPARTURE.substring(14,16))/60
-                 return x}}).then(data=>{
+                    if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')) {
+                    x.DESTINATION_AIRPORT_POS = JSON.parse(x.DESTINATION_AIRPORT_POS.replace(/\'/g, "\""))
+                    x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
+                    x.Hour = Number(x.SCHEDULED_DEPARTURE.substring(11,13)) +Number(x.SCHEDULED_DEPARTURE.substring(14,16))/60
+                    return x}
+                }).then(data=>{
                     
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
-                    Airline!="all"? data = data.filter(x=>{return Airline==x.AIRLINE}): 
-                    console.log(data)
+                    Airline!="all"? data = data.filter(x=>{return Airline==x.AIRLINE}):null
                     
-                    
-                    
-                   
-                    
-
-                    var x = d3.scaleLinear()
-                        .domain([0, 5])
-                        .range([0, 1000]);
-
-                    var y = d3.scaleLinear()
-                        .domain([10, 0])
-                        .range([0, 500])
-
-                    var line = d3.line()
-                        .x((d) => x(d.x))
-                        .y((d) => y(d.y))
-                    
+                    //____________________Für jeden Flug eine Kreis inkl Animation anlegen__________________  
                     g = svg.selectAll("circle")
                         .data(data)
                         .enter()
@@ -433,48 +440,48 @@
                         .attr("r", 2)
                         .attr("cx", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("cy", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
-                        .style('fill', d => { return myColor(d.DEPARTURE_DELAY) })
+                        .style('fill', d => { return myColor(d.DEPARTURE_DELAY) })//Setzt Startfarbe auf Startverspätung
                         .style("opacity", 0)
 
                         .transition()
                         .style("opacity", 1)
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed }) //Setzen der realen Startzeit
 
                         .transition()
-                        .duration(function (d, i) { return (d.ELAPSED_TIME/60) * AnimationSpeed })
+                        .duration(function (d, i) { return (d.ELAPSED_TIME/60) * AnimationSpeed })//Setzen der realen Dauer
                         .attr("cx", d => { return projectPoint(d.DESTINATION_AIRPORT_POS.lon, d.DESTINATION_AIRPORT_POS.lat).x })
                         .attr("cy", d => { return projectPoint(d.DESTINATION_AIRPORT_POS.lon, d.DESTINATION_AIRPORT_POS.lat).y })
-                        .style('fill', d => { return myColor(d.DESTINATION_DELAY) })
+                        .style('fill', d => { return myColor(d.DESTINATION_DELAY) })//Setzt Endfarbe auf Endverspätung
                         .transition()
                         .remove()
-
+                    //____________________Für jeden Flug eine Linie hingter Flugzeug inkl Animation anlegen__________________ 
                     g.append("line")
                         .attr("x1", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("y1", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
                         .attr("x2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).x })
                         .attr("y2", d => { return projectPoint(d.ORIGIN_AIRPORT_POS.lon, d.ORIGIN_AIRPORT_POS.lat).y })
                         .attr("stroke-width", 0.5)
-                        .attr("stroke", d => {return  myColor(d.DEPARTURE_DELAY) })
+                        .attr("stroke", d => {return  myColor(d.DEPARTURE_DELAY) }) //Setzt Startfarbe auf Startverspätung
                         .attr("stroke-dasharray", "4")
                         .style("opacity", 0)
 
                         .transition()
                         .style("opacity", 1)
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })//Setzen der realen Startzeit
 
                         .transition()
-                        .duration(function (d, i) { return (d.ELAPSED_TIME/60) * AnimationSpeed })
+                        .duration(function (d, i) { return (d.ELAPSED_TIME/60) * AnimationSpeed })//Setzen der realen Dauer
                         .attr("x2", d => { return projectPoint(d.DESTINATION_AIRPORT_POS.lon, d.DESTINATION_AIRPORT_POS.lat).x })
                         .attr("y2", d => { return projectPoint(d.DESTINATION_AIRPORT_POS.lon, d.DESTINATION_AIRPORT_POS.lat).y })
-                        .attr("stroke", d => { return  myColor(d.DESTINATION_DELAY) })
+                        .attr("stroke", d => { return  myColor(d.DESTINATION_DELAY) })//Setzt Endfarbe auf Endverspätung
                         .transition()
                         .remove()
                    
 
                     
-                    
+                    //____________________Setzen des Zeitlabels (Animation)__________________ 
                     for(let i = StartHour; i<24;i++)
-                        {
+                    {
                     
                         if(i<=9){
                             TimeText.transition()
@@ -497,7 +504,10 @@
                  })
 
             }
-
+//_______________________________________________________________________________________________________________________
+//________________________________Hilfsfunktionen_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+  
             function project(d) {
                 return map.project(new mapboxgl.LngLat(d[0], d[1]));
             }

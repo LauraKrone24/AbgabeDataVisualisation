@@ -55,29 +55,38 @@
 
 
         <script type="text/javascript">
+
+//_______________________________________________________________________________________________________________________
+//________________________________Wichtige Variablen_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+  
             var OrgAirport="*";
             var DestAirport="*"; 
             var filteroption = 0; 
             var DestAirports = [];
             var OrgAirports = [];
             var DelayTime =  0; 
+            var AddAirportInfo={};
+            let Airportlink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
+            let CSVLink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/BestConnectSummary.csv"; 
+            let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
 
 
-            var container = d3.select("#Container")
-                        .style("overflow-y","scroll")
-                        .attr("id","Container")
-                        
-            var svg = container.append("svg")
+//________________________________Anlegen Svg- Elelement für Visualisierung _________________________________________________________________________
+             
+            var svg = d3.select("#Container").append("svg")
                         .attr("id","Lollipop")
             
-
-            
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Dropdownbutton_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+             
             var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
                 .append('select')
                 
                 dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"}])
+                .data([{text:"Best Connections",value:"BestConnect.html"},{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"State Connections",value:"connections.html"}])
                 .attr("class","dropdown")
                 .enter()
                 .append('option')
@@ -104,41 +113,47 @@
 
             dropdownButtonDelayTime.on("change", function(d) {
                 let option = d3.select(this).property("value")
+                DelayTime  =  option; 
+                load();
                 
                 })
 
-
+//________________________________Anlegen  der Dropdowns für Start und Zielflughafen _________________________________________________________________________
+           
             var dropdownButtonOrgAirport = d3.select("#dropdownButtonOrgAirport")
                     .append('select') 
             var dropdownButtonDestAirport = d3.select("#dropdownButtonDestAirport")
                 .append('select') 
 
             loadDropDown();
-            
-
+//________________________________Funktion zum Anlegen der Inhalte für Start und Zielflughafen _________________________________________________________________________
             
            function loadDropDown(){
-                let Airportlink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
-
+                
                 d3.csv(Airportlink).then(airportData=>{
-                    console.log(OrgAirport,DestAirport)
                     let DestAirportInfo=[];
                     let OrgAirportInfo =[];
+                    
+                    //_____________________Filtern der Daten _________________________________________________________________________
 
                     filteroption == 1 ? airportData = airportData.filter(element=>{element.IATA ==DestAirport?DestAirportInfo.push(element) : null ;return OrgAirports.includes(element.IATA)}):null
                     filteroption == 2 ? airportData = airportData.filter(element=>{element.IATA ==OrgAirport?OrgAirportInfo.push(element) : null ; return DestAirports.includes(element.IATA) }):null
-
+                    airportData.forEach(element=>{
+                        AddAirportInfo[element.IATA] = element.AIRPORT;
+                    })
+                    console.log(OrgAirports)
+                    //_____Hinzufügen einer Option für alle Flughäfen______
                     airportData = [{IATA:"*",AIRPORT:"All Airports"},...airportData]
 
                     OrgAirport =="*"?OrgAirportInfo=[{IATA:"*",AIRPORT:"All Airports"}]:null
                     DestAirport =="*"?DestAirportInfo=[{IATA:"*",AIRPORT:"All Airports"}]:null
-                    console.log(airportData)
-
+                    
+                    //_________ vorherige Optionen entfernen_________
                     dropdownButtonOrgAirport.selectAll("*").remove()
                     dropdownButtonDestAirport.selectAll("*").remove()
-                        
-                        dropdownButtonOrgAirport
-                        .selectAll('myOptions') 
+
+                    //_____________________Anlegen der neuen Dropdown Optionen _________________________________________________________________________    
+                    dropdownButtonOrgAirport.selectAll('myOptions') 
                         .data(filteroption==2?OrgAirportInfo:airportData)
                         .enter()
                         .append('option')
@@ -153,8 +168,6 @@
                         load()
                         })
 
-
-                    
                         
                     dropdownButtonDestAirport
                         .selectAll('myOptions') 
@@ -174,7 +187,7 @@
                  })
 
            }
-
+        //_____________________Funktionalität der Radiobuttons für Filtereinstellung  _________________________________________________________________________
            var filters = d3.selectAll("input");
            filters.on("change", function(){
                 let option = d3.select(this).property("value")
@@ -182,6 +195,9 @@
                 loadDropDown(); 
             })
             
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Farblegende_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
 
             
             var myColor = d3.scaleLinear().domain([-60,0,60])
@@ -192,8 +208,13 @@
                 array.push(i)
             }
 
-            colorSvg = d3.select("#Container").append("svg").style("position", "fixed")
+            colorSvg = d3.select("#Container")
+                .append("svg")
+                .style("position", "fixed")
+                .attr("pointer-events","none")
+
             
+            //_____________________Weißes Rechteck um Hintergrund zu verstecken  _________________________________________________________________________
             var hiddenrect = colorSvg.append("rect")
                             .attr("class","hiderect")
                             .attr("x",0)
@@ -201,223 +222,362 @@
                             .attr("height",1000)
                             .attr("width","100%")
                             .attr("fill","white")
-                            
-            
-                
-                
-
+            //_____________________Textlabel der Farblegende _________________________________________________________________________
             var colorlable = colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",1170)
                     .attr("y",530)
                     .attr("fill","#222222")
                     .text("Delay in min")
-
+            //_____________________Farbskala _________________________________________________________________________
             var colorscale = colorSvg.selectAll("rect")
-            .data(array)
-            .enter()
-            .append("rect")
-            .attr("x",(d,i)=>{return 1130+(d*2)})
-            .attr("y",540)
-            .attr("height",20)
-            .attr("width",0.2)
-            .attr("fill",(d)=>{return myColor(d)})
+                .data(array)
+                .enter()
+                .append("rect")
+                .attr("x",(d,i)=>{return 1130+(d*2)})
+                .attr("y",540)
+                .attr("height",20)
+                .attr("width",0.2)
+                .attr("fill",(d)=>{return myColor(d)})
 
             var ColorX  = d3.scaleLinear()
                 .domain([-60,60])
                 .range([0,240]);
-
+            //_____________________Achse der Farblegende _________________________________________________________________________
             var colorAxis = colorSvg.append("g")
                     .attr("transform",
                             "translate(1010,560)")
                     .call(d3.axisBottom(ColorX))
                     .attr("stroke", "#222222")
-                            
-            
-                    
-        
-            
 
-                            
-                            
-            
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Legdende 2 für gebrauchte Zeit_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+
+
+            var TimeLegend = colorSvg.append("g")
+                .attr("id","test")
+                .attr("opacity",0)
+                .attr("transform",
+                            "translate(1010,500)")
+            //_____________________Legedendensymbol angesetzte Zeit _______________________________
+            TimeLegend.append("rect")
+                .attr("x",1010)
+                .attr("y",37.5)
+                .attr("height",15)
+                .attr("width",4)
+                .attr("fill","white")
+                .attr("stroke-width", "0.5px")
+                .attr("stroke","black")
+            TimeLegend.append("text")
+                .attr("class","LegendLable")
+                .attr("x",1030)
+                .attr("y",50)
+                .attr("fill","#222222")
+                .text("Scheduled Time")
+            //_____________________Legedendensymbol minimal gebrauchte Zeit _______________________________                
+            TimeLegend.append("circle")
+                .attr("cx", 800)
+                .attr("cy", 45)
+                .attr("r", "10")
+                .style("fill", "green")
+                .attr("stroke-width", "0.5px")
+                .attr("stroke","black")
+            TimeLegend.append("text")
+                .attr("class","LegendLable")
+                .attr("x",820)
+                .attr("y",50)
+                .attr("fill","#222222")
+                .text("Min. Time needed")
+            //_____________________Legedendensymbol maximal gebrauchte Zeit _______________________________
+            TimeLegend.append("circle")
+                .attr("cx", 800)
+                .attr("cy", 70)
+                .attr("r", "10")
+                .style("fill", "red")
+                .attr("stroke-width", "0.5px")
+                .attr("stroke","black")
+            TimeLegend.append("text")
+                .attr("class","LegendLable")
+                .attr("x",820)
+                .attr("y",75)
+                .attr("fill","#222222")
+                .text("Max. Time needed")
+            //_____________________Legedendensymbol durchschnittlich Zeit _______________________________
+            TimeLegend.append("rect")
+                .attr("x",1010)
+                .attr("y",65)
+                .attr("height",15)
+                .attr("width",4)
+                .attr("fill","black")
+                .attr("stroke-width", "0.5px")
+                .attr("stroke","black")
+            TimeLegend.append("text")
+                .attr("class","LegendLable")
+                .attr("x",1030)
+                .attr("y",75)
+                .attr("fill","#222222")
+                .text("Avg. Time needed")
+            //_____________________Legedendensymbol Hauptskala _______________________________
+            TimeLegend.append("text")
+                .attr("class","LegendLable")
+                .attr("x",1170)
+                .attr("y",30)
+                .attr("fill","#222222")
+                .text("Time in min")
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Tooltip_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+
+            var tooltip = d3.select("#Container")
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px")
+                    
+//_______________________________________________________________________________________________________________________
+//________________________________Hauptfunktion "load"_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+           
             load()
             function load()
             {
-                
-                
-
-                var CSVLink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/BestConnectSummary.csv"; 
-                
-                
-
-                
-                        
-                        
-                        
+                //_____________________Laden der Daten _______________________________      
                 d3.csv(CSVLink).then(data=>{
-                    DestAirports= []
-                    OrgAirports= []
-                    //console.log(data)
-                    svg.selectAll("*").remove()
-                    console.log(svg)
-                    data =  data.filter(element=>{
+                    d3.csv(AirlineInfo).then(airlinedata=>{
+                        //_____________________Zurücksetzen _______________________________ 
+                        DestAirports = []
+                        OrgAirports = []
+                        let usedata = []
+                        let AddAirlineInfo = {}
+                        let max = 70
+                        let min = -10
+
+                        svg.selectAll("*").remove()
                         
                         
-
-                        element.OrgAirport==OrgAirport ||OrgAirport=="*"? DestAirports.push(element.DestAirport):null
-                        element.DestAirport==DestAirport||DestAirport=="*"? OrgAirports.push(element.OrgAirport):null
-                        
-                        return ((OrgAirport!="*"?element.OrgAirport==OrgAirport:true)&&(DestAirport!="*"?element.DestAirport==DestAirport:true))
-                    })
-                    //console.log("Found"+DestAirports, OrgAirports)
-
-                    console.log(OrgAirport,DestAirport,data)
-
-                    let count = data.length
-                    let height = count *50;
-                    var usedata = []
-                    var max = 70;
-                    var min = -10
-                    
-                    
-
-
-                    svg.attr("height",height+200)
-
-                    data.forEach(element => {
-
-                            max = max<parseFloat(element.MaxDelayOrg)?parseFloat(element.MaxDelayOrg):max;
-                            max = max<parseFloat(element.MaxDelayDest)?parseFloat(element.MaxDelayDest):max;
-                            min = min>parseFloat(element.MinDelayOrg)?parseFloat(element.MinDelayOrg):min;
-                            min = min>parseFloat(element.MinDelayDest)?parseFloat(element.MinDelayDest):min;
+                        //_____________________Datenvorbereitung_______________________________
+                        airlinedata.forEach(element=>{
+                            AddAirlineInfo[element.IATA]= element.Name
+                        })
+                        data =  data.filter(element=>{ 
                             
-                            usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Depature",MinDelay:element.MinDelayOrg,AvgDelay:element.AvgDelayOrg,MaxDelay:element.MaxDelayOrg})
-                            usedata.push({Title:element.OrgAirport+"- "+element.DestAirport+"- "+element.Airline+" - Destination",MinDelay:element.MinDelayDest,AvgDelay:element.AvgDelayDest,MaxDelay:element.MaxDelayDest})
-                    });
-                    console.log(svg)
-                    min = Math.floor(min/10)*10-10
-                    max = Math.ceil(max/10)*10+10
-                    
-                    //console.log(min,max)
-                    console.log(usedata)
-                    var x = d3.scaleLinear()
-                    .domain([min, max])
-                    .range([ 0, 1000]);
+                            element.OrgAirport==OrgAirport ||OrgAirport=="*"? DestAirports.push(element.DestAirport):null
+                            element.DestAirport==DestAirport||DestAirport=="*"? OrgAirports.push(element.OrgAirport):null
+                            
+                            return ((OrgAirport!="*"?element.OrgAirport==OrgAirport:true)&&(DestAirport!="*"?element.DestAirport==DestAirport:true))
+                        })
+                        
 
-                    var y = d3.scaleBand()
-                        .range([ 0, height ])
-                        .domain(usedata.map(function(d) { return d.Title; }))
-                        .padding(1);
+                        let count = data.length
+                        let height = count * (DelayTime==0? 50:25);
+                        svg.attr("height",height+200)
 
-                    
+                        data.forEach(element => {
+                                
+                            if(DelayTime==0){//Für Verspätungs Grafik
+                                //_________Ermitteln dere benötigten Skalawerte_____________
+                                max = max<parseFloat(element.MaxDelayOrg)?parseFloat(element.MaxDelayOrg):max;
+                                max = max<parseFloat(element.MaxDelayDest)?parseFloat(element.MaxDelayDest):max;
+                                min = min>parseFloat(element.MinDelayOrg)?parseFloat(element.MinDelayOrg):min;
+                                min = min>parseFloat(element.MinDelayDest)?parseFloat(element.MinDelayDest):min;
 
-                    if(count!=0){
+                                //___________Abspeichern der Daten im benötigten Format_________
+                                usedata.push({Org:element.OrgAirport,Dest:element.DestAirport,Air:element.Airline,Title:" - Depature",Min:element.MinDelayOrg,Avg:element.AvgDelayOrg,Max:element.MaxDelayOrg,Count:element.Count})
+                                usedata.push({Org:element.OrgAirport,Dest:element.DestAirport,Air:element.Airline,Title:" - Destination",Min:element.MinDelayDest,Avg:element.AvgDelayDest,Max:element.MaxDelayDest,Count:element.Count})
+                            }else{//Für Zeit Grafik
+                                max = max<parseFloat(element.ElapsedTimeMax)?parseFloat(element.ElapsedTimeMax):max;
+                                min = min>parseFloat(element.ElapsedTimeMin)?parseFloat(element.ElapsedTimeMin):min;
+                                usedata.push({Title:"",Org:element.OrgAirport,Dest:element.DestAirport,Air:element.Airline,Min:element.ElapsedTimeMin,Avg:element.ElapsedTimeAvg,Max:element.ElapsedTimeMax,Schedule:element.ScheduledTime,Count:element.Count})
+                            }
+                        })
+
+                        //_____________________Anlegen der passenden Skalen_______________________________
+                        min = Math.floor(min/10)*10-10
+                        max = Math.ceil(max/10)*10+10
+                        
+                        var x = d3.scaleLinear()
+                        .domain([min, max])
+                        .range([ 0, 1000]);
+
+                        var y = d3.scaleBand()
+                            .range([ 0, height ])
+                            .domain(usedata.map(function(d) { return d.Org+"-"+d.Dest+"-"+d.Air+d.Title; }))
+                            .padding(1);
+
                         colorSvg.select("#XAxix").remove()
-                        var XAxix  = colorSvg.append("g")
-                            .attr("id","XAxix")
-                            .attr("transform", "translate(150,520)")
-                            .call(d3.axisBottom(x))
+                        //_____________________Wenn eine Verbindung exististiert_______________________________
+                        if(count!=0){ 
+                            
+                            var XAxix  = colorSvg.append("g")
+                                .attr("id","XAxix")
+                                .attr("transform", "translate(150,520)")
+                                .call(d3.axisBottom(x))
 
-                            if(height<=500){
+                                
+                            //_____________________Anpassen der Positionen_______________________________
+                            hiddenrect.attr("y",height<=500?height+20:520)
+                            colorlable.attr("y",height<=500?height+30:530)
+                            colorscale.attr("y",height<=500?height+40:540)
+                            colorAxis.attr("transform",
+                                "translate(1010,"+(height<=500?height+60:560)+")")
+                            XAxix.attr("transform", "translate(150,"+(height<=500?height+20:520)+")")
+                            TimeLegend.attr("transform", "translate(0,"+(height<=500?height+5:505)+")")
 
-                                hiddenrect.attr("y",height+20)
-                                colorlable.attr("y",height+30)
-                                colorscale.attr("y",height+40)
-                                colorAxis.attr("transform",
-                                    "translate(1010,"+(height+60)+")")
-                                XAxix.attr("transform", "translate(150,"+(height+20)+")")
+                            
+                            //_____________________Anpassen der Sichtbarkeiten_______________________________
+                            colorlable.attr("opacity",DelayTime==0?1:0)
+                            colorscale.attr("opacity",DelayTime==0?1:0)
+                            colorAxis.attr("opacity",DelayTime==0?1:0)
+                            TimeLegend.attr("opacity",DelayTime==0?0:1)
+                                                     
+                            
+                            //_____________________Anlegen  Y-Achse_______________________________
+                            svg.append("g")
+                                .attr("transform", "translate(150,20)")
+                                .call(d3.axisLeft(y))
 
-                            }else{
-                                hiddenrect.attr("y",520)
-                                colorlable.attr("y",530)
-                                colorscale.attr("y",540)
-                                colorAxis.attr("transform",
-                                    "translate(1010,"+(560)+")")
-                                XAxix.attr("transform", "translate(150,"+(520)+")")
+
+                            //_____________________Anpassen der Position_______________________________    
+                            var LolliG = svg.selectAll("myg")
+                                .data(usedata)
+                                .enter()
+                                .append("g")
+
+                            //_____________________Anlegen  horizontale  Linie min bis Max_______________________________
+                            LolliG.append("line")
+                                .attr("x1", (d)=>{ return x(d.Min); })
+                                .attr("x2", (d)=>{ return x(d.Max); })
+                                .attr("y1", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title); })
+                                .attr("y2", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title); })
+                                .attr("stroke-width", "1.5px")
+                                .attr("stroke","black")
+                                .attr("transform", "translate(150,20)")
+                            //_____________________Anlegen Kreis min Verspätung bzw. Zeit_______________________________
+                            LolliG.append("circle")
+                                .attr("cx", (d)=>{ return x(d.Min); })
+                                .attr("cy", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title); })
+                                .attr("r", "5")
+                                .style("fill", (d)=>{return (DelayTime==0?myColor(d.Min):"green")})
+                                .attr("transform", "translate(150,20)")
+                                .attr("stroke","black")
+                                .attr("stroke-width", "0.5px")
+                            //_____________________Anlegen Kreis max Verspätung bzw. Zeit_______________________________
+                            LolliG.append("circle")
+                                .attr("cx", (d)=>{ return x(d.Max); })
+                                .attr("cy", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title); })
+                                .attr("r", "5")
+                                .style("fill", (d)=>{return (DelayTime==0?myColor(d.Max):"red")})
+                                .attr("transform", "translate(150,20)")
+                                .attr("stroke","black")
+                                .attr("stroke-width", "0.5px")
+                            //_____________________Anlegen Kreis Avg. Verspätung bzw. Zeit_______________________________
+                            LolliG.append("line")
+                                .attr("x1", (d)=>{ return x(d.Avg); })
+                                .attr("x2", (d)=>{ return x(d.Avg); })
+                                .attr("y1", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title)-5; })
+                                .attr("y2", (d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title)+5; })
+                                .attr("stroke-width", "2.5px")
+                                .attr("stroke","black")
+                                .attr("transform", "translate(150,20)")
+
+                            
+
+                            if(DelayTime==1){// Wenn gebrauchte Zeit dargestellt werden soll 
+
+                                //_____________________Anlegen Bereiche für Kurz-, Mittel- und Langstreckenflüge_______________________________
+                                var g =  svg.selectAll("myg")
+                                    .data([{Name: "Short Haul",left:min,right:180},{Name: "Mid Haul",left:180,right:360},{Name: "Long Haul",left:360,right:max}])
+                                    .enter()
+                                    .append("g")
+                                    .attr("pointer-events","none")
+
+                                //________Farberechteck im Hintergrund_______
+                                g.append("rect")
+                                    .attr("x",(d)=>{ return x(d.left)})
+                                    .attr("y",0)
+                                    .attr("height",height)
+                                    .attr("width",(d)=>{ max<d.right ? d.right= max:null;return x(d.right)-x(d.left)<0?0:x(d.right)-x(d.left)})
+                                    .attr("fill",(d,i)=>{colors = ["blue","purple","grey"]; return colors[i]})
+                                    .attr("stroke-width", "0.2px")
+                                    .attr("stroke","black")
+                                    .attr("opacity",0.2)
+                                    .attr("transform", "translate(150,20)")
+                                //________Überschrift_______
+                                g.append("text")
+                                    .attr("x",(d)=>{ return max<d.left?2000:x(d.left)})
+                                    .attr("y",-5)
+                                    .attr("fill",(d,i)=>{colors = ["blue","purple","grey"]; return colors[i]})
+                                    .attr("stroke-width", "0.2px")
+                                    .attr("stroke","black")
+                                    .attr("opacity",0.5)
+                                    .text((d)=>{return d.Name})
+                                    .attr("transform", "translate(150,20)")
+
+                                //_____________________Anlegen Makierung geplante Zeit_______________________________
+                                LolliG.append("rect")
+                                    .attr("x",(d)=>{ return x(d.Schedule)})
+                                    .attr("y",(d)=>{ return y(d.Org+"-"+d.Dest+"-"+d.Air+d.Title)-5; })
+                                    .attr("height",10)
+                                    .attr("width",3)
+                                    .attr("fill","white")
+                                    .attr("stroke-width", "0.5px")
+                                    .attr("stroke","black")
+                                    .attr("transform", "translate(150,20)")
 
                             }
 
+                            //_____________________Füllen und sichtbarmachen Tooltip_______________________________
+                            LolliG.on("mouseover", function(d) { 
+                                
+                                tooltip
+                                    .style("opacity", 1)
+                                    .html(()=>{text = "Connection <br>"
+                                    +"From: "+AddAirportInfo[d.Org]+"<br>"
+                                    +"To: "+AddAirportInfo[d.Dest]+"<br>"
+                                    +"By: "+AddAirlineInfo[d.Air]+"<br>"
+                                    +"Number of Flights: "+d.Count+"<br>"
+                                    DelayTime==1?text = text+"Scheduled: "+d.Schedule+"min <br>":null
+                                    text = text
+                                    +"Min: "+d.Min+"min <br>"
+                                    +"Avg: "+d.Avg+"min <br>"
+                                    +"Max: "+d.Max+"min <br>"
+
+                                    return text})
+                                    .style("left", (d3.event.pageX + 15) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px")
+                            
+                                
+                            })
+                            //__________________Ausblenden Tooltip____________________
+                            .on("mouseleave", function(d){tooltip.style("opacity", 0)})
+
+
+                        }else{ 
+                        //_____________________Text falls es eine Verbindung nicht gibt_______________________________
+                            
+                            var Text = svg.append("text")
+                            .attr("x",350)
+                            .attr("y",30)
+                            .text("There are no flights connecting those two Airports ")
+
+                            colorlable.attr("opacity",0)
+                            colorscale.attr("opacity",0)
+                            colorAxis.attr("opacity",0)
+                            TimeLegend.attr("opacity",0)
+
+                        }
                         
-                        
-                        
-                        svg.append("g")
-                            .attr("transform", "translate(150,20)")
-                            .call(d3.axisLeft(y))
-
-                        svg.selectAll("myline")
-                            .data(usedata)
-                            .enter()
-                            .append("line")
-                            .attr("x1", (d)=>{ return x(d.MinDelay); })
-                            .attr("x2", (d)=>{ return x(d.MaxDelay); })
-                            .attr("y1", (d)=>{ return y(d.Title); })
-                            .attr("y2", (d)=>{ return y(d.Title); })
-                            .attr("stroke-width", "1px")
-                            .attr("stroke","black")
-                            .attr("transform", "translate(150,20)")
-
-                        svg.selectAll("mycircle")
-                            .data(usedata)
-                            .enter()
-                            .append("circle")
-                            .attr("cx", (d)=>{ return x(d.MinDelay); })
-                            .attr("cy", (d)=>{ return y(d.Title); })
-                            .attr("r", "4")
-                            .style("fill", (d)=>{return myColor(d.MinDelay)})
-                            .attr("transform", "translate(150,20)")
-                            .attr("stroke","black")
-                            .attr("stroke-width", "0.5px")
-                        
-                        svg.selectAll("mycircle")
-                            .data(usedata)
-                            .enter()
-                            .append("circle")
-                            .attr("cx", (d)=>{ return x(d.MaxDelay); })
-                            .attr("cy", (d)=>{ return y(d.Title); })
-                            .attr("r", "4")
-                            .style("fill", (d)=>{return myColor(d.MaxDelay)})
-                            .attr("transform", "translate(150,20)")
-                            .attr("stroke","black")
-                            .attr("stroke-width", "0.5px")
-
-                        svg.selectAll("myline")
-                            .data(usedata)
-                            .enter()
-                            .append("line")
-                            .attr("x1", (d)=>{ return x(d.AvgDelay); })
-                            .attr("x2", (d)=>{ return x(d.AvgDelay); })
-                            .attr("y1", (d)=>{ return y(d.Title)-5; })
-                            .attr("y2", (d)=>{ return y(d.Title)+5; })
-                            .attr("stroke-width", "2px")
-                            .attr("stroke","black")
-                            .attr("transform", "translate(150,20)")
-
-                        
-
-
-
-                    }else{
-                        
-                        var Text = svg.append("text")
-                        .attr("x",10)
-                        .attr("y",100)
-                        .text("There are no flights connectiong those two Airports ")
-
-
-
-                    }
-                    
-
                     })
+                })
 
             }
 
-            
-
-        
-            
         </script>
     </body>
 
-    </html>
+</html>

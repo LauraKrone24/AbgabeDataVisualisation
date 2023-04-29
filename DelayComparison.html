@@ -61,15 +61,44 @@
 
 
         <script type="text/javascript">
-            var HigAvgLow=2;
-            var OrginDestAirline=1; 
-            var AnimationSpeed = 3000;
-            var StartHour=-1; 
-            var AscDesc = 1;
+//_______________________________________________________________________________________________________________________
+//________________________________Wichtige Variablen_____________________________________________________________________
+//_______________________________________________________________________________________________________________________
+
+            var HigAvgLow=2
+            var OrginDestAirline=1
+            var AnimationSpeed = 3000
+            var StartHour=-1
+            var AscDesc = 1
             var LinesInHour = {}
+            let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
+            let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
+            let AirlineOrgData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineOrgDelaySummary.csv"
+            let AirlineDestData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineDestDelaySummary.csv"
+            let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
+            let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
            
-            
-            
+//_______________________________________________________________________________________________________________________
+//________________________________Dropdown Button Anlegen _______________________________________________________________
+//_______________________________________________________________________________________________________________________           
+            var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
+                .append('select')
+                
+                dropdownButtonVisulisation 
+                .selectAll('myOptions') 
+                .data([{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"State Connections",value:"connections.html"},{text:"Best Connections",value:"BestConnect.html"}])
+                .attr("class","dropdown")
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonVisulisation.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                
+                open(option,"_self")
+                })  
+
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
                 
@@ -89,6 +118,23 @@
                 load()
                 })
                
+            var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
+                .append('select')
+                
+            dropdownButtonOrginDestination
+                .selectAll('myOptions') 
+                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline at Depature",value:3},{text:"Airline at Destination",value:4}])
+                .enter()
+                .append('option')
+                .text(function (d) { return d.text; }) 
+                .attr("value", function (d) { return d.value; }) 
+
+            dropdownButtonOrginDestination.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                OrginDestAirline = option;
+                load()
+                })
+
             var dropdownButtonAscDesc = d3.select("#dropdownButtonAscDesc")
                 .append('select')
                 
@@ -109,31 +155,12 @@
                 })
 
 
-            var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
-                .append('select')
-                
-            dropdownButtonOrginDestination
-                .selectAll('myOptions') 
-                .data([{text:"Origin Airport",value:1},{text:"Destination Airport",value:2},{text:"Airline at Depature",value:3},{text:"Airline at Destination",value:4}])
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonOrginDestination.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                OrginDestAirline = option;
-                load()
-                })
-
-
-
             var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
                 .append('select')
                 
             dropdownButtonAnimationspeed 
                 .selectAll('myOptions') 
-                .data([{text:"x 1200     ",value:3000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
+                .data([{text:"x 1200",value:3000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -166,60 +193,50 @@
                 load()
                 })
 
-            var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
-                .append('select')
-                
-                dropdownButtonVisulisation 
-                .selectAll('myOptions') 
-                .data([{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"}])
-                .attr("class","dropdown")
-                .enter()
-                .append('option')
-                .text(function (d) { return d.text; }) 
-                .attr("value", function (d) { return d.value; }) 
-
-            dropdownButtonVisulisation.on("change", function(d) {
-                let option = d3.select(this).property("value")
-                
-                open(option,"_self")
-                })
+//_______________________________________________________________________________________________________________________
+//________________________________Farblegende Anlegen _________________________________________________________________________
+//_______________________________________________________________________________________________________________________           
+             
             
-                var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
-                    .range(["#002800","#65A765","white","yellow","orange", "red"])
-                var array = [];
+            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
+                .range(["#002800","#65A765","white","yellow","orange", "red"])
+            var array = [];
 
-                for(let i = -60;i<240;i=i+0.1){
-                    array.push(i)
-                }
+            for(let i = -60;i<240;i=i+0.1){
+                array.push(i)
+            }
 
-                colorSvg = d3.select("#legend").append("svg")
-                colorSvg.append("text")
-                        .attr("class","LegendLable")
-                        .attr("x",1170)
-                        .attr("y",520)
-                        .attr("fill","#222222")
-                        .text("Delay in min")
+            colorSvg = d3.select("#legend").append("svg")
+            colorSvg.append("text")
+                    .attr("class","LegendLable")
+                    .attr("x",1170)
+                    .attr("y",520)
+                    .attr("fill","#222222")
+                    .text("Delay in min")
 
-                colorSvg.selectAll("rect")
-                .data(array)
-                .enter()
-                .append("rect")
-                .attr("x",(d,i)=>{return 1020+(d)})
-                .attr("y",550)
-                .attr("height",20)
-                .attr("width",0.1)
-                .attr("fill",(d)=>{return myColor(d)})
+            colorSvg.selectAll("rect")
+            .data(array)
+            .enter()
+            .append("rect")
+            .attr("x",(d,i)=>{return 1020+(d)})
+            .attr("y",550)
+            .attr("height",20)
+            .attr("width",0.1)
+            .attr("fill",(d)=>{return myColor(d)})
 
-                var ColorX  = d3.scaleLinear()
-                    .domain([-60,240])
-                    .range([0,300]);
+            var ColorX  = d3.scaleLinear()
+                .domain([-60,240])
+                .range([0,300]);
 
-                colorSvg.append("g")
-                        .attr("transform",
-                                "translate(960,550)")
-                        .call(d3.axisTop(ColorX))
-                        .attr("stroke", "#222222")
-                            
+            colorSvg.append("g")
+                    .attr("transform",
+                            "translate(960,550)")
+                    .call(d3.axisTop(ColorX))
+                    .attr("stroke", "#222222")
+//_______________________________________________________________________________________________________________________
+//________________________________Zeitlable und SVG Anlegen _________________________________________________________________________
+//_______________________________________________________________________________________________________________________           
+                         
             var TimeText = d3.select('#TimeText')
                         .append("text")
                         .attr("color","beige")
@@ -229,7 +246,10 @@
                 .attr("width","100%")
                 .attr("height","5000px")
 
-        
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip Anlegen _________________________________________________________________________
+//_______________________________________________________________________________________________________________________           
+         
             var tooltip = d3.select("#BarChart")
                     .append("div")
                     .style("opacity", 0)
@@ -239,23 +259,24 @@
                     .style("border-width", "1px")
                     .style("border-radius", "5px")
                     .style("padding", "10px")
-            
+//_______________________________________________________________________________________________________________________
+//________________________________Hauptfunktion "load"_________________________________________________________________________
+//_______________________________________________________________________________________________________________________           
+             
             load()
             function load()
-            {
-                 Delay = []
+            {   //__________________________________Zurücksetzen________________________________
+
+                Delay = []
                 svg.selectAll("*").remove()
                 TimeText.interrupt()
-                let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
-                let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
-                let AirlineOrgData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineOrgDelaySummary.csv"
-                let AirlineDestData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineDestDelaySummary.csv"
-                let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/airports.csv"
-                let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
+                let CSVLink; 
+                let AddLink;
+                for(let i=-1;i<24;i++){
+                    LinesInHour[""+i+""]=0    
+                }
 
-
-                var CSVLink; 
-                var AddLink; 
+                //__________________________Auswahl der richtigen Daten________________________
                 switch(OrginDestAirline){
                     case "2": CSVLink = destAirportsDelay; AddLink=AirportInfo; break;
                     case "3": CSVLink = AirlineOrgData;AddLink = AirlineInfo; break;
@@ -263,178 +284,165 @@
                     default: CSVLink = orgAirportsDelay; AddLink=AirportInfo; break;
                 }
 
-                for(let i=-1;i<24;i++){
-                    LinesInHour[""+i+""]=0    
-                }
-                
-               
-
-               
-                
-
-
+                //__________________________Laden der Daten________________________
                 d3.csv(CSVLink).then(data=>{
                     d3.csv(AddLink).then(addData=>{
 
-                        console.log(data)
-                    data = data.filter(x => { return  (x.Hour*1)>= StartHour})
+                        //__________________________Filtern der Daten________________________
+                        data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
-                    if (StartHour ==-1){
-                        AnimationSpeed =  1000000000000; 
-                    }
-                    
-                    
-                    
+                        if (StartHour ==-1){
+                            AnimationSpeed =  1000000000000; 
+                        }
+                        //__________________________Sortieren der Daten________________________
+                        switch(HigAvgLow){
+                            case "1": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","HighDelay")):data = data.sort(dynamicSortMultiple("Hour","-HighDelay")); break;
+                            case "3": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","LowDelay")):data = data.sort(dynamicSortMultiple("Hour","-LowDelay")); break;
+                            default:  AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","AvgDelay")):data = data.sort(dynamicSortMultiple("Hour","-AvgDelay")); break;
+                        }
 
-                  
-
-                    switch(HigAvgLow){
-                        case "1": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","HighDelay")):data = data.sort(dynamicSortMultiple("Hour","-HighDelay")); break;
-                        case "3": AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","LowDelay")):data = data.sort(dynamicSortMultiple("Hour","-LowDelay")); break;
-                        default:  AscDesc ==1?data = data.sort(dynamicSortMultiple("Hour","AvgDelay")):data = data.sort(dynamicSortMultiple("Hour","-AvgDelay")); break;
-                    }
-
-                    
-                    
-
-                    g = svg.selectAll("g")
-                        .data(data)
-                        .enter()
-                        .append("g")
-
-                    
-                    
-                    g.append("rect")
-                    .transition()
-                        .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
-                        .attr("x",(d,i)=>{
+                        //__________________________Erzeugen g für alle Daten___________________
+                        g = svg.selectAll("g")
+                            .data(data)
+                            .enter()
+                            .append("g")
+                        //__________________________Anhängen eines Rechtecks___________________
+                        g.append("rect")
+                            .transition()
+                            .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
+                            .attr("x",(d,i)=>{
+                                LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
+                                console.log("Lines in Hour: "+LinesInHour[""+d.Hour+""])
+                                switch(HigAvgLow){
+                                    case "1": Delay.push(d.HighDelay);  break;
+                                    case "3": Delay.push(d.LowDelay) ;break;
+                                    default: Delay.push(d.AvgDelay); break;
+                                }
+                                let x =Delay[i]<0?((HigAvgLow==1&AscDesc==2)?220:405+parseFloat(Delay[i])*5):(HigAvgLow==1&AscDesc==2)?220:405;
                             
-                            LinesInHour[""+d.Hour+""]=LinesInHour[""+d.Hour+""]+1
-                            console.log("Lines in Hour: "+LinesInHour[""+d.Hour+""])
-                            switch(HigAvgLow){
-                                case "1": Delay.push(d.HighDelay);  break;
-                                case "3": Delay.push(d.LowDelay) ;break;
-                                default: Delay.push(d.AvgDelay); break;
-                            }
-                            let x =Delay[i]<0?((HigAvgLow==1&AscDesc==2)?220:405+parseFloat(Delay[i])*5):(HigAvgLow==1&AscDesc==2)?220:405;
-                           
-                            
-                            return x})
-                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >9?-50: (30+rank*20)})
-                        .attr("height",15)
-                        .attr("width",(d,i)=>{return (Math.abs(Delay[i]!=0?Delay[i]:0.01))*((HigAvgLow==1&AscDesc==2)?2/3:5)})
-                        .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
-                        .attr("stroke","black")
-                        .style("opacity",1)
-                        .transition()
-                        .duration(AnimationSpeed)
-                        .remove()
-
-                    g.append("text")
-                        .style("opacity",0)
-                        .transition()
-                        .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
-                        .attr("x",10)
-                        .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(40+rank*20)})
-                        .attr("color","black")
-                        .text((d,i)=>{
-                            if(parseInt(OrginDestAirline)<=2){
-                                let found = addData.find(element=> element.IATA==d.Airport);
-                                return found!=undefined?found.AIRPORT+"  ("+found.IATA+")":d.Airport;
-                            }else{
-                                let found = addData.find(element=> element.IATA==d.Airline);
-                                return found!=undefined?found.Name+" ("+found.IATA+")":d.Airline;
-                            }
-                            
-                        })
-                        .attr("class","legendText")
-                        .style("opacity",1)
-                        .transition()
-                        .duration(AnimationSpeed)
-                        .remove()
-                    
-                    var x = d3.scaleLinear()
-                        .domain([(HigAvgLow==1&AscDesc==2)?0:-60, (HigAvgLow==1&AscDesc==2)?1200:120])
-                        .range([0, (HigAvgLow==1&AscDesc==2)?800:900]);
-
-                
-                    svg.append("g")
-                        .attr("transform", "translate("+((HigAvgLow==1&AscDesc==2)?220:105)+", 20)")
-                        .call(d3.axisTop(x));
-                
-                    svg.append("g")
-                        .attr("transform", "translate(1120, 17.5)")
-                        .append("text")
-                        .text("Delay in min ")
-                        .attr("color","black")
-                        
-                    
-                    
-                    g.on("mouseover",function(d,i){
-                        console.log("hihi")
-                        tooltip
+                                return x})
+                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >9?-50: (30+rank*20)})
+                            .attr("height",15)
+                            .attr("width",(d,i)=>{return (Math.abs(Delay[i]!=0?Delay[i]:0.01))*((HigAvgLow==1&AscDesc==2)?2/3:5)})
+                            .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
+                            .attr("stroke","black")
                             .style("opacity",1)
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
-                            .html(()=>{
+                            .transition()
+                            .duration(AnimationSpeed)
+                            .remove()
+                        //__________________________Anhängen des Texts____________________________
+                        g.append("text")
+                            .style("opacity",0)
+                            .transition()
+                            .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
+                            .attr("x",10)
+                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(40+rank*20)})
+                            .attr("color","black")
+                            .text((d,i)=>{
                                 if(parseInt(OrginDestAirline)<=2){
                                     let found = addData.find(element=> element.IATA==d.Airport);
-                                     found!=undefined?text=found.AIRPORT+"("+found.IATA+")":text=d.Airport;
+                                    return found!=undefined?found.AIRPORT+"  ("+found.IATA+")":d.Airport;
                                 }else{
                                     let found = addData.find(element=> element.IATA==d.Airline);
-                                     found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
+                                    return found!=undefined?found.Name+" ("+found.IATA+")":d.Airline;
                                 }
-                                text+=(StartHour==-1)?"<br>Avg Flight Count/Hour: "+d.Count :"<br>Flight Count: "+d.Count;  
-                                text+="<br>Delay:"+Delay[i]; 
-                                return text
-                            })
-                         
-                    })
-                    .on("mouseout", function(d){ tooltip.style("opacity", 0)})
-                    // Reset to Daily Avg after Animation
-                    setTimeout(function(){ 
-                        if(StartHour!=-1){
-                            dropdownButtonAnimationStartOptions.property("selected",(d)=>{
-                                console.log(d.value)
-                                return d.value==-1
-                            })
-                            StartHour=-1
-                            load()
-                        }
-                        
-                    }, (25-StartHour)*AnimationSpeed);  
-
-                    //For TimeText Only 
-                    if(StartHour==-1)
-                    {
-                        TimeText.text("Daily Avg: 2015-01-01")
-                           
-                    }
-                    else{
-                        for(let i = StartHour; i<24;i++)
-                         {
-                       
-                            if(i<=9){
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .text("2015-01-01 0"+i+":00:00")
-                                .duration(AnimationSpeed)
                                 
-                            }else{
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .duration(AnimationSpeed)
-                                .text("2015-01-01 "+i+":00:00")
-                                
-                            }
-                        }
-                    }
+                            })
+                            .attr("class","legendText")
+                            .style("opacity",1)
+                            .transition()
+                            .duration(AnimationSpeed)
+                            .remove()
+                        //_____________________________Anlegen der Skala_________________________
+                        var x = d3.scaleLinear()
+                            .domain([(HigAvgLow==1&AscDesc==2)?0:-60, (HigAvgLow==1&AscDesc==2)?1200:120])
+                            .range([0, (HigAvgLow==1&AscDesc==2)?800:900]);
 
                     
-                })})
+                        svg.append("g")
+                            .attr("transform", "translate("+((HigAvgLow==1&AscDesc==2)?220:105)+", 20)")
+                            .call(d3.axisTop(x));
+                    
+                        svg.append("g")
+                            .attr("transform", "translate(1120, 17.5)")
+                            .append("text")
+                            .text("Delay in min ")
+                            .attr("color","black")
+                            
+                        
+                        //__________________________Tooltip füllen und sichtbar machen___________________
+                        g.on("mouseover",function(d,i){
+                            console.log("hihi")
+                            tooltip
+                                .style("opacity",1)
+                                .style("left", (d3.event.pageX + 15) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px")
+                                .html(()=>{
+                                    if(parseInt(OrginDestAirline)<=2){
+                                        let found = addData.find(element=> element.IATA==d.Airport);
+                                        found!=undefined?text=found.AIRPORT+"("+found.IATA+")":text=d.Airport;
+                                    }else{
+                                        let found = addData.find(element=> element.IATA==d.Airline);
+                                        found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
+                                    }
+                                    text+=(StartHour==-1)?"<br>Avg Flight Count/Hour: "+d.Count :"<br>Flight Count: "+d.Count;  
+                                    text+="<br>Delay:"+Delay[i]; 
+                                    return text
+                                })
+                            
+                        })
+                        //__________________________Tooltip unsichtbar machen___________________
+                        .on("mouseout", function(d){ tooltip.style("opacity", 0)})
+
+
+                        // __________________Zurücksetzen zum Tagesdurchschnitt nach Animation_______________
+                        setTimeout(function(){ 
+                            if(StartHour!=-1){
+                                dropdownButtonAnimationStartOptions.property("selected",(d)=>{
+                                    console.log(d.value)
+                                    return d.value==-1
+                                })
+                                StartHour=-1
+                                load()
+                            }
+                            
+                        }, (25-StartHour)*AnimationSpeed);  
+
+                        //____________Setzen des Zeitlabels (ggf mit Animation) ________________________________________________________________
+                        if(StartHour==-1)
+                        {
+                            TimeText.text("Daily Avg: 2015-01-01")
+                            
+                        }
+                        else{
+                            for(let i = StartHour; i<24;i++)
+                            {
+                        
+                                if(i<=9){
+                                    TimeText.transition()
+                                    .delay((i-StartHour) * AnimationSpeed  )
+                                    .text("2015-01-01 0"+i+":00:00")
+                                    .duration(AnimationSpeed)
+                                    
+                                }else{
+                                    TimeText.transition()
+                                    .delay((i-StartHour) * AnimationSpeed  )
+                                    .duration(AnimationSpeed)
+                                    .text("2015-01-01 "+i+":00:00")
+                                    
+                                }
+                            }
+                        }
+
+                        
+                    })})
 
             }
-
+//_______________________________________________________________________________________________________________________
+//________________________________Hilfsfunktionen_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+            
+            //____________Funktion berechnet wie viele Einträge es schon bis zu einer bestimmten Stunde gibt________________________________________________________________
             function lineSumTillHour(hour){
                 let sum = 0; 
 
@@ -445,17 +453,19 @@
                 return sum; 
             }
 
+            //____________Sortiert  nach mehrern Kriterien________________________________________________________________
             function dynamicSortMultiple() {
                 var props = arguments;
                 return function (obj1, obj2) {
-                    var i = 0, result = 0, numberOfProperties = props.length;
-                    while(result === 0 && i < numberOfProperties) {
+                    var i = 0, result = 0, number = props.length;
+                    while(result === 0 && i < number) {
                         result = dynamicSort(props[i])(obj1, obj2);
                         i++;
                     }
                     return result;
                 }
             }
+            //____________Sortiert  nach einem Kriterium________________________________________________________________
             function dynamicSort(property) {
                 var sortOrder = 1;
                 if(property[0] === "-") {
