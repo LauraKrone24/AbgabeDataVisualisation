@@ -58,10 +58,31 @@
 
 
         <script type="text/javascript">
+//_______________________________________________________________________________________________________________________
+//________________________________Wichtige Variablen Anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________
+           
             var HigAvgLow=2;
             var OrginDestination=1; 
             var AnimationSpeed = 1000;
             var StartHour=-1; 
+            var orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
+            var destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
+            var x = d3.scaleLinear()
+                .domain([0, 5])
+                .range([0, 1000]);
+
+            var y = d3.scaleLinear()
+                .domain([10, 0])
+                .range([0, 500])
+
+            var line = d3.line()
+                .x((d) => x(d.x))
+                .y((d) => y(d.y))    
+
+//_______________________________________________________________________________________________________________________
+//________________________________DropDownButton anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________
             
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
@@ -100,8 +121,6 @@
                 load()
                 })
 
-
-
             var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
                 .append('select')
                 
@@ -135,7 +154,6 @@
                 StartHour = option;
                 if(StartHour!= -1)
                 {
-                    
                     AnimationSpeed= dropdownButtonAnimationspeed.property("value");
                     console.log("Animationspeed:"+AnimationSpeed)
                 }
@@ -147,7 +165,7 @@
                 
                 dropdownButtonVisulisation 
                 .selectAll('myOptions') 
-                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"Connections",value:"connections.html"},{text:"Delay Comparison",value:"DelayComparison.html"}])
+                .data([{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"State Connections",value:"connections.html"},{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Best Connections",value:"BestConnect.html"}])
                 .attr("class","dropdown")
                 .enter()
                 .append('option')
@@ -159,6 +177,10 @@
                 console.log(option)
                 open(option,"_self")
                 })
+
+//_______________________________________________________________________________________________________________________
+//________________________________Karte erzeugen und SVG anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________
 
             var view = "map"
             mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cmFrcm8iLCJhIjoiY2xmbWx0cHEzMGQwNTN4bnA1Ync1eHI5cyJ9.RbCaC98XN7LIzk4pde9YbA'; 
@@ -178,6 +200,10 @@
 
             var canvas = map.getCanvasContainer();
             var svg = d3.select(canvas).append("svg");
+
+//_______________________________________________________________________________________________________________________
+//________________________________Farblegende erstellen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
 
             var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
                     .range(["#002800","#65A765","white","yellow","orange", "red"])
@@ -215,6 +241,10 @@
                     .call(d3.axisTop(ColorX))
                     .attr("stroke", "#eeeeee")
 
+//_______________________________________________________________________________________________________________________
+//________________________________Größenlegende erzeugen ________________________________________________________________
+//_______________________________________________________________________________________________________________________
+
             legendvalues = [10,25,50]
             legendXValues=[30,100,220]
 
@@ -248,7 +278,9 @@
                     .attr("fill","#eeeeee")
                     .text("Number of Flights per Hour")
 
-                    
+ //_______________________________________________________________________________________________________________________
+//________________________________Infomationslable anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________                   
             
                             
             var TimeText = d3.select('#TimeText')
@@ -259,29 +291,28 @@
             var tooltip = d3.select('body')
             .append('div')
             .attr('class', 'tt')
-
-            tooltip
-              .append('div')
-              .attr('class', 'label')
+            .attr('class', 'label')
+//_______________________________________________________________________________________________________________________
+//________________________________Haupfunktion "load"________________________________________________________________
+//_______________________________________________________________________________________________________________________
 
             load()
             function load()
             {
-
-                TimeText.interrupt()
-                let orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
-                let destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
+                //____________Elemente zurücksetzen ________________________________________________________________
+ 
+                TimeText.interrupt() //
                 var CSVLink; 
                 OrginDestination==1?CSVLink= orgAirportsDelay:CSVLink= destAirportsDelay
-
-                
                 svg.selectAll("*").remove()
-                
+
+                //____________Daten laden und filtern ________________________________________________________________
                 d3.csv(CSVLink,(x)=> {
-                
-                if (!x.AIRPORT_POS.includes('nan')) {
-                 x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
-                 return x}}).then(data=>{
+                    if (!x.AIRPORT_POS.includes('nan')) {
+                    x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
+                    return x}
+                }).then(data=>{
+
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
                     if (StartHour ==-1){
@@ -289,20 +320,9 @@
                     }
                     
                     
-                   
+                //____________Erzeugen der Grafik inkl Animation ________________________________________________________________
+ 
                     
-
-                    var x = d3.scaleLinear()
-                        .domain([0, 5])
-                        .range([0, 1000]);
-
-                    var y = d3.scaleLinear()
-                        .domain([10, 0])
-                        .range([0, 500])
-
-                    var line = d3.line()
-                        .x((d) => x(d.x))
-                        .y((d) => y(d.y))
                     
                     g = svg.selectAll("circle")
                     .data(data)
@@ -331,11 +351,11 @@
                     .duration(AnimationSpeed)
                     .remove()
 
-                    // Reset to Daily Avg after Animation
+                    //____________Zurücksetzen auf Tagesdurchschnitt nach Animation ________________________________________________________________
+ 
                     setTimeout(function(){ 
                         if(StartHour!=-1){
                             dropdownButtonAnimationStartOptions.property("selected",(d)=>{
-                                console.log(d.value)
                                 return d.value==-1
                             })
                             StartHour=-1
@@ -345,7 +365,8 @@
                     }, (25-StartHour)*AnimationSpeed);  
                    
 
-                    
+                     //____________Setzen des Zeitlabels (ggf mit Animation) ________________________________________________________________
+ 
                     if(StartHour==-1)
                     {
                         TimeText.text("Daily Avg: 2015-01-01")
@@ -375,7 +396,10 @@
                  })
 
             }
-
+ //_______________________________________________________________________________________________________________________
+//________________________________Hilfsfunktionen_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
+           
             function project(d) {
                 return map.project(new mapboxgl.LngLat(d[0], d[1]));
             }
