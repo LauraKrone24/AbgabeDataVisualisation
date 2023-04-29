@@ -3,7 +3,9 @@ import numpy as np
 import json
 
 df = pd.read_csv("https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv")
-#Origin Delay CSV
+#_____________________________________________________________________________________________
+#_________________Für Visualisierung 1,4: Verspätung beim Abflug an Flughäfen_________________
+#_____________________________________________________________________________________________
 dfOriginAirportsDelay =df[["ORIGIN_AIRPORT","ORIGIN_AIRPORT_POS","DEPARTURE_DELAY"]]
 dfOriginAirportsDelay["hour"]=df["SCHEDULED_DEPARTURE"]//100
 dfOriginAirportsDelayDay = dfOriginAirportsDelay.groupby(["ORIGIN_AIRPORT"])
@@ -19,8 +21,9 @@ for a in dfOriginAirportsDelay:
 dfOrigDelaySummary = dfOrigDelaySummary.sort_values(by=["Hour","Count"],ascending=[True, False]) 
 dfOrigDelaySummary.to_csv("OrigDelaySummary.csv")
 
-
-#Destination Delay CSV
+#_____________________________________________________________________________________________
+#_____________________Für Visualisierung 1,4: Verspätung beim Laden an Flughäfen______________
+#_____________________________________________________________________________________________
 dfDestinationAirportsDelay =df[["DESTINATION_AIRPORT","DESTINATION_AIRPORT_POS","DESTINATION_DELAY"]]
 dfDestinationAirportsDelay["hour"]=df["SCHEDULED_DESTINATION"]//100
 dfDestinationAirportsDelayDay = dfDestinationAirportsDelay.groupby(["DESTINATION_AIRPORT"])
@@ -38,12 +41,13 @@ dfDestDelaySummary = dfDestDelaySummary.sort_values(by=["Hour","Count"],ascendin
 dfDestDelaySummary.to_csv("DestDelaySummary.csv")
 
 
-
-#Dataset for names of Airlines 
-Airlines = df["AIRLINE"].unique()
-df2 = pd.read_csv("OrgAirlineData.csv")
+#____________________________________________________________________________________________
+#_________________Für Visualisierung 2,4,5:  Airlinenamen und zusätzliche Infos______________
+#____________________________________________________________________________________________
+Airlines = df["AIRLINE"].unique() 
+df2 = pd.read_csv("OrgAirlineData.csv") #Hilfsdatenset, welches Airlinenamen in Kombination zu den IATA Kürzeln enthät
 df2= df2[["Name","IATA"]]
-df2 = df2[df2["IATA"].isin(Airlines)].sort_values(by="IATA")
+df2 = df2[df2["IATA"].isin(Airlines)].sort_values(by="IATA") 
 
 df["AirTimeDiff"]  = df["ELAPSED_TIME"]-df["SCHEDULED_TIME"]
 dfAirlineGrouped = df.groupby("AIRLINE")
@@ -52,20 +56,22 @@ dfAirlineSummary = pd.DataFrame()
 for a in dfAirlineGrouped: 
     dfAirlineSummary= dfAirlineSummary.append({"IATA":a[1]["AIRLINE"].iloc[0],"OrgDelayMax":a[1]["DEPARTURE_DELAY"].max(),"OrgDelayMin":a[1]["DEPARTURE_DELAY"].min(),"OrgDelayQ2":round(a[1]["DEPARTURE_DELAY"].quantile(.5),2),"OrgDelayQ3":round(a[1]["DEPARTURE_DELAY"].quantile(.75),2),"OrgDelayQ1":round(a[1]["DEPARTURE_DELAY"].quantile(.25),2),"DestDelayMax":a[1]["DESTINATION_DELAY"].max(),"DestDelayMin":a[1]["DESTINATION_DELAY"].min(),"DestDelayQ2":round(a[1]["DESTINATION_DELAY"].quantile(.5),2),"DestDelayQ3":round(a[1]["DESTINATION_DELAY"].quantile(.75),2),"DestDelayQ1":round(a[1]["DESTINATION_DELAY"].quantile(.25),2),"AirTimeDiffMax":a[1]["AirTimeDiff"].max(),"AirTimeDiffMin":a[1]["AirTimeDiff"].min(),"AirTimeDiffQ2":round(a[1]["AirTimeDiff"].quantile(.5),2),"AirTimeDiffQ3":round(a[1]["AirTimeDiff"].quantile(.75),2),"AirTimeDiffQ1":round(a[1]["AirTimeDiff"].quantile(.25),2),"Count":len(a[1].index)},ignore_index = True)
 
-
-
+#_____________________________ Werte für Alle Airlines anhängen_____________________________
 result = pd.merge(df2, dfAirlineSummary, how="outer",on="IATA")
 result= result.append({"Name":" All Airlines","IATA":"all","OrgDelayMax":df["DEPARTURE_DELAY"].max(),"OrgDelayMin":df["DEPARTURE_DELAY"].min(),"OrgDelayQ2":round(df["DEPARTURE_DELAY"].quantile(.5),2),"OrgDelayQ3":round(df["DEPARTURE_DELAY"].quantile(.75),2),"OrgDelayQ1":round(df["DEPARTURE_DELAY"].quantile(.25),2),"DestDelayMax":df["DESTINATION_DELAY"].max(),"DestDelayMin":df["DESTINATION_DELAY"].min(),"DestDelayQ2":round(df["DESTINATION_DELAY"].quantile(.5),2),"DestDelayQ3":round(df["DESTINATION_DELAY"].quantile(.75),2),"DestDelayQ1":round(df["DESTINATION_DELAY"].quantile(.25),2),"AirTimeDiffMax":df["AirTimeDiff"].max(),"AirTimeDiffMin":df["AirTimeDiff"].min(),"AirTimeDiffQ2":round(df["AirTimeDiff"].quantile(.5),2),"AirTimeDiffQ3":round(df["AirTimeDiff"].quantile(.75),2),"AirTimeDiffQ1":round(df["AirTimeDiff"].quantile(.25),2),"Count":len(df.index)},ignore_index = True)
 
 df2 = result.sort_values(by="Name")
 df2.to_csv("Airlines.csv")
 
-df3 = pd.read_csv("airports.csv")
+#____________________________________________________________________________________________
+#___________Für Visualisierung 3:  Kombination IATA,State + Verbindung zwischen States_______
+#____________________________________________________________________________________________
+df3 = pd.read_csv("airports.csv") #Hilfsdatenset, welches Airportname und State in Kombination zu den IATA Kürzeln enthät
 df4 = df3
 
 
 df3 = df3[["IATA","STATE"]]
-
+#__________________________Joinen der States zu Start und Zielflughafen_____________________
 df = pd.merge(df, df3, left_on='ORIGIN_AIRPORT', right_on='IATA')
 df.drop('IATA', axis=1, inplace=True)
 df.rename(columns={"STATE": "OrgState"}, inplace=True)
@@ -76,7 +82,7 @@ print(df)
 
 
 
-#Connections by State 
+#___________________Anlegen aller State Verbindungen un zusätzlicher Werte_______________
 
 dfConnections = df.groupby(["OrgState","DestState"])
 dfConnectionsummary ={}
@@ -86,10 +92,11 @@ for a in dfConnections:
     
     dfConnectionsummary[org+","+dest] = {"count":len(a[1].index),"OrgDelay":round(a[1]["DEPARTURE_DELAY"].mean(),2),"DestDelay":round(a[1]["DESTINATION_DELAY"].mean(),2)}
 
-print(dfConnectionsummary)
+#_______________________Isolieren aller vorhandenen States___________________
 States = df["OrgState"].dropna().astype("str").append(df["DestState"].dropna()).astype("str").unique()
 States = np.sort(States)
 
+#_______________________String im CSV Format anlegen _______________________
 csvString = ""
 for org in States:
     csvString+=org+";"
@@ -107,14 +114,16 @@ for org in States:
     csvString.strip(";")
     csvString+="\n"
 
-
+#_______________________Schreiben des CSV Strings in eine Datei _______________________
 csvString = csvString.replace("\'","\"")
 f = open("Connections.csv", "w")
 f.write(csvString)
 f.close()
 
 
-#Airline Delay 
+#____________________________________________________________________________________________
+#______________Für Visualisierung 4: Verspätung von Airlines bei Abflug und Ankunft__________
+#____________________________________________________________________________________________ 
 
 dfAirlineDelay =df[["AIRLINE","DEPARTURE_DELAY","DESTINATION_DELAY"]]
 dfAirlineDelay["DestHour"]=df["SCHEDULED_DESTINATION"]//100
@@ -141,13 +150,12 @@ dfAirlineDelaySummaryOrg.to_csv("AirlineOrgDelaySummary.csv")
 dfAirlineDelaySummaryDest = dfAirlineDelaySummaryDest.sort_values(by="Hour") 
 dfAirlineDelaySummaryDest.to_csv("AirlineDestDelaySummary.csv")
         
-#Datenvorbereitung für Vis 5 - Best Connection 
+#____________________________________________________________________________________________
+#___Für Visualisierung 5: Kombination Start-, Zielflughafen und Airline+ ZUsätzliche Infos___
+#____________________________________________________________________________________________ 
 dfBestConnect = df
 dfBestConnect["hour"]=df["SCHEDULED_DEPARTURE"]//100
 dfBestConnectDay = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","AIRLINE"])
-dfBestConnect = dfBestConnect.groupby(["ORIGIN_AIRPORT","DESTINATION_AIRPORT","hour","AIRLINE"])
-
-
 
 dfBestConnectSummary = pd.DataFrame()
 for a in dfBestConnectDay: 
@@ -159,7 +167,9 @@ dfBestConnectSummary.to_csv("BestConnectSummary.csv")
 
 
 
-# hier noch filter ob Airport überhaupt in Best Connection Summaray
+#____________________________________________________________________________________________
+#______________Für Visualisierung 4,5: Sortierte Liste aller vorkommenden Flughäfen__________
+#____________________________________________________________________________________________
 df4 = df4.sort_values(by=["IATA"])
 
 Airports = df["ORIGIN_AIRPORT"].dropna().astype("str").append(df["DESTINATION_AIRPORT"].dropna()).astype("str").unique()
