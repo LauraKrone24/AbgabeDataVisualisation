@@ -78,7 +78,6 @@ df.rename(columns={"STATE": "OrgState"}, inplace=True)
 df = pd.merge(df, df3, left_on='DESTINATION_AIRPORT', right_on='IATA')
 df.drop('IATA', axis=1, inplace=True)
 df.rename(columns={"STATE": "DestState"}, inplace=True)
-print(df)
 
 
 

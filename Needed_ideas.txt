@@ -1,11 +1,41 @@
+Visualisierung 1
++ Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
+    + Punktgröße= Anzahl flüge gestartet
+    + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
+    + Colorlegend https://observablehq.com/@d3/color-legend
+    + Größenlegende
 
--  Histogram wie vielen Flüge am Stunde pro Flughafen / pro Airline
-    - Aufschlüsselung nach zu früh, pünktlich (+-5 min), zu spät
-    - Histogram
-    - Selektierbar Airline, Dest Flughafen, Org Flughafen
-    - Selektierbar Welcher Flughafen / Welche Airline 
-    - Tooltip 
 
+Visualisierung 2
++ Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
+    + 2. Datenset zu Airline Kürzeln --> im Filter 
+    + Visualisierung von Verspätungen
+    + Animierung nach Zeit (verfeinern) 
+    + 2. Tablerow für zusätzliche Infos 
+    + 2. Tablerow mit Visualisierung 
+    + Colorlegend https://observablehq.com/@d3/color-legend
+    + Korrektur de Positionen wenn Addinfo ausgeklappt ist
+
+Visualisierung 3
++ Chord Diagramm Flugverbindungen (States)
+    + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
+    + Einfaches Chord Diagramm in d3
+    + Anzeige Interaktivität
+    + Tooltip mit zusatzinfos
+    + Labels für State
+    + Legende Statekürzel
+
+Visualisierung 4
++ Barchart Verspätungsvergleich Animation
+    + Auswahl Airline, Dest Flughafen, Org Flughafen  
+    + Auswahl high Avg Low Delay  
+    + Animation der Balken  
+    + Sortierung der Position der Balken nach  Rank
+    + Label 
+    + Tooltip fixen
+    + Color Legend 
+
+Visualisierung 5
 + Lollipop Graph mit welcher Airline welche Strecken
     + groupen Org Dest Airline --> Infos Min max Avg
     + Auswahl Org und Dest 
@@ -16,43 +46,6 @@
     + Überschrift einfügen
     + Ändern Verspätung in Zeit gebraucht -> oder Auswählbar Zeit / Verspätung 
 
-    
-
-
-+ Barchart Verspätungsvergleich Animation
-    + Auswahl Airline, Dest Flughafen, Org Flughafen  
-    + Auswahl high Avg Low Delay  
-    + Animation der Balken  
-    + Sortierung der Position der Balken nach  Rank
-    + Label 
-    + Tooltip fixen
-    + Color Legend 
-
-+ Chord Diagramm Flugverbindungen (States)
-    + Datenvorbereitung (+ 3. Datensat, dass Flughafenkürzel mit State in Verbindung bringt )
-    + Einfaches Chord Diagramm in d3
-    + Anzeige Interaktivität
-    + Tooltip mit zusatzinfos
-    + Labels für State
-    + Legende Statekürzel
-    
-
-+ Karte: Pünktlichkeit von Flughäfen (Filter: Abflug vs Ankunft)(Filter: Gesamt vs pro Stunde (Auswahl))(Animation oder Regler)
-    + Punktgröße= Anzahl flüge gestartet
-    + Farbe = Durchschnittliche Pünklichkeit in Bereich (Skala grün bis rot)
-    + Colorlegend https://observablehq.com/@d3/color-legend
-    + Größenlegende
-    
-
-+ Karte: Flüge von Airlines (gleiches Fenster wie vorheriges unterschieden durch Filter) (Filter nach Airlines)
-    + 2. Datenset zu Airline Kürzeln --> im Filter 
-    + Visualisierung von Verspätungen
-    + Animierung nach Zeit (verfeinern) 
-    + 2. Tablerow für zusätzliche Infos 
-    + 2. Tablerow mit Visualisierung 
-    + Colorlegend https://observablehq.com/@d3/color-legend
-    ? Kreise durch Flugzeuge ersetzen 
-    + Korrektur de Positionen wenn Addinfo ausgeklappt ist
     
 
 
