@@ -70,8 +70,31 @@
             let Airportlink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
             let CSVLink ="https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/BestConnectSummary.csv"; 
             let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Tooltip_________________________________________________________________________
+//_______________________________________________________________________________________________________________________
 
-
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip zur Beschreibung der Visualisierung ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+            d3.select("h2").on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This Visualisation lets you find which airlines provides<br>the probably best Connection by needed time and delay"
+                        return text})
+                        .style("left", (d3.event.pageX ) + "px")
+                        .style("top", (d3.event.pageY -2) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 //________________________________Anlegen Svg- Elelement für Visualisierung _________________________________________________________________________
              
             var svg = d3.select("#Container").append("svg")
@@ -84,7 +107,7 @@
             var dropdownButtonVisulisation = d3.select("#dropdownButtonVisulisation")
                 .append('select')
                 
-                dropdownButtonVisulisation 
+            dropdownButtonVisulisation 
                 .selectAll('myOptions') 
                 .data([{text:"Best Connections",value:"BestConnect.html"},{text:"Delay Comparison",value:"DelayComparison.html"},{text:"Delay at airports",value:"airports.html"},{text:"Delay from airlines",value:"airlines.html"},{text:"State Connections",value:"connections.html"}])
                 .attr("class","dropdown")
@@ -98,6 +121,15 @@
                 
                 open(option,"_self")
                 })
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose between the different Visualisations"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 
             var dropdownButtonDelayTime = d3.select("#dropdownButtonDelayTime")
                 .append('select')
@@ -117,6 +149,15 @@
                 load();
                 
                 })
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose if you<br>want to compare the delay or the time needed"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 
 //________________________________Anlegen  der Dropdowns für Start und Zielflughafen _________________________________________________________________________
            
@@ -194,6 +235,15 @@
                 filteroption = option; 
                 loadDropDown(); 
             })
+            .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "Those radiobuttons let you choose if you want to filter the origin or destination airportlist for only those connections that really exist"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
             
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Farblegende_________________________________________________________________________
@@ -325,19 +375,7 @@
                 .attr("y",30)
                 .attr("fill","#222222")
                 .text("Time in min")
-//_______________________________________________________________________________________________________________________
-//________________________________Anlegen Tooltip_________________________________________________________________________
-//_______________________________________________________________________________________________________________________
 
-            var tooltip = d3.select("#Container")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "1px")
-                    .style("border-radius", "5px")
-                    .style("padding", "10px")
                     
 //_______________________________________________________________________________________________________________________
 //________________________________Hauptfunktion "load"_________________________________________________________________________
@@ -540,7 +578,7 @@
                                     +"From: "+AddAirportInfo[d.Org]+"<br>"
                                     +"To: "+AddAirportInfo[d.Dest]+"<br>"
                                     +"By: "+AddAirlineInfo[d.Air]+"<br>"
-                                    +"Number of Flights: "+d.Count+"<br>"
+                                    +"Number of flights per month: "+d.Count+"<br>"
                                     DelayTime==1?text = text+"Scheduled: "+d.Schedule+"min <br>":null
                                     text = text
                                     +"Min: "+d.Min+"min <br>"

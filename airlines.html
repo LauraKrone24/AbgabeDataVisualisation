@@ -31,11 +31,11 @@
                          <h5>Airline</h5>
                         <div id="dropdownButtonAirlines"></div>
                     </td>
-                    <td width="220px">
+                    <td width="160px">
                         <h5>Speed</h5>
                         <div id="dropdownButtonAnimationspeed"></div>
                     </td>
-                    <td width="220px">
+                    <td width="160px">
                         <h5>Starthour</h5>
                         <div id="dropdownButtonAnimationStart"></div>
                     </td>
@@ -43,8 +43,12 @@
                         <h5>Show Add Info</h5> 
                         <input type="checkbox">
                     </td>
+                    <td width="200px">
+                        <h5>Date</h5>
+                        <div id="dropdownButtonDate"></div>
+                    </td>
                     <td >
-                        <h5>Date and Time</h5> 
+                        <h5>Time</h5> 
                         <div id="TimeText"></div>
                     </td>
                     
@@ -89,6 +93,7 @@
             var AnimationSpeed = 1000;
             var StartHour=0; 
             var boxSvg = [];
+            var day  =1; 
             var x = d3.scaleLinear()
                 .domain([0, 5])
                 .range([0, 1000]);
@@ -103,8 +108,34 @@
 
 
             let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
-            let flights = 'https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv'
-                
+            let flights = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv"
+            //let flights = 'https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv'
+//_______________________________________________________________________________________________________________________
+//________________________________Anlegen Tooltip ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+            var tooltip = d3.selectAll("body")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px")
+                .style("color","black")               
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip zur Beschreibung der Visualisierung ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+            d3.select("h2").on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This Visualisation shows all flights of differnet Airlines <br>and additional Information about those Airlines"
+                        return text})
+                        .style("left", (d3.event.pageX ) + "px")
+                        .style("top", (d3.event.pageY -2) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdownbutton anlegen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -124,10 +155,20 @@
                 let option = d3.select(this).property("value")
                     open(option,"_self")
                 })
+
+            dropdownButtonVisulisation.on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose between the different Visualisations"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
             
 
             d3.csv(AirlineLink).then(airlinedata=>{
-                console.log(airlinedata)
+                
                 loadBoxPlots(airlinedata)
                 
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
@@ -147,6 +188,16 @@
                     loadBoxPlots(airlinedata)
                     load()
                     })
+                    
+                dropdownButtonAirlines.on("mouseover",(d)=>{
+                    tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose for which Airline you want<br>to see all flights and additional infomation"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
                
             });
 
@@ -155,7 +206,7 @@
                 
             dropdownButtonAnimationspeed 
                 .selectAll('myOptions') 
-                .data([{text:"x 3600     ",value:1000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
+                .data([{text:"x 3600",value:1000},{text:"x 360",value:10000},{text:"x120",value:30000},{text:"x 60 ",value:60000}])
                 .enter()
                 .append('option')
                 .text(function (d) { return d.text; }) 
@@ -166,6 +217,16 @@
                 AnimationSpeed= option;
                 load()
                 })
+
+            dropdownButtonAnimationspeed.on("mouseover",(d)=>{
+                tooltip
+                    .style("opacity", 1)
+                    .html(()=>{text = "This button lets you choose the speed of the animation"
+                    return text})
+                    .style("left", (d3.event.pageX + 15) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 
             var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
@@ -187,6 +248,45 @@
                 
                 load()
                 })
+
+            dropdownButtonAnimationStart.on("mouseover",(d)=>{
+                tooltip
+                    .style("opacity", 1)
+                    .html(()=>{text = "This button lets you choose at which hour the animation starts"
+                    return text})
+                    .style("left", (d3.event.pageX + 15) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+
+            var dropdownButtonDate = d3.select("#dropdownButtonDate")
+                .append('select')
+            numberarray = [...Array(31).keys()]    
+            
+            dropdownButtonDate
+                .selectAll('myOptions') 
+                .data(numberarray)
+                .enter()
+                .append('option')
+                .text(function (d) { return d<9?"2015-01-0"+(d+1):"2015-01-"+(d+1); }) 
+                .attr("value", function (d) { return d+1 }) 
+
+            dropdownButtonDate.on("change", function(d) {
+                let option = d3.select(this).property("value")
+                day = option
+                
+                load()
+                })
+
+            dropdownButtonDate.on("mouseover",(d)=>{
+                tooltip
+                    .style("opacity", 1)
+                    .html(()=>{text = "This button lets you choose at which hour the animation starts"
+                    return text})
+                    .style("left", (d3.event.pageX + 15) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Checkbox für Addinfo ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -218,6 +318,15 @@
                     load
                 }
             })
+            .on("mouseover",(d)=>{
+                tooltip
+                    .style("opacity", 1)
+                    .html(()=>{text = "If this Checkbox is checked additional Infomation will be displayed"
+                    return text})
+                    .style("left", (d3.event.pageX + 15) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
             //__________________________Anlegen Textlabel für Zeit___________________________
             var TimeText = d3.select('#TimeText')
                         .append("text")
@@ -226,20 +335,7 @@
             //___________________________Addinfo defaultmäßig ausblenden____________________            
             d3.select("#Addinfo").style("display","none")
 
-//_______________________________________________________________________________________________________________________
-//________________________________Anlegen Tooltip ________________________________________________________________
-//_______________________________________________________________________________________________________________________            
 
-            var tooltip = d3.selectAll(".Box")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "1px")
-                    .style("border-radius", "5px")
-                    .style("padding", "10px")
-                    .style("color","black")
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Addinfozeile ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -420,12 +516,13 @@
                 svg.selectAll("*").remove()
                 //____________________Daten laden und Filtern__________________ 
                 d3.csv(flights,(x)=> {
-                    if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')) {
+                    if (!x.ORIGIN_AIRPORT_POS.includes('nan') && !x.DESTINATION_AIRPORT_POS.includes('nan')&&x.DAY ==day) {
                     x.DESTINATION_AIRPORT_POS = JSON.parse(x.DESTINATION_AIRPORT_POS.replace(/\'/g, "\""))
                     x.ORIGIN_AIRPORT_POS = JSON.parse(x.ORIGIN_AIRPORT_POS.replace(/\'/g, "\""))
-                    x.Hour = Number(x.SCHEDULED_DEPARTURE.substring(11,13)) +Number(x.SCHEDULED_DEPARTURE.substring(14,16))/60
+                    x.Hour = (x.SCHEDULED_DEPARTURE%100/60)+Math.floor(x.SCHEDULED_DEPARTURE/100)
                     return x}
                 }).then(data=>{
+                    console.log(data)
                     
                     data = data.filter(x => { return  (x.Hour*1)>= StartHour})
                     Airline!="all"? data = data.filter(x=>{return Airline==x.AIRLINE}):null
@@ -486,14 +583,14 @@
                         if(i<=9){
                             TimeText.transition()
                             .delay((i-StartHour) * AnimationSpeed  )
-                            .text("2015-01-01 0"+i+":00:00")
+                            .text("0"+i+":00:00")
                             .duration(AnimationSpeed)
                             
                         }else{
                             TimeText.transition()
                             .delay((i-StartHour) * AnimationSpeed  )
                             .duration(AnimationSpeed)
-                            .text("2015-01-01 "+i+":00:00")
+                            .text(""+i+":00:00")
                             
                         }
                     }

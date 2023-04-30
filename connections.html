@@ -55,13 +55,37 @@
 //_______________________________________________________________________________________________________________________            
 
             var unselect;
-            var tooltip ;
             var array = []
             var colors = []
             var destDelayArray = []
             var orgDelayArray = []
             let connection  = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Connections.csv'
             let StateLink = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/States.csv" 
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip anlegen ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px") 
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip zur Beschreibung der Visualisierung ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+            d3.select("h2").on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This Visualisation shows the Flights Connection between US States"
+                        return text})
+                        .style("left", (d3.event.pageX ) + "px")
+                        .style("top", (d3.event.pageY -2) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdownbutton anlegen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -82,7 +106,17 @@
                 let option = d3.select(this).property("value")
                     open(option,"_self")
                 })   
-                         
+
+            dropdownButtonVisulisation.on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This Button lets you choose between the different Visualisations"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                        
             
 
 //_______________________________________________________________________________________________________________________
@@ -129,16 +163,7 @@
                 
                 States = Object.keys(data[0])
                 
-                //____________Anlegen Tooltip ________________________________________________________________
-                var tooltip = d3.select("#chord")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "1px")
-                    .style("border-radius", "5px")
-                    .style("padding", "10px")
+                
 
                 //____________Anlegen SVG ________________________________________________________________
                 var svg = d3.select("#chord")

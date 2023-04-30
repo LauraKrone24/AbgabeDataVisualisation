@@ -77,7 +77,31 @@
             let AirlineDestData = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AirlineDestDelaySummary.csv"
             let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
             let AirlineInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv"
-           
+ //_______________________________________________________________________________________________________________________
+//________________________________Tooltip Anlegen _________________________________________________________________________
+//_______________________________________________________________________________________________________________________           
+         
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px")          
+//_______________________________________________________________________________________________________________________
+//________________________________Tooltip zur Beschreibung der Visualisierung ________________________________________________________________
+//_______________________________________________________________________________________________________________________            
+            d3.select("h2").on("mouseover",(d)=>{
+                tooltip
+                        .style("opacity", 1)
+                        .html(()=>{text = "This Visualisation lets you compare the Delay of different options"
+                        return text})
+                        .style("left", (d3.event.pageX ) + "px")
+                        .style("top", (d3.event.pageY -2) + "px")
+            })
+            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdown Button Anlegen _______________________________________________________________
 //_______________________________________________________________________________________________________________________           
@@ -98,6 +122,15 @@
                 
                 open(option,"_self")
                 })  
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose between the different Visualisations"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
@@ -117,7 +150,16 @@
                 
                 load()
                 })
-               
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose if you want to see<br>the highest, average or lowest delay"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})   
+
             var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
                 .append('select')
                 
@@ -134,6 +176,15 @@
                 OrginDestAirline = option;
                 load()
                 })
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose what option you want to compare"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
 
             var dropdownButtonAscDesc = d3.select("#dropdownButtonAscDesc")
                 .append('select')
@@ -153,7 +204,15 @@
                 
                 load()
                 })
-
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose if you what to see the top 10 or the bottom 10"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
 
             var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
                 .append('select')
@@ -171,6 +230,15 @@
                 AnimationSpeed= option;
                 load()
                 })
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose the speed of the Animation"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
 
             var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
@@ -192,6 +260,15 @@
                 }
                 load()
                 })
+                .on("mouseover",(d)=>{
+                    tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = "This button lets you choose to see either the daily average or the starthour of the animation"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                })
+                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
 
 //_______________________________________________________________________________________________________________________
 //________________________________Farblegende Anlegen _________________________________________________________________________
@@ -246,19 +323,7 @@
                 .attr("width","100%")
                 .attr("height","5000px")
 
-//_______________________________________________________________________________________________________________________
-//________________________________Tooltip Anlegen _________________________________________________________________________
-//_______________________________________________________________________________________________________________________           
-         
-            var tooltip = d3.select("#BarChart")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip")
-                    .style("background-color", "white")
-                    .style("border", "solid")
-                    .style("border-width", "1px")
-                    .style("border-radius", "5px")
-                    .style("padding", "10px")
+
 //_______________________________________________________________________________________________________________________
 //________________________________Hauptfunktion "load"_________________________________________________________________________
 //_______________________________________________________________________________________________________________________           
@@ -385,7 +450,7 @@
                                         let found = addData.find(element=> element.IATA==d.Airline);
                                         found!=undefined?text=found.Name+"("+found.IATA+")":text=d.Airline;
                                     }
-                                    text+=(StartHour==-1)?"<br>Avg Flight Count/Hour: "+d.Count :"<br>Flight Count: "+d.Count;  
+                                    text+=(StartHour==-1)?"<br>Avg Flight Count/Hour: "+d.Count :"<br> Avg. Flight Count: "+d.Count;  
                                     text+="<br>Delay:"+Delay[i]; 
                                     return text
                                 })
