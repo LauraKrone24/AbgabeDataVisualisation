@@ -274,7 +274,7 @@
             svg.on("mousemove",(d)=>{
                 if(drag){
                     let pos = map.getCenter();
-                    console.log(pos.lat)
+                    
                     map.flyTo({
                         center:[pos.lng<0?pos.lng-(d3.event.movementX):pos.lng+(d3.event.movementX),pos.lat<0?pos.lat-(d3.event.movementY):pos.lat+(d3.event.movementY)],
                         zoom: 3
