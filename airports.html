@@ -69,6 +69,8 @@
             var drag = false; 
             var orgAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/OrigDelaySummary.csv"
             var destAirportsDelay = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/DestDelaySummary.csv"
+            let AirportInfo = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/SortedAirports.csv"
+            
             var x = d3.scaleLinear()
                 .domain([0, 5])
                 .range([0, 1000]);
@@ -391,108 +393,111 @@
                     x.AIRPORT_POS = JSON.parse(x.AIRPORT_POS.replace(/\'/g, "\""))
                     return x}
                 }).then(data=>{
+                    d3.csv(AirportInfo).then(addData=>{
 
-                    data = data.filter(x => { return  (x.Hour*1)>= StartHour})
+                        data = data.filter(x => { return  (x.Hour*1)>= StartHour})
 
-                    if (StartHour ==-1){
-                        AnimationSpeed =  1000000000000; 
-                    }
-                    
-                    
-                //____________Erzeugen der Grafik inkl Animation ________________________________________________________________
- 
-                    
-                    
-                    g = svg.selectAll("circle")
-                    .data(data)
-                    .enter()
-                    .append('g')
-                   
-                    circles = g.append('circle')
-                        .style("opacity",0)
-                        .transition()
-                        .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
-                        .attr("cx", d => {
-                            return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).x
-                        })
-                        .attr("cy", d => {
-                            return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).y
-                        })
-                        .attr("r",d => { return d.Count })
-                        .style('fill', d => {
-                            
-                            if(HigAvgLow==1) {return d.HighDelay<-60?"Green":myColor(d.HighDelay) }
-                            if(HigAvgLow==2) {return d.AvgDelay<-60?"Green":myColor(d.AvgDelay) }
-                            if(HigAvgLow==3) {return d.LowDelay<-60?"Green":myColor(d.LowDelay)  }
-                        })
-                        .attr("stroke","black")
-                        .attr("stroke-width", "0.5px")
-                        .style("opacity",0)
-                        .transition()
-                        .delay(function (d, i) { return 10})
-                        .style("opacity",1)
-                        .transition()
-                        .duration(AnimationSpeed)
-                        .remove()
-
-                        g.on("mouseover",(d)=>{
-                            tooltip
-                                .style("opacity", 1)
-                                .html(()=>{text = "Airport: "+d.Airport+"<br>"
-                                    text+=StartHour==-1?"Agv. ":""
-                                    text+="Count: "+d.Count+"<br>"
-                                    if(HigAvgLow==1) {return text+="Highest Delay:"+d.HighDelay+"<br>" }
-                                    if(HigAvgLow==2) {return text+="Avgerage Delay:"+d.AvgDelay+"<br>" }
-                                    if(HigAvgLow==3) {return text+="Lowest Delay:"+d.LowDelay+"<br>"  }
-                                return text})
-                                .style("left", (d3.event.pageX ) + "px")
-                                .style("top", (d3.event.pageY -2) + "px")
-                        })
-                        .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
-                        
-
-                    //____________Zurücksetzen auf Tagesdurchschnitt nach Animation ________________________________________________________________
- 
-                    setTimeout(function(){ 
-                        if(StartHour!=-1){
-                            dropdownButtonAnimationStartOptions.property("selected",(d)=>{
-                                return d.value==-1
-                            })
-                            StartHour=-1
-                            load()
+                        if (StartHour ==-1){
+                            AnimationSpeed =  1000000000000; 
                         }
                         
-                    }, (25-StartHour)*AnimationSpeed);  
-                   
+                        
+                    //____________Erzeugen der Grafik inkl Animation ________________________________________________________________
+    
+                        
+                        
+                        g = svg.selectAll("circle")
+                        .data(data)
+                        .enter()
+                        .append('g')
+                    
+                        circles = g.append('circle')
+                            .style("opacity",0)
+                            .transition()
+                            .delay(function (d, i) { return (((d.Hour-StartHour) * AnimationSpeed)-10) })
+                            .attr("cx", d => {
+                                return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).x
+                            })
+                            .attr("cy", d => {
+                                return projectPoint(d.AIRPORT_POS.lon, d.AIRPORT_POS.lat).y
+                            })
+                            .attr("r",d => { return d.Count })
+                            .style('fill', d => {
+                                
+                                if(HigAvgLow==1) {return d.HighDelay<-60?"Green":myColor(d.HighDelay) }
+                                if(HigAvgLow==2) {return d.AvgDelay<-60?"Green":myColor(d.AvgDelay) }
+                                if(HigAvgLow==3) {return d.LowDelay<-60?"Green":myColor(d.LowDelay)  }
+                            })
+                            .attr("stroke","black")
+                            .attr("stroke-width", "0.5px")
+                            .style("opacity",0)
+                            .transition()
+                            .delay(function (d, i) { return 10})
+                            .style("opacity",1)
+                            .transition()
+                            .duration(AnimationSpeed)
+                            .remove()
 
-                     //____________Setzen des Zeitlabels (ggf mit Animation) ________________________________________________________________
- 
-                    if(StartHour==-1)
-                    {
-                        TimeText.text("Complete Day")
-                           
-                    }
-                    else{
-                        for(let i = StartHour; i<24;i++)
-                         {
-                       
-                            if(i<=9){
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .text(" 0"+i+":00:00")
-                                .duration(AnimationSpeed)
-                                
-                            }else{
-                                TimeText.transition()
-                                .delay((i-StartHour) * AnimationSpeed  )
-                                .duration(AnimationSpeed)
-                                .text(" "+i+":00:00")
-                                
+                            g.on("mouseover",(d)=>{
+                                tooltip
+                                    .style("opacity", 1)
+                                    .html(()=>{
+                                        let found = addData.find(element=> element.IATA==d.Airport);
+                                        text = "Airport: "+d.Airport+""
+                                        text+=found=!undefined?  " - "+found.AIRPORT+"<br>":"<br>"
+                                        text+=StartHour==-1?"Agv. ":""
+                                        text+="Count: "+d.Count+"<br>"
+                                        if(HigAvgLow==1) {return text+="Highest Delay:"+d.HighDelay+"<br>" }
+                                        if(HigAvgLow==2) {return text+="Avgerage Delay:"+d.AvgDelay+"<br>" }
+                                        if(HigAvgLow==3) {return text+="Lowest Delay:"+d.LowDelay+"<br>"  }
+                                    return text})
+                                    .style("left", (d3.event.pageX ) + "px")
+                                    .style("top", (d3.event.pageY -2) + "px")
+                            })
+                            .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                            
+
+                        //____________Zurücksetzen auf Tagesdurchschnitt nach Animation ________________________________________________________________
+    
+                        setTimeout(function(){ 
+                            if(StartHour!=-1){
+                                dropdownButtonAnimationStartOptions.property("selected",(d)=>{
+                                    return d.value==-1
+                                })
+                                StartHour=-1
+                                load()
+                            }
+                            
+                        }, (25-StartHour)*AnimationSpeed);  
+                    
+
+                        //____________Setzen des Zeitlabels (ggf mit Animation) ________________________________________________________________
+    
+                        if(StartHour==-1)
+                        {
+                            TimeText.text("Complete Day")
+                            
+                        }
+                        else{
+                            for(let i = StartHour; i<24;i++)
+                            {
+                        
+                                if(i<=9){
+                                    TimeText.transition()
+                                    .delay((i-StartHour) * AnimationSpeed  )
+                                    .text(" 0"+i+":00:00")
+                                    .duration(AnimationSpeed)
+                                    
+                                }else{
+                                    TimeText.transition()
+                                    .delay((i-StartHour) * AnimationSpeed  )
+                                    .duration(AnimationSpeed)
+                                    .text(" "+i+":00:00")
+                                    
+                                }
                             }
                         }
-                    }
-
-                   
+                    })
                  })
 
             }

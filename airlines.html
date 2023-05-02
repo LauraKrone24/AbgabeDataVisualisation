@@ -67,11 +67,15 @@
                             <h6>Destination Delay</h6>
                             <div class="Uncentered" id="DestDelayBox"></div>
                     </td>
+                    <td width="220px"  > 
+                        <h6>Share of all Flights </h6>
+                        <div id="Donut" width="220px" height="100px" ></div>
+                    </td>
                     <td width="220px" class="Count"> 
                         <br>
                         <h6>Number of Flights (Complete January) </h6>
                         <div class="Count" id="CountText" ></div>
-                </td>
+                    </td>
                 
                 </tr>
             </table> 
@@ -109,7 +113,7 @@
 
             let AirlineLink = 'https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/Airlines.csv'
             let flights = "https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv"
-            //let flights = 'https://gist.githubusercontent.com/florianeichin/cfa1705e12ebd75ff4c321427126ccee/raw/c86301a0e5d0c1757d325424b8deec04cc5c5ca9/flights_all_cleaned.csv'
+            
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Tooltip ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -185,6 +189,7 @@
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
                     Airline = option;
+                    console.log("change")
                     loadBoxPlots(airlinedata)
                     load()
                     })
@@ -344,10 +349,36 @@
             var boxX  = d3.scaleLinear()
                             .domain([-65,60])
                             .range([0,200]);
+            //________________________________Donut SVG  anlegen_______________________________               
+            var DonutSVG = d3.select("#Donut")
+                    .append("svg")
+                    .attr("width", 100)
+                    .attr("height", 100)
             
                 
             //__________Funktion zum (Neu-)Befüllen der Addinfozeile __________________________
             function loadBoxPlots (airlinedata){
+                DonutSVG.selectAll("*").remove()
+                let donutdata = {}
+                let donutColor={}
+                let allFlightsCount = airlinedata.filter(x=>{return x.IATA == "all" })[0].Count
+                if(Airline =="all"){
+                    airlinedata.forEach(element=>{
+                        if(element.IATA != Airline){
+                            donutdata[element.Name]=parseInt(element.Count)
+                            donutColor[element.Name]=d3.rgb(Math.random() * 255, 0, Math.random() * 122)
+                        }
+                    })
+
+                }else{
+                    let AirlineFound = airlinedata.filter(x=>{return x.IATA == Airline })[0]
+                    donutdata[AirlineFound.Name] =parseInt(AirlineFound.Count)
+                    donutColor[AirlineFound.Name]=d3.rgb(Math.random() * 255, 0, Math.random() * 122)
+                    donutdata["Rest"]=airlinedata.filter(x=>{return x.IATA == "all" })[0].Count-AirlineFound.Count
+                    donutColor["Rest"]="#555555"
+
+                }
+                console.log(donutdata)
                 let found = airlinedata.filter(x=>{return x.IATA == Airline })[0]
                 
                 CountText.text(found.Count)
@@ -358,6 +389,36 @@
                 plotBoxPlot(1,"#DepatureDelayBox",parseFloat(found.OrgDelayMin),parseFloat(found.OrgDelayMax),parseFloat(found.OrgDelayQ1),parseFloat(found.OrgDelayQ2),parseFloat(found.OrgDelayQ3))
                 plotBoxPlot(2,"#AirTimeDiffBox",parseFloat(found.AirTimeDiffMin),parseFloat(found.AirTimeDiffMax),parseFloat(found.AirTimeDiffQ1),parseFloat(found.AirTimeDiffQ2),parseFloat(found.AirTimeDiffQ3))
                 plotBoxPlot(3,"#DestDelayBox",parseFloat(found.DestDelayMin),parseFloat(found.DestDelayMax),parseFloat(found.DestDelayQ1),parseFloat(found.DestDelayQ2),parseFloat(found.DestDelayQ3))
+                //_________________________________________Anlegen Donut Diagramm__________________________________________ 
+
+                
+                   
+                var pie = d3.pie()
+                .value(function(d) {return d.value; })
+                var data_donut = pie(d3.entries(donutdata))
+                DonutSVG.selectAll('whatever')
+                    .data(data_donut)
+                    .enter()
+                    .append('path')
+                    .attr('d', d3.arc()
+                        .innerRadius(10)         
+                        .outerRadius(30)
+                    )
+                    .attr('fill', function(d){ console.log(d);return(donutColor[d.data.key]) })
+                    .attr("stroke", "#cccccc")
+                    .style("stroke-width", "0.5px")
+                    .style("opacity", 0.7)
+                    .attr("transform", "translate(100,30)")
+                    .on("mouseover",(d)=>{
+                        console.log("mouseover"+d)
+                        tooltip
+                            .style("opacity", 1)
+                            .html(()=>{text = d.data.key+": "+(d.data.value/allFlightsCount*100).toFixed(2)+"%"
+                            return text})
+                            .style("left", (d3.event.pageX + 15) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")
+                    })
+                    .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
 
             }
             //______________________Funktion zum Plotten der Boxplots__________________________
@@ -432,6 +493,8 @@
                   
                 
             }
+            
+            
             //____________________Zähler anzahl der geflogenen Flüge pro Airline im Januar hinzufügen__________________ 
             var CountText = d3.select('#CountText')
                 .append("text")
@@ -465,42 +528,42 @@
                 var svg = d3.select(canvas).append("svg")
               
 //_______________________________________________________________________________________________________________________
-//________________________________Farblegende anlegen ________________________________________________________________
+//________________________________Farblegende erstellen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
-
-            var myColor = d3.scaleLinear().domain([-60,-20,0,60,120,240])
-                    .range(["#002800","#65A765","white","yellow","orange", "red"])
+            
+            var myColor = d3.scaleLinear().domain([-60,-20,0,30,90,240,440,600,1000])
+                    .range(["#002800","#65A765","white","yellow","orange", "red","#880000","#550000","#220000"])
             var array = [];
 
-            for(let i = -60;i<240;i=i+0.1){
+            for(let i = -60;i<1000;i=i+0.1){
                 array.push(i)
             }
 
             colorSvg = d3.select(canvas).append("svg")
-            ColorLable = colorSvg.append("text")
+            colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",1170)
                     .attr("y",520)
                     .attr("fill","#eeeeee")
                     .text("Delay in min")
 
-            Colorscale = colorSvg.selectAll("rect")
+            colorSvg.selectAll("rect")
             .data(array)
             .enter()
             .append("rect")
-            .attr("x",(d,i)=>{return 1020+(d)})
+            .attr("x",(d,i)=>{return 1000+(d/4)})
             .attr("y",550)
             .attr("height",20)
             .attr("width",0.1)
             .attr("fill",(d)=>{return myColor(d)})
 
             var ColorX  = d3.scaleLinear()
-                .domain([-60,240])
-                .range([0,300]);
+                .domain([-60,1000])
+                .range([0,265]);
 
-            ColorAxis = colorSvg.append("g")
+            colorSvg.append("g")
                     .attr("transform",
-                            "translate(960,550)")
+                            "translate(985,550)")
                     .call(d3.axisTop(ColorX))
                     .attr("stroke", "#eeeeee")
                     
