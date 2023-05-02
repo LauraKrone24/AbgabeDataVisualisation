@@ -45,7 +45,7 @@ dfDestDelaySummary.to_csv("DestDelaySummary.csv")
 #_________________Für Visualisierung 2,4,5:  Airlinenamen und zusätzliche Infos______________
 #____________________________________________________________________________________________
 Airlines = df["AIRLINE"].unique() 
-df2 = pd.read_csv("OrgAirlineData.csv") #Hilfsdatenset, welches Airlinenamen in Kombination zu den IATA Kürzeln enthät
+df2 = pd.read_csv("OriginalAirlineData.csv") #Hilfsdatenset, welches Airlinenamen in Kombination zu den IATA Kürzeln enthät
 df2= df2[["Name","IATA"]]
 df2 = df2[df2["IATA"].isin(Airlines)].sort_values(by="IATA") 
 
