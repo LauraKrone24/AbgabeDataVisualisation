@@ -100,13 +100,14 @@
 //_______________________________________________________________________________________________________________________            
             d3.select("h2").on("mouseover",(d)=>{
                 tooltip
-                        .style("opacity", 1)
-                        .html(()=>{text = "This Visualisation lets you compare the Delay of different options"
-                        return text})
-                        .style("left", (d3.event.pageX ) + "px")
-                        .style("top", (d3.event.pageY -2) + "px")
+                    .style("display","")
+                    .style("opacity", 1)
+                    .html(()=>{text = "This Visualisation lets you compare the Delay of different options"
+                    return text})
+                    .style("left", (d3.event.pageX ) + "px")
+                    .style("top", (d3.event.pageY -2) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdown Button Anlegen _______________________________________________________________
 //_______________________________________________________________________________________________________________________           
@@ -129,13 +130,14 @@
                 })  
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose between the different Visualisations"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("display","")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose between the different Visualisations"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                .on("mouseout",(d)=>{tooltip.style("display","none")})
 
             var dropdownButtonHighAvgLow = d3.select("#dropdownButtonHighAvgLow")
                 .append('select')
@@ -157,13 +159,14 @@
                 })
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose if you want to see<br>the highest, average or lowest delay"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("display","")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose if you want to see<br>the highest, average or lowest delay"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})   
+                .on("mouseout",(d)=>{tooltip.style("display","none")})   
 
             var dropdownButtonOrginDestination = d3.select("#dropdownButtonOrginDestination")
                 .append('select')
@@ -183,13 +186,14 @@
                 })
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose what option you want to compare"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("opacity", 1)
+                        .style("display","")
+                        .html(()=>{text = "This button lets you choose what option you want to compare"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                .on("mouseout",(d)=>{tooltip.style("display","none")}) 
 
             var dropdownButtonAscDesc = d3.select("#dropdownButtonAscDesc")
                 .append('select')
@@ -210,28 +214,28 @@
                 load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose if you what to see the top 10 or the bottom 10"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                    tooltip.style("display","none")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose if you what to see the top 10 or the bottom 10"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                .on("mouseout",(d)=>{tooltip.style("display","none")}) 
 
                 d3.select("#minFlights").on("input", function() {
                     minFlights=this.value
                     load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This numberinput lets you set the minumum avgerage number<br>of flights that need to be considered for the Visualisation"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                    tooltip.style("display","none")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This numberinput lets you set the minumum avgerage number<br>of flights that need to be considered for the Visualisation"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                .on("mouseout",(d)=>{tooltip.style("display","none")}) 
 
             var dropdownButtonAnimationspeed = d3.select("#dropdownButtonAnimationspeed")
                 .append('select')
@@ -250,14 +254,14 @@
                 load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose the speed of the Animation"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                    tooltip.style("display","none")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose the speed of the Animation"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                .on("mouseout",(d)=>{tooltip.style("display","none")}) 
 
             var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
@@ -281,13 +285,14 @@
                 })
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose to see either the daily average or the starthour of the animation"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("display","")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose to see either the daily average or the starthour of the animation"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)}) 
+                .on("mouseout",(d)=>{tooltip.style("display","none")}) 
 //_______________________________________________________________________________________________________________________
 //________________________________Zeitlable und SVG Anlegen _________________________________________________________________________
 //_______________________________________________________________________________________________________________________           
@@ -456,6 +461,7 @@
                             
                             tooltip
                                 .style("opacity",1)
+                                .style("display","")
                                 .style("left", (d3.event.pageX + 15) + "px")
                                 .style("top", (d3.event.pageY - 28) + "px")
                                 .html(()=>{
@@ -473,7 +479,7 @@
                             
                         })
                         //__________________________Tooltip unsichtbar machen___________________
-                        .on("mouseout", function(d){ tooltip.style("opacity", 0)})
+                        .on("mouseout", function(d){ tooltip.style("display","none")})
 
 
                         // __________________Zurücksetzen zum Tagesdurchschnitt nach Animation_______________

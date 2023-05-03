@@ -88,13 +88,14 @@
 //_______________________________________________________________________________________________________________________            
             d3.select("h2").on("mouseover",(d)=>{
                 tooltip
-                        .style("opacity", 1)
-                        .html(()=>{text = "This Visualisation lets you find out which airlines provides<br>the probably best Connection by needed time and delay"
-                        return text})
-                        .style("left", (d3.event.pageX ) + "px")
-                        .style("top", (d3.event.pageY -2) + "px")
+                    .style("display","")
+                    .style("opacity", 1)
+                    .html(()=>{text = "This Visualisation lets you find out which airlines provides<br>the probably best Connection by needed time and delay"
+                    return text})
+                    .style("left", (d3.event.pageX ) + "px")
+                    .style("top", (d3.event.pageY -2) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 //________________________________Anlegen Svg- Elelement für Visualisierung _________________________________________________________________________
              
             var svg = d3.select("#Container").append("svg")
@@ -123,13 +124,14 @@
                 })
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose between the different Visualisations"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("opacity", 1)
+                        .style("display","")
+                        .html(()=>{text = "This button lets you choose between the different Visualisations"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                .on("mouseout",(d)=>{tooltip.style("display","none")})
 
             var dropdownButtonDelayTime = d3.select("#dropdownButtonDelayTime")
                 .append('select')
@@ -151,13 +153,14 @@
                 })
                 .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "This button lets you choose if you<br>want to compare the delay or the time needed"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("display","")
+                        .style("opacity", 1)
+                        .html(()=>{text = "This button lets you choose if you<br>want to compare the delay or the time needed"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                .on("mouseout",(d)=>{tooltip.style("display","none")})
 
 //________________________________Anlegen  der Dropdowns für Start und Zielflughafen _________________________________________________________________________
            
@@ -237,13 +240,14 @@
             })
             .on("mouseover",(d)=>{
                     tooltip
-                            .style("opacity", 1)
-                            .html(()=>{text = "Those radiobuttons let you choose if you want to filter the origin or destination airportlist for only those connections that really exist"
-                            return text})
-                            .style("left", (d3.event.pageX + 15) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px")
+                        .style("opacity", 1)
+                        .style("display","")
+                        .html(()=>{text = "Those radiobuttons let you choose if you want to filter the origin or destination airportlist for only those connections that really exist"
+                        return text})
+                        .style("left", (d3.event.pageX + 15) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                .on("mouseout",(d)=>{tooltip.style("display","none")})
             
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Farblegende_________________________________________________________________________
@@ -574,6 +578,7 @@
                                 
                                 tooltip
                                     .style("opacity", 1)
+                                    .style("display","")
                                     .html(()=>{text = "Connection <br>"
                                     +"From: "+AddAirportInfo[d.Org]+"<br>"
                                     +"To: "+AddAirportInfo[d.Dest]+"<br>"
@@ -592,7 +597,7 @@
                                 
                             })
                             //__________________Ausblenden Tooltip____________________
-                            .on("mouseleave", function(d){tooltip.style("opacity", 0)})
+                            .on("mouseleave", function(d){tooltip.style("display","none")})
 
 
                         }else{ 

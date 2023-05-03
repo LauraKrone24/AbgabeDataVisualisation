@@ -80,12 +80,13 @@
             d3.select("h2").on("mouseover",(d)=>{
                 tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "This Visualisation shows the Flights Connection between US States"
                         return text})
                         .style("left", (d3.event.pageX ) + "px")
                         .style("top", (d3.event.pageY -2) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdownbutton anlegen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -110,12 +111,13 @@
             dropdownButtonVisulisation.on("mouseover",(d)=>{
                 tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "This Button lets you choose between the different Visualisations"
                         return text})
                         .style("left", (d3.event.pageX + 15) + "px")
                         .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
                         
             
 
@@ -221,6 +223,7 @@
                     //____________Tooltip befüllen und sichtbar machen________________________________________________________________
                     tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "Flights <br>"
                             + States[d.source.index]+" -> " + States[d.target.index]+
                             "<br>Flight Count: "+d.source.value+
@@ -237,7 +240,7 @@
                         
                         
                     })
-                .on("mouseleave", function(d){tooltip.style("opacity", 0)})
+                .on("mouseleave", function(d){tooltip.style("display","none")})
                 .on("click",function(d){
                     
                     let clicked = d3.select(this)

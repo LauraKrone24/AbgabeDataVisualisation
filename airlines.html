@@ -134,12 +134,13 @@
             d3.select("h2").on("mouseover",(d)=>{
                 tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "This Visualisation shows all flights of differnet Airlines <br>and additional Information about those Airlines"
                         return text})
                         .style("left", (d3.event.pageX ) + "px")
                         .style("top", (d3.event.pageY -2) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 //_______________________________________________________________________________________________________________________
 //________________________________Dropdownbutton anlegen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -163,12 +164,13 @@
             dropdownButtonVisulisation.on("mouseover",(d)=>{
                 tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "This button lets you choose between the different Visualisations"
                         return text})
                         .style("left", (d3.event.pageX + 15) + "px")
                         .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
             
 
             d3.csv(AirlineLink).then(airlinedata=>{
@@ -197,12 +199,13 @@
                 dropdownButtonAirlines.on("mouseover",(d)=>{
                     tooltip
                         .style("opacity", 1)
+                        .style("display","")
                         .html(()=>{text = "This button lets you choose for which Airline you want<br>to see all flights and additional infomation"
                         return text})
                         .style("left", (d3.event.pageX + 15) + "px")
                         .style("top", (d3.event.pageY - 28) + "px")
                 })
-                .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                .on("mouseout",(d)=>{tooltip.style("display","none")})
                
             });
 
@@ -226,12 +229,13 @@
             dropdownButtonAnimationspeed.on("mouseover",(d)=>{
                 tooltip
                     .style("opacity", 1)
+                    .style("display","")
                     .html(()=>{text = "This button lets you choose the speed of the animation"
                     return text})
                     .style("left", (d3.event.pageX + 15) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 
             var dropdownButtonAnimationStart = d3.select("#dropdownButtonAnimationStart")
                 .append('select')
@@ -257,12 +261,13 @@
             dropdownButtonAnimationStart.on("mouseover",(d)=>{
                 tooltip
                     .style("opacity", 1)
+                    .style("display","")
                     .html(()=>{text = "This button lets you choose at which hour the animation starts"
                     return text})
                     .style("left", (d3.event.pageX + 15) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 
             var dropdownButtonDate = d3.select("#dropdownButtonDate")
                 .append('select')
@@ -286,12 +291,13 @@
             dropdownButtonDate.on("mouseover",(d)=>{
                 tooltip
                     .style("opacity", 1)
+                    .style("display","")
                     .html(()=>{text = "This button lets you choose at which hour the animation starts"
                     return text})
                     .style("left", (d3.event.pageX + 15) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
 //_______________________________________________________________________________________________________________________
 //________________________________Anlegen Checkbox für Addinfo ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
@@ -326,12 +332,13 @@
             .on("mouseover",(d)=>{
                 tooltip
                     .style("opacity", 1)
+                    .style("display","")
                     .html(()=>{text = "If this Checkbox is checked additional Infomation will be displayed"
                     return text})
                     .style("left", (d3.event.pageX + 15) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
             })
-            .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+            .on("mouseout",(d)=>{tooltip.style("display","none")})
             //__________________________Anlegen Textlabel für Zeit___________________________
             var TimeText = d3.select('#TimeText')
                         .append("text")
@@ -413,12 +420,13 @@
                         console.log("mouseover"+d)
                         tooltip
                             .style("opacity", 1)
+                            .style("display","")
                             .html(()=>{text = d.data.key+": "+(d.data.value/allFlightsCount*100).toFixed(2)+"%"
                             return text})
                             .style("left", (d3.event.pageX + 15) + "px")
                             .style("top", (d3.event.pageY - 28) + "px")
                     })
-                    .on("mouseout",(d)=>{tooltip.style("opacity", 0)})
+                    .on("mouseout",(d)=>{tooltip.style("display","none")})
 
             }
             //______________________Funktion zum Plotten der Boxplots__________________________
@@ -448,11 +456,12 @@
                     
                     tooltipString = d3.select(this).attr("value")
                     tooltip.style("opacity", 1)
+                        .style("display","none")
                         .html(tooltipString)
                         .style("left", (d3.event.pageX + 15) + "px")
                         .style("top", (d3.event.pageY - 28) + "px")
                 }) 
-                boxSvg[number].on("mouseleave",function(d){tooltip.style("opacity", 0)   
+                boxSvg[number].on("mouseleave",function(d){tooltip.style("display","none")   
                 })
                 //_________Achse hinzufügen_______   
                 boxSvg[number].append("g")
@@ -501,7 +510,7 @@
                 .attr("color","beige")
 
 
-            d3.selectAll(".Count").on("mouseover",()=>{tooltip.style("opacity", 0)})
+            d3.selectAll(".Count").on("mouseover",()=>{tooltip.style("display","none")})
             
 //_______________________________________________________________________________________________________________________
 //________________________________Karte anlegen und Svg hinzufügen ________________________________________________________________
