@@ -130,6 +130,8 @@
             
             d3.dsv(";",connection).then(data=>{
                 
+                let zahler   = 0
+                
                 //____________Daten Bearbeitung ________________________________________________________________
  
                 
@@ -138,6 +140,7 @@
                     let intArray = []
                     let destDelayInnerArray = []
                     let orgDelayInnerArray = []
+                    
                     
                     if (data[i]!= undefined){
                             Object.values(data[i]).forEach(element => {
@@ -154,7 +157,11 @@
                         array.push(intArray)
                         destDelayArray.push(destDelayInnerArray)
                         orgDelayArray.push(orgDelayInnerArray)
-                        colors.push(d3.rgb(Math.random() * 255, 0, Math.random() * 122))
+                        do{
+                            color = d3.rgb(Math.random() * 255, Math.random() * 40, Math.random() * 122) 
+                        }while(colors.includes(color) )
+                        colors.push(color)
+                        
                     }
                     
                 }
@@ -218,6 +225,7 @@
                 .attr("d", d3.ribbon().radius(245))
                 .style("fill",function(d) { return(colors[d.source.index])} )
                 .style("stroke", "black")
+                .style("stroke-width","0.5")
                 .attr("class", "unselected")
                 .on("mouseover", function(d) { 
                     //____________Tooltip befüllen und sichtbar machen________________________________________________________________

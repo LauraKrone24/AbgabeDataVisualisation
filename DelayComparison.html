@@ -214,7 +214,7 @@
                 load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip.style("display","none")
+                    tooltip.style("display","")
                         .style("opacity", 1)
                         .html(()=>{text = "This button lets you choose if you what to see the top 10 or the bottom 10"
                         return text})
@@ -228,7 +228,7 @@
                     load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip.style("display","none")
+                    tooltip.style("display","")
                         .style("opacity", 1)
                         .html(()=>{text = "This numberinput lets you set the minumum avgerage number<br>of flights that need to be considered for the Visualisation"
                         return text})
@@ -254,7 +254,7 @@
                 load()
                 })
                 .on("mouseover",(d)=>{
-                    tooltip.style("display","none")
+                    tooltip.style("display","")
                         .style("opacity", 1)
                         .html(()=>{text = "This button lets you choose the speed of the Animation"
                         return text})
@@ -310,19 +310,22 @@
 //_______________________________________________________________________________________________________________________           
              
             
-            var myColor = d3.scaleLinear().domain([-60,-20,0,30,90,240,440,600,1000])
+            var myColor = d3.scaleSqrt().domain([-60,-20,0,30,90,240,440,600,2000])
                     .range(["#002800","#65A765","white","yellow","orange", "red","#880000","#550000","#440022"])
             var array = [];
 
-            for(let i = -60;i<1000;i=i+0.1){
+            for(let i = -60;i<2000;i=i+0.1){
                 array.push(i)
             }
+            var ColorX  = d3.scaleSqrt()
+                .domain([-60,2000])
+                .range([0,265]);
 
             colorSvg = d3.select("#Farblegende").append("svg")
             colorSvg.append("text")
                     .attr("class","LegendLable")
-                    .attr("x",1170)
-                    .attr("y",520)
+                    .attr("x",window.innerWidth-100)
+                    .attr("y",window.innerHeight-230)
                     .attr("fill","black")
                     .text("Delay in min")
 
@@ -330,21 +333,23 @@
             .data(array)
             .enter()
             .append("rect")
-            .attr("x",(d,i)=>{return 1000+(d/4)})
-            .attr("y",550)
+            .attr("x",(d,i)=>{return ColorX(d)})
+            .attr("y",window.innerHeight-200)
             .attr("height",20)
             .attr("width",0.1)
             .attr("fill",(d)=>{return myColor(d)})
+            .attr("transform",
+                            "translate("+(window.innerWidth-300)+",0)")
 
-            var ColorX  = d3.scaleLinear()
-                .domain([-60,1000])
-                .range([0,265]);
+            
 
-            colorSvg.append("g")
+            let ticks = ["-50","-10","0","10","50","125","250","500","1000","2000"]
+            
+            ColorAxis = colorSvg.append("g")
                     .attr("transform",
-                            "translate(985,550)")
-                    .call(d3.axisTop(ColorX))
-                    .attr("stroke", "black")
+                            "translate("+(window.innerWidth-300)+","+(window.innerHeight-201)+")")
+                    .call(d3.axisTop(ColorX).tickValues(ticks))
+                    
 
 //_______________________________________________________________________________________________________________________
 //________________________________Hauptfunktion "load"_________________________________________________________________________

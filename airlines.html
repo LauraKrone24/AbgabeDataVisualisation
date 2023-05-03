@@ -311,7 +311,7 @@
                         zoom: 2.25,
                     })
                     ColorLable.attr("y",370)
-                    Colorscale.attr("y",400)
+                    ColorScale.attr("y",400)
                     ColorAxis.attr("transform",
                             "translate(960,400)")
                     load
@@ -322,7 +322,7 @@
                         zoom: 3,
                     })
                     ColorLable.attr("y",520)
-                    Colorscale.attr("y",550)
+                    ColorScale.attr("y",550)
                     ColorAxis.attr("transform",
                             "translate(960,550)")
                     
@@ -373,7 +373,7 @@
                     airlinedata.forEach(element=>{
                         if(element.IATA != Airline){
                             donutdata[element.Name]=parseInt(element.Count)
-                            donutColor[element.Name]=d3.rgb(Math.random() * 255, 0, Math.random() * 122)
+                            donutColor[element.Name]=d3.rgb(Math.random() * 255, Math.random() * 40, Math.random() * 122)
                         }
                     })
 
@@ -540,42 +540,47 @@
 //________________________________Farblegende erstellen ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
             
-            var myColor = d3.scaleLinear().domain([-60,-20,0,30,90,240,440,600,1000])
+            var myColor = d3.scaleSqrt().domain([-60,-20,0,30,90,240,440,600,2000])
                     .range(["#002800","#65A765","white","yellow","orange", "red","#880000","#550000","#220000"])
             var array = [];
 
-            for(let i = -60;i<1000;i=i+0.1){
-                array.push(i)
+            for(let i = -60;i<2000;i=i+0.1){
+                array.push(2^i)
             }
+            var ColorX  = d3.scaleSqrt()
+                .domain([-60,2000])
+                .range([0,265]);
 
             colorSvg = d3.select(canvas).append("svg")
-            colorSvg.append("text")
+            ColorLable = colorSvg.append("text")
                     .attr("class","LegendLable")
-                    .attr("x",1170)
-                    .attr("y",520)
+                    .attr("x",window.innerWidth-100)
+                    .attr("y",window.innerHeight-230)
                     .attr("fill","#eeeeee")
                     .text("Delay in min")
 
-            colorSvg.selectAll("rect")
+            ColorScale = colorSvg.selectAll("rect")
             .data(array)
             .enter()
             .append("rect")
-            .attr("x",(d,i)=>{return 1000+(d/4)})
-            .attr("y",550)
+            .attr("x",(d,i)=>{return ColorX(d)})
+            .attr("y",window.innerHeight-200)
             .attr("height",20)
-            .attr("width",0.1)
+            .attr("width",10)
             .attr("fill",(d)=>{return myColor(d)})
+            .attr("transform",
+                            "translate("+(window.innerWidth-300)+",0)")
 
-            var ColorX  = d3.scaleLinear()
-                .domain([-60,1000])
-                .range([0,265]);
 
-            colorSvg.append("g")
+            let ticks = ["-50","-10","0","10","50","125","250","500","1000","2000"]
+            
+            ColorAxis = colorSvg.append("g")
                     .attr("transform",
-                            "translate(985,550)")
-                    .call(d3.axisTop(ColorX))
+                            "translate("+(window.innerWidth-300)+","+(window.innerHeight-201)+")")
+                    .call(d3.axisTop(ColorX).tickValues(ticks))
                     .attr("stroke", "#eeeeee")
-                    
+
+            console.log(window.innerWidth)
 //_______________________________________________________________________________________________________________________
 //________________________________Hauptfunktion "load" ________________________________________________________________
 //_______________________________________________________________________________________________________________________            

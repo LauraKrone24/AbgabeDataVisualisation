@@ -311,8 +311,8 @@
             colorSvg = d3.select(canvas).append("svg")
             colorSvg.append("text")
                     .attr("class","LegendLable")
-                    .attr("x",1170)
-                    .attr("y",520)
+                    .attr("x",window.innerWidth-100)
+                    .attr("y",window.innerHeight-230)
                     .attr("fill","#eeeeee")
                     .text("Delay in min")
 
@@ -321,12 +321,12 @@
             .enter()
             .append("rect")
             .attr("x",(d,i)=>{return ColorX(d)})
-            .attr("y",550)
+            .attr("y",window.innerHeight-200)
             .attr("height",20)
             .attr("width",10)
             .attr("fill",(d)=>{return myColor(d)})
             .attr("transform",
-                            "translate(985,0)")
+                            "translate("+(window.innerWidth-300)+",0)")
 
             
 
@@ -334,7 +334,7 @@
             
             colorSvg.append("g")
                     .attr("transform",
-                            "translate(985,550)")
+                            "translate("+(window.innerWidth-300)+","+(window.innerHeight-201)+")")
                     .call(d3.axisTop(ColorX).tickValues(ticks))
                     .attr("stroke", "#eeeeee")
 
@@ -354,7 +354,7 @@
                 .attr("class","LegendCircle")
                 .attr("r",d => { return d })
                 .attr("cx",(d,i)=>{return legendXValues[i]})
-                .attr("cy",550)
+                .attr("cy",window.innerHeight-190)
                 .attr("fill","#eeeeee")
                 
             colorSvg.selectAll(".Legendtext")
@@ -363,7 +363,7 @@
                 .append("text")
                 .attr("class","Legendtext")
                 .attr("x",(d,i)=>{return legendXValues[i]-7})
-                .attr("y",555)
+                .attr("y",window.innerHeight-185)
                 .attr("fill","black")
                 .attr("color","black")
                 .text((d)=>{return d})
@@ -371,7 +371,7 @@
             colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",10)
-                    .attr("y",520)
+                    .attr("y",window.innerHeight-230)
                     .attr("fill","#eeeeee")
                     .text("Number of Flights per Hour")
 
