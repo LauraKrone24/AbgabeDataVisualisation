@@ -171,7 +171,7 @@
                         .style("top", (d3.event.pageY - 28) + "px")
             })
             .on("mouseout",(d)=>{tooltip.style("display","none")})
-            
+            var dropdownButtonAirlinesOptions
 
             d3.csv(AirlineLink).then(airlinedata=>{
                 
@@ -180,7 +180,7 @@
                 var dropdownButtonAirlines = d3.select("#dropdownButtonAirlines")
                     .append('select')
                     
-                dropdownButtonAirlines
+                dropdownButtonAirlinesOptions = dropdownButtonAirlines
                     .selectAll('myOptions') 
                     .data(airlinedata)
                     .enter()
@@ -191,7 +191,6 @@
                 dropdownButtonAirlines.on("change", function(d) {
                     let option = d3.select(this).property("value")
                     Airline = option;
-                    console.log("change")
                     loadBoxPlots(airlinedata)
                     load()
                     })
@@ -253,7 +252,6 @@
                 StartHour = option;
 
                 AnimationSpeed= dropdownButtonAnimationspeed.property("value");
-                    console.log("Animationspeed:"+AnimationSpeed)
                 
                 load()
                 })
@@ -368,12 +366,14 @@
                 DonutSVG.selectAll("*").remove()
                 let donutdata = {}
                 let donutColor={}
+                let IATADonut = {}
                 let allFlightsCount = airlinedata.filter(x=>{return x.IATA == "all" })[0].Count
                 if(Airline =="all"){
                     airlinedata.forEach(element=>{
                         if(element.IATA != Airline){
                             donutdata[element.Name]=parseInt(element.Count)
                             donutColor[element.Name]=d3.rgb(Math.random() * 255, Math.random() * 40, Math.random() * 122)
+                            IATADonut[element.Name]=element.IATA;
                         }
                     })
 
@@ -383,9 +383,10 @@
                     donutColor[AirlineFound.Name]=d3.rgb(Math.random() * 255, 0, Math.random() * 122)
                     donutdata["Rest"]=airlinedata.filter(x=>{return x.IATA == "all" })[0].Count-AirlineFound.Count
                     donutColor["Rest"]="#555555"
+                    IATADonut[AirlineFound.Name]=AirlineFound.IATA;
+                    IATADonut["Rest"]="all";
 
                 }
-                console.log(donutdata)
                 let found = airlinedata.filter(x=>{return x.IATA == Airline })[0]
                 
                 CountText.text(found.Count)
@@ -411,13 +412,12 @@
                         .innerRadius(10)         
                         .outerRadius(30)
                     )
-                    .attr('fill', function(d){ console.log(d);return(donutColor[d.data.key]) })
+                    .attr('fill', function(d){return(donutColor[d.data.key]) })
                     .attr("stroke", "#cccccc")
                     .style("stroke-width", "0.5px")
                     .style("opacity", 0.7)
                     .attr("transform", "translate(100,30)")
                     .on("mouseover",(d)=>{
-                        console.log("mouseover"+d)
                         tooltip
                             .style("opacity", 1)
                             .style("display","")
@@ -427,6 +427,18 @@
                             .style("top", (d3.event.pageY - 28) + "px")
                     })
                     .on("mouseout",(d)=>{tooltip.style("display","none")})
+                    .on("click",(d,i)=>{
+                        let clickedAirline = IATADonut[d.data.key]
+                            
+                        dropdownButtonAirlinesOptions.property("selected",(d)=>{
+                            return d.IATA==clickedAirline
+                        })
+                        
+                        Airline = clickedAirline
+                        loadBoxPlots(airlinedata)
+                        load()
+
+                    })
 
             }
             //______________________Funktion zum Plotten der Boxplots__________________________
@@ -580,7 +592,7 @@
                     .call(d3.axisTop(ColorX).tickValues(ticks))
                     .attr("stroke", "#eeeeee")
 
-            console.log(window.innerWidth)
+            
 //_______________________________________________________________________________________________________________________
 //________________________________Hauptfunktion "load" ________________________________________________________________
 //_______________________________________________________________________________________________________________________            
