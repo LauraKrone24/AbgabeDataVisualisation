@@ -51,7 +51,7 @@ Visualisierung 5
 
 
 + Tooltip fürs Hovern über den Titel --> erklärt mehr zur Grafik
-- Text "There are no flights connecting those 2 airports " Hübsch machen
++ Text "There are no flights connecting those 2 airports " Hübsch machen
 + Airlins Flüge pro Tag
 ? Ailines und  Best Connect Ladeanimation 
 
@@ -60,4 +60,4 @@ Zusätzliche To-Dos
 * Durch CSS Menu hübsch machen (style.css)
 + Code sortieren und Kommentieren (6/6) 
 * Dokumentation schreiben 
-? Ggf falls nötig absolute px  zahlen zu relative % zahlen umwandeln 
+* Ggf falls nötig absolute px  zahlen zu relative % zahlen umwandeln 
