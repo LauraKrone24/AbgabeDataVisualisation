@@ -261,7 +261,7 @@
             
 
 //_______________________________________________________________________________________________________________________
-//________________________________Karte erzeugen und SVG anlegen ________________________________________________________________
+//________________________________Karte erzeugen, SVG anlegen Zoom und Move handling ____________________________________
 //_______________________________________________________________________________________________________________________
 
             var view = "map"
@@ -292,6 +292,24 @@
             })
             svg.on("mouseup",(d)=>{drag  = false})
             svg.on("mouseleave",(d)=>{drag  = false})
+
+           let zoom = d3.zoom()
+            .on("zoom",handleZoom)
+
+            let ScaleFaktor = 1;
+
+            function  handleZoom(event){
+                
+
+                    map.flyTo({
+                        zoom: ScaleFaktor<d3.event.transform.k?map.getZoom()+0.2:map.getZoom()-0.2
+                    })
+                    ScaleFaktor=d3.event.transform.k
+                    load()
+                }
+            
+
+            svg.call(zoom)
 
 //_______________________________________________________________________________________________________________________
 //________________________________Farblegende erstellen ________________________________________________________________
@@ -457,11 +475,11 @@
                                         let found = addData.find(element=> element.IATA==d.Airport);
                                         text = "Airport: "+d.Airport+""
                                         text+=found=!undefined?  " - "+found.AIRPORT+"<br>":"<br>"
-                                        text+=StartHour==-1?"Agv. ":""
-                                        text+="Count: "+d.Count+"<br>"
-                                        if(HigAvgLow==1) {return text+="Highest Delay:"+d.HighDelay+"<br>" }
-                                        if(HigAvgLow==2) {return text+="Avgerage Delay:"+d.AvgDelay+"<br>" }
-                                        if(HigAvgLow==3) {return text+="Lowest Delay:"+d.LowDelay+"<br>"  }
+                                        text+=StartHour==-1?"Avg. ":""
+                                        text+="Count of Flights per Hour: "+d.Count+"<br>"
+                                        if(HigAvgLow==1) {return text+="Highest Delay: "+d.HighDelay+"<br>" }
+                                        if(HigAvgLow==2) {return text+="Avgerage Delay: "+d.AvgDelay+"<br>" }
+                                        if(HigAvgLow==3) {return text+="Lowest Delay: "+d.LowDelay+"<br>"  }
                                     return text})
                                     .style("left", (d3.event.pageX ) + "px")
                                     .style("top", (d3.event.pageY -2) + "px")
@@ -509,6 +527,8 @@
                                 }
                             }
                         }
+
+                        
                     })
                  })
 
