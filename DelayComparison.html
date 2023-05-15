@@ -408,11 +408,11 @@
                                     case "3": Delay.push(d.LowDelay) ;break;
                                     default: Delay.push(d.AvgDelay); break;
                                 }
-                                let x =Delay[i]<0?(((HigAvgLow==1)?220:(HigAvgLow==3)?355:255)+parseFloat(Delay[i])*2.5):(HigAvgLow==1)?220:(HigAvgLow==3)?355:255;
+                                let x =Delay[i]<0?(((HigAvgLow==1)?240:(HigAvgLow==3)?375:275)+parseFloat(Delay[i])*2.5):(HigAvgLow==1)?240:(HigAvgLow==3)?375:275;
                             
                                 return x})
-                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >9?-50: (30+rank*20)})
-                            .attr("height",15)
+                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour)); return rank >9?-50: (30+rank*25)})
+                            .attr("height",20)
                             .attr("width",(d,i)=>{return (Math.abs(Delay[i]!=0?Delay[i]:0.01))*((HigAvgLow==1)?0.4:2.5)})
                             .attr('fill', (d,i)=>{return Delay[i]<-15?"Green":myColor(Delay[i])})
                             .attr("stroke","black")
@@ -426,7 +426,7 @@
                             .transition()
                             .delay(function (d, i) { return (d.Hour-StartHour) * AnimationSpeed })
                             .attr("x",10)
-                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(40+rank*20)})
+                            .attr("y",(d,i)=>{let rank = (i-lineSumTillHour(d.Hour));return rank>9?-50:(42.5+rank*25)})
                             .attr("color","black")
                             .text((d,i)=>{
                                 if(parseInt(OrginDestAirline)<=2){
@@ -450,7 +450,7 @@
 
                     
                         svg.append("g")
-                            .attr("transform", "translate("+((HigAvgLow==1)?220:105)+", 20)")
+                            .attr("transform", "translate("+((HigAvgLow==1)?240:125)+", 20)")
                             .call(d3.axisTop(x));
                     
                         svg.append("g")
