@@ -330,7 +330,7 @@
             colorSvg.append("text")
                     .attr("class","LegendLable")
                     .attr("x",window.innerWidth-100)
-                    .attr("y",window.innerHeight-230)
+                    .attr("y",window.innerHeight-200)
                     .attr("fill","#eeeeee")
                     .text("Delay in min")
 
@@ -339,7 +339,7 @@
             .enter()
             .append("rect")
             .attr("x",(d,i)=>{return ColorX(d)})
-            .attr("y",window.innerHeight-200)
+            .attr("y",window.innerHeight-170)
             .attr("height",20)
             .attr("width",10)
             .attr("fill",(d)=>{return myColor(d)})
@@ -352,7 +352,7 @@
             
             colorSvg.append("g")
                     .attr("transform",
-                            "translate("+(window.innerWidth-300)+","+(window.innerHeight-201)+")")
+                            "translate("+(window.innerWidth-300)+","+(window.innerHeight-171)+")")
                     .call(d3.axisTop(ColorX).tickValues(ticks))
                     .attr("stroke", "#eeeeee")
 
