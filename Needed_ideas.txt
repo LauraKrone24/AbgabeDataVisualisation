@@ -56,7 +56,9 @@ Visualisierung 5
 
 
 Zusätzliche To-Dos
-* Durch CSS Menu hübsch machen (style.css)
++ Durch CSS Menu hübsch machen (style.css)
 + Code sortieren und Kommentieren (6/6) 
 + Dokumentation schreiben 
-* Ggf falls nötig absolute px  zahlen zu relative % zahlen umwandeln 
+* Screenshots machen und hochladen
+- Animationen bzw. Funktionen abfilmen und hochladen
+

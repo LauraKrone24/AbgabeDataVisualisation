@@ -195,6 +195,10 @@
                     dropdownButtonOrgAirport.selectAll("*").remove()
                     dropdownButtonDestAirport.selectAll("*").remove()
 
+                    //_________Anzeigedaten korrigieren_________
+                    filteroption ==1? OrgAirport="*":filteroption==2?DestAirport="*":null;
+                    
+
                     //_____________________Anlegen der neuen Dropdown Optionen _________________________________________________________________________    
                     dropdownButtonOrgAirport.selectAll('myOptions') 
                         .data(filteroption==2?OrgAirportInfo:airportData)
@@ -227,7 +231,9 @@
                         
                         load()
                         })
+                        load();
                  })
+
 
            }
         //_____________________Funktionalität der Radiobuttons für Filtereinstellung  _________________________________________________________________________
