@@ -196,7 +196,11 @@
                     dropdownButtonDestAirport.selectAll("*").remove()
 
                     //_________Anzeigedaten korrigieren_________
-                    filteroption ==1? OrgAirport="*":filteroption==2?DestAirport="*":null;
+                    filteroption ==1? OrgAirport="*":filteroption==2?DestAirport="*":null
+                    if (filteroption==0){
+                        DestAirport="*"
+                        OrgAirport="*"
+                    }
                     
 
                     //_____________________Anlegen der neuen Dropdown Optionen _________________________________________________________________________    
