@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import json
 
 df = pd.read_csv("https://raw.githubusercontent.com/LauraKrone24/AbgabeDataVisualisation/master/AllFlightsJanuary.csv")
 #_____________________________________________________________________________________________
